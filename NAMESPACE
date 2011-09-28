@@ -1,0 +1,7 @@
+## Namespace for RXMCDA
+
+## Generics and functions defined in this package
+export(
+	"weightedSum"
+)
+
