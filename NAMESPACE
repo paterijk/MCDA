@@ -2,6 +2,9 @@
 
 ## Generics and functions defined in this package
 export(
-	"weightedSum"
+	"weightedSum",
+  "plotValueFunctions",
+  "UTA",
+  "applyValueFunctionsOnPerformanceTable"
 )
 
