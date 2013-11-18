@@ -6,8 +6,10 @@
 \description{Elicit a general additive value function from a ranking of alternatives.}
 
 \usage{
-additiveValueFunctionElicitation(performanceTable, alternativesRanks, criteriaMinMax, epsilon, 
-    alternativesIDs = NULL, criteriaIDs = NULL)
+additiveValueFunctionElicitation(performanceTable, alternativesRanks, 
+                                  criteriaMinMax, epsilon, 
+                                  alternativesIDs = NULL, 
+                                  criteriaIDs = NULL)
 }
 
 \arguments{
@@ -27,6 +29,10 @@ additiveValueFunctionElicitation(performanceTable, alternativesRanks, criteriaMi
   \item{ranks}{The ranks of the alternatives obtained via the elicited value functions. Ties method = "min".}
   \item{Kendall}{Kendall's tau between the input ranking and the one obtained via the elicited value functions.}
   \item{errors}{The errors (sigma) which have to be added to the overall values of the alternatives in order to respect the input ranking.}
+}
+
+\references{
+Based on the UTA algorithm (E. Jacquet-Lagreze, J. Siskos, Assessing a set of additive utility functions for multicriteria decision-making, the UTA method, European Journal of Operational Research, Volume 10, Issue 2, 151--164, June 1982) except that the breakpoints of the value functions are the actual performances of the alternatives on the criteria. 
 }
 
 \examples{
@@ -85,7 +91,8 @@ criteriaMinMax <- c("max","min","min","max","max","min")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-x<-additiveValueFunctionElicitation(performanceTable, alternativesRanks, criteriaMinMax, epsilon)
+x<-additiveValueFunctionElicitation(performanceTable, alternativesRanks, 
+                                      criteriaMinMax, epsilon)
 
 }
 

@@ -39,6 +39,10 @@ UTA(performanceTable, alternativesRanks, criteriaMinMax,
   \item{averageValueFunctionsPO}{In case a post-optimality analysis is performed, average value functions respecting the input ranking, else NULL.}
 }
 
+\references{
+E. Jacquet-Lagreze, J. Siskos, Assessing a set of additive utility functions for multicriteria decision-making, the UTA method, European Journal of Operational Research, Volume 10, Issue 2, 151--164, June 1982.
+}
+
 \examples{
 # the separation threshold
 
@@ -226,7 +230,8 @@ x<-UTA(performanceTable, alternativesRanks, criteriaMinMax,
 
 # plot the value functions obtained
 
-plotPiecewiseLinearValueFunctions(x$valueFunctions, criteriaIDs = c("MaximalSpeed","Price"))
+plotPiecewiseLinearValueFunctions(x$valueFunctions, 
+                                  criteriaIDs = c("MaximalSpeed","Price"))
 
 # apply the value functions on the original performance table
 
