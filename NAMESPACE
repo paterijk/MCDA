@@ -2,10 +2,14 @@
 
 ## Generics and functions defined in this package
 export(
-	"weightedSum",
-  "plotPiecewiseLinearValueFunctions",
+  "additiveValueFunctionElicitation",
   "UTA",
+  "UTASTAR",
+  "weightedSum",
+  
   "applyValueFunctionsOnPerformanceTable",
-  "additiveValueFunctionElicitation"
+  
+  "plotPiecewiseLinearValueFunctions"
+  
 )
 
