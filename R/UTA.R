@@ -37,7 +37,7 @@
 #
 ##############################################################################
 
-UTA <- function(performanceTable, alternativesRanks, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon, criteriaLBs=NULL, criteriaUBs=NULL, alternativesIDs = NULL, criteriaIDs = NULL){
+UTA <- function(performanceTable, alternativesRanks, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon, criteriaLBs=NULL, criteriaUBs=NULL, alternativesIDs = NULL, criteriaIDs = NULL, kPostOptimality = NULL){
 	
 	## check the input data
   
@@ -406,8 +406,6 @@ UTA <- function(performanceTable, alternativesRanks, criteriaMinMax, criteriaNum
   # the ranks of the alternatives 
   
 	outRanks <- rank(-overallValues, ties.method="min")
-  
-	# -------------------------------------------------------
 	
 	# -------------------------------------------------------
 	
@@ -420,11 +418,83 @@ UTA <- function(performanceTable, alternativesRanks, criteriaMinMax, criteriaNum
 	
 	out <- list(optimum = lpSolution$optimum, valueFunctions = valueFunctions, overallValues = overallValues, ranks = outRanks, errors = errorValues, Kendall = tau)
 	
-#   print(a)
-#   print(criteriaBreakPoints)
-#   print(mat)
-#   print(dir)
-#   print(rhs)
+  
+	# -------------------------------------------------------
+  
+  # post-optimality analysis if the optimum is found and if kPostOptimality is not NULL, i.e. the solution space is not empty
+  
+	minWeights <- NULL
+	maxWeights <- NULL
+	averageValueFunctions <- NULL
+  
+  
+  if (!is.null(kPostOptimality) && (lpSolution$optimum == 0)){
+    
+    # add F \leq F* + k(F*) to the constraints, where F* is the optimum and k(F*) is a positive threshold, which is a small proportion of F*
+    
+    mat <- rbind(mat,obj)
+    dir <- c(dir,"<=")
+    rhs <- c(rhs,kPostOptimality)
+    
+    minWeights <- c()
+    maxWeights <- c()
+    combinedSolutions <- c()
+    
+    for (i in 1:numCrit){
+    
+      # first maximize the best ui for each criterion, then minimize it
+      # this gives the interval of variation for each weight
+      # the objective function : the first elements correspond to the ui's, the last one to the sigmas
+
+      obj<-rep(0,sum(criteriaNumberOfBreakPoints))
+      obj<-c(obj,rep(0,numAlt))
+
+      if (i==1)
+        pos <- criteriaNumberOfBreakPoints[i]
+      else
+        pos<-sum(criteriaNumberOfBreakPoints[1:(i-1)])+criteriaNumberOfBreakPoints[i]
+
+      obj[pos] <- 1
+      
+      lpSolutionMin <- Rglpk_solve_LP(obj, mat, dir, rhs)
+      lpSolutionMax <- Rglpk_solve_LP(obj, mat, dir, rhs, max=TRUE)
+      
+      minWeights <- c(minWeights,lpSolutionMin$optimum)
+      maxWeights <- c(maxWeights,lpSolutionMax$optimum)
+      combinedSolutions <- rbind(combinedSolutions,lpSolutionMin$solution)
+      combinedSolutions <- rbind(combinedSolutions,lpSolutionMax$solution)
+    }
+    
+    names(minWeights) <- colnames(performanceTable)
+    names(maxWeights) <- colnames(performanceTable)
+    
+    # calculate the average value function, for which each component is the average value obtained for each of the programs above
+    averageSolution <- apply(combinedSolutions,2,mean)
+    
+    # create a structure containing the average value functions
+    
+    averageValueFunctions <- list()
+    
+    for (i in 1:length(criteriaNumberOfBreakPoints)){
+      tmp <- c() 
+      if (i==1)
+        pos <- 0
+      else
+        pos<-sum(criteriaNumberOfBreakPoints[1:(i-1)])
+      for (j in 1:criteriaNumberOfBreakPoints[i]){
+        tmp <- c(tmp,averageSolution[pos+j])
+      }
+      tmp<-rbind(criteriaBreakPoints[[i]],tmp)
+      colnames(tmp)<- NULL
+      rownames(tmp) <- c("x","y")
+      averageValueFunctions <- c(averageValueFunctions,list(tmp))
+    }
+    
+    names(averageValueFunctions) <- colnames(performanceTable)
+    
+  }
+  
+	out <- c(out, list(minimumWeightsPO = minWeights, maximumWeightsPO = maxWeights, averageValueFunctionsPO = averageValueFunctions))
   
 	return(out)
 }

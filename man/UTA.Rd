@@ -9,7 +9,8 @@
 UTA(performanceTable, alternativesRanks, criteriaMinMax, 
     criteriaNumberOfBreakPoints, epsilon, 
     criteriaLBs=NULL, criteriaUBs=NULL,
-    alternativesIDs = NULL, criteriaIDs = NULL)
+    alternativesIDs = NULL, criteriaIDs = NULL,
+    kPostOptimality = NULL)
 }
 
 \arguments{
@@ -22,6 +23,7 @@ UTA(performanceTable, alternativesRanks, criteriaMinMax,
   \item{criteriaUBs}{Vector containing the upper bounds of the criteria to be considered for the elicitation of the value functions. If not specified, the upper bounds present in the performance table are taken.}
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
+  \item{kPostOptimality}{A small positive threshold used to make the postoptimality analysis (see article on UTA by Siskos and Lagreze in EJOR, 1982)}
   }
 
 \value{
@@ -32,6 +34,9 @@ UTA(performanceTable, alternativesRanks, criteriaMinMax,
   \item{ranks}{The ranks of the alternatives obtained via the elicited value functions. Ties method = "min".}
   \item{Kendall}{Kendall's tau between the input ranking and the one obtained via the elicited value functions.}
   \item{errors}{The errors (sigma) which have to be added to the overall values of the alternatives in order to respect the input ranking.}
+  \item{minimumWeightsPO}{In case a post-optimality analysis is performed, the minimal weight of each criterion, else NULL.}
+  \item{maximumWeightsPO}{In case a post-optimality analysis is performed, the maximal weight of each criterion, else NULL.}
+  \item{averageValueFunctionsPO}{In case a post-optimality analysis is performed, average value functions respecting the input ranking, else NULL.}
 }
 
 \examples{
@@ -183,6 +188,32 @@ weights<-c(1,1,1,1,1,1)
 names(weights)<-colnames(performanceTable)
 
 weightedSum(transformedPerformanceTable,c(1,1,1,1,1,1))
+
+# the same analysis with less extreme value functions from the post-optimality analysis
+
+x<-UTA(performanceTable, alternativesRanks, criteriaMinMax, 
+        criteriaNumberOfBreakPoints, epsilon, 
+        criteriaLBs = criteriaLBs, criteriaUBs = criteriaUBs, kPostOptimality = 0.01)
+        
+# plot the value functions obtained
+
+plotPiecewiseLinearValueFunctions(x$averageValueFunctionsPO)
+
+# apply the value functions on the original performance table
+
+transformedPerformanceTable <- applyValueFunctionsOnPerformanceTable(
+      x$averageValueFunctionsPO, 
+      performanceTable, 
+      criteriaMinMax)
+
+# calculate the overall score of each alternative
+
+weights<-c(1,1,1,1,1,1)
+
+names(weights)<-colnames(performanceTable)
+
+weightedSum(transformedPerformanceTable,c(1,1,1,1,1,1))
+
 
 # ----------------------------------------
 # Let us consider only 2 criteria : Price and MaximalSpeed. What happens ? 
