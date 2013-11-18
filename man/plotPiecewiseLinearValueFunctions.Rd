@@ -1,12 +1,12 @@
-\name{plotValueFunctions}
-\alias{plotValueFunctions}
+\name{plotPiecewiseLinearValueFunctions}
+\alias{plotPiecewiseLinearValueFunctions}
 
-\title{Function to plot value functions.}
+\title{Function to plot piecewise linear value functions.}
 
-\description{Plots value function.}
+\description{Plots piecewise linear value function.}
 
 \usage{
-plotValueFunctions(valueFunctions, criteriaIDs = NULL)
+plotPiecewiseLinearValueFunctions(valueFunctions, criteriaIDs = NULL)
 }
 
 \arguments{
@@ -26,7 +26,7 @@ v<-list(
 
 # plot the value functions
 
-plotValueFunctions(v)
+plotPiecewiseLinearValueFunctions(v)
 }
 
 \keyword{methods}

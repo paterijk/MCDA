@@ -37,7 +37,7 @@
 #
 ##############################################################################
 
-plotValueFunctions <- function(valueFunctions, criteriaIDs = NULL){
+plotPiecewiseLinearValueFunctions <- function(valueFunctions, criteriaIDs = NULL){
 	
 	## check the input data
   
