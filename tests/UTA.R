@@ -37,7 +37,7 @@ names(criteriaNumberOfBreakPoints) <- colnames(performanceTable)
 
 x<-UTA(performanceTable, alternativesRanks, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon)
 
-stopifnot(x$Kendall$tau[1] ==1)
+stopifnot(x$Kendall ==1)
 
 x<-UTA(performanceTable, alternativesRanks, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon, criteriaIDs = c("Price", "Time"), alternativesIDs = c("METRO1","METRO2","TAXI"))
 

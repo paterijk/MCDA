@@ -75,7 +75,7 @@ x<-UTA(performanceTable, alternativesRanks, criteriaMinMax,
 
 # plot the value functions obtained
 
-plotValueFunctions(x$valueFunctions)
+plotPiecewiseLinearValueFunctions(x$valueFunctions)
 
 # apply the value functions on the original performance table
 
@@ -167,7 +167,7 @@ x<-UTA(performanceTable, alternativesRanks, criteriaMinMax,
 
 # plot the value functions obtained
 
-plotValueFunctions(x$valueFunctions)
+plotPiecewiseLinearValueFunctions(x$valueFunctions)
 
 # apply the value functions on the original performance table
 
@@ -195,7 +195,7 @@ x<-UTA(performanceTable, alternativesRanks, criteriaMinMax,
 
 # plot the value functions obtained
 
-plotValueFunctions(x$valueFunctions, criteriaIDs = c("MaximalSpeed","Price"))
+plotPiecewiseLinearValueFunctions(x$valueFunctions, criteriaIDs = c("MaximalSpeed","Price"))
 
 # apply the value functions on the original performance table
 

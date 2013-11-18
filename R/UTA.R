@@ -409,11 +409,17 @@ UTA <- function(performanceTable, alternativesRanks, criteriaMinMax, criteriaNum
   
 	# -------------------------------------------------------
 	
-  
-  # prepare the output
-  
-  out <- list(optimum = lpSolution$optimum, valueFunctions = valueFunctions, overallValues = overallValues, ranks = outRanks, errors = errorValues, Kendall = Kendall(alternativesRanks,outRanks))
-  
+	# -------------------------------------------------------
+	
+	if (numAlt >= 3)
+	  tau = Kendall(alternativesRanks,outRanks)$tau[1]
+	else
+	  tau = NULL
+	
+	# prepare the output
+	
+	out <- list(optimum = lpSolution$optimum, valueFunctions = valueFunctions, overallValues = overallValues, ranks = outRanks, errors = errorValues, Kendall = tau)
+	
 #   print(a)
 #   print(criteriaBreakPoints)
 #   print(mat)
