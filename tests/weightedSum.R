@@ -14,6 +14,6 @@ overall1 <- weightedSum(performanceTable, weights)
 
 overall2 <- weightedSum(performanceTable, weights, alternativesIDs <- c("x2","x3"), criteriaIDs <- c("g2","g3"))
 
-stopifnot(dim(overall2) == c(2,1))
+stopifnot(length(overall2) == 2)
 
 

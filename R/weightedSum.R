@@ -1,13 +1,13 @@
 #############################################################################
 #
-# Copyright Institut Télécom-Télécom Bretagne, 2011
+# Copyright Institut Télécom-Télécom Bretagne, 2013
 #
 # Contributors:
 #   Patrick Meyer <patrick.meyer@telecom-bretagne.eu>
 #   Sebastien Bigaret <sebastien.bigaret@telecom-bretagne.eu>
 #		
-# This software, MCDA, is a library to for the R statistical software which 
-# allows you to use MCDA algorithms and methods. 
+# This software, MCDA, is a package for the R statistical software which 
+# allows to use MCDA algorithms and methods. 
 # 
 # This software is governed by the CeCILL license (v2) under French law
 # and abiding by the rules of distribution of free software. You can
@@ -69,10 +69,10 @@ weightedSum <- function(performanceTable, criteriaWeights, alternativesIDs = NUL
 	for (i in 1:dim(performanceTable)[1]){
 		out<-rbind(out, crossprod(performanceTable[i,],criteriaWeights))
 	}
-	
-	row.names(out) <- row.names(performanceTable)
-	
-	colnames(out) <- c("weighted sum")
+  
+	out<-as.vector(out)
+  
+  names(out) <- rownames(performanceTable)
 	
 	return(out)
 }

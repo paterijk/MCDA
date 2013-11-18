@@ -6,7 +6,8 @@
 \description{Computes the weighted sum of the evaluations of alternatives, stored in a performance table, with respect to a vector of criteria weights.}
 
 \usage{
-weightedSum(performanceTable, criteriaWeights, alternativesIDs = NULL, criteriaIDs = NULL)
+weightedSum(performanceTable, criteriaWeights, 
+      alternativesIDs = NULL, criteriaIDs = NULL)
 }
 
 \arguments{
@@ -17,7 +18,7 @@ weightedSum(performanceTable, criteriaWeights, alternativesIDs = NULL, criteriaI
   }
 
 \value{
-  The function returns a matrix containing the weighted sum of the alternatives with respect to the criteria weights. 
+  The function returns a vector containing the weighted sum of the alternatives with respect to the criteria weights. 
 }
 
 \examples{
@@ -33,7 +34,8 @@ names(weights) <- c("g1","g2","g3")
 
 overall1 <- weightedSum(performanceTable, weights)
 
-overall2 <- weightedSum(performanceTable, weights, alternativesIDs <- c("x2","x3"), criteriaIDs <- c("g2","g3"))
+overall2 <- weightedSum(performanceTable, weights, 
+      alternativesIDs <- c("x2","x3"), criteriaIDs <- c("g2","g3"))
 }
 
 \keyword{methods}
