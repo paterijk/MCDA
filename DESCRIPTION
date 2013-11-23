@@ -5,7 +5,7 @@ Title: MCDA
 Author: Patrick Meyer, Sebastien Bigaret.  
 Maintainer: Patrick Meyer <patrick.meyer@telecom-bretagne.eu>
 Description: The MCDA library for the R statistical software allows you to use MCDA methods and functions in R. 
-Depends: R(>= 2.1.0), methods, Rglpk, Kendall
+Depends: R(>= 2.1.0), methods, Rglpk, Kendall, glpkAPI
 Suggests: kappalab
 Encoding: utf8
 License: CeCILL-2

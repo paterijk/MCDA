@@ -3,6 +3,8 @@
 ## Generics and functions defined in this package
 export(
   "additiveValueFunctionElicitation",
+  "ElectreTRIBM",
+  "ElectreTRIBMInference",
   "UTA",
   "UTASTAR",
   "weightedSum",
