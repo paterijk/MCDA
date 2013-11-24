@@ -5,6 +5,7 @@ export(
   "additiveValueFunctionElicitation",
   "ElectreTRIBM",
   "ElectreTRIBMInference",
+  "ElectreTRIBMIdentifyIncompatibleAssignments",
   "UTA",
   "UTASTAR",
   "weightedSum",

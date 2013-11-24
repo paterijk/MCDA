@@ -1,0 +1,80 @@
+/* ************************ */
+/* ****** parameters ****** */
+/* ************************ */
+/* alternatives */
+param X;
+/* criteria */
+param F;
+/* criteria preference direction*/
+param Fdir{i in 1..F};
+/* criteria min*/
+param Fmin{i in 1..F};
+/* criteria max*/
+param Fmax{i in 1..F};
+/* categories */
+param K;
+/* assignments */
+param A{x in 1..X};
+/* performance table - alternatives */
+param PTx{x in 1..X, i in 1..F};
+/* big M */
+param M{i in 1..F};
+/* separation for inequalities and parameters */
+param gamma;
+/* big B */
+param B;
+/* *********************** */
+/* ****** variables ****** */
+/* *********************** */
+/* majority threshold */
+var lambda >= 0.5, <= 1;
+/* weights */
+var w{i in 1..F} >=0, <=1;
+/* performance table - profiles */
+var PTk{k in 1..(K+1), i in 1..F};
+/* on off variables to remove constraints */
+var OnOff{x in 1..X} binary;
+/* local concordance to upper profile */
+var lCupp{x in 1..X, i in 1..F} binary;
+/* local concordance to lower profile */
+var lClow{x in 1..X, i in 1..F} binary;
+/* weighted local concordance to upper profile */
+var wlCupp{x in 1..X, i in 1..F};
+/* weighted local concordance to lower profile */
+var wlClow{x in 1..X, i in 1..F};
+/* profile separation */
+var ksep >=0;
+/* ******************************** */
+/* ****** objective function ****** */
+/* ******************************** */
+minimize obj: sum{x in 1..X} (OnOff[x]);
+/* ************************* */
+/* ****** constraints ****** */
+/* ************************* */
+/* normalized weights */
+s.t. normalisedWeights: sum{i in 1..F} w[i] = 1;
+/* constraints on the local concordance */
+s.t. lCupp1{x in 1..X, i in 1.. F}: Fdir[i] * 1/M[i] * (PTx[x,i] - PTk[A[x],i]) + gamma <= lCupp[x,i];
+s.t. lCupp2{x in 1..X, i in 1.. F}: lCupp[x,i] <= Fdir[i] * 1/M[i] * (PTx[x,i] - PTk[A[x],i]) + 1;
+s.t. lClow1{x in 1..X, i in 1.. F}: Fdir[i] * 1/M[i] * (PTx[x,i] - PTk[A[x]+1,i]) + gamma <= lClow[x,i];
+s.t. lClow2{x in 1..X, i in 1.. F}: lClow[x,i] <= Fdir[i] * 1/M[i] * (PTx[x,i] - PTk[A[x]+1,i]) + 1;
+/* constraints on the weighted local concordance */
+s.t. wlCupp1{x in 1..X, i in 1..F}: wlCupp[x,i] <= w[i];
+s.t. wlCupp2{x in 1..X, i in 1..F}: 0 <= wlCupp[x,i];
+s.t. wlCupp3{x in 1..X, i in 1..F}: wlCupp[x,i] <= lCupp[x,i];
+s.t. wlCupp4{x in 1..X, i in 1..F}: lCupp[x,i] + w[i] - 1 <= wlCupp[x,i];
+s.t. wlClow1{x in 1..X, i in 1..F}: wlClow[x,i] <= w[i];
+s.t. wlClow2{x in 1..X, i in 1..F}: 0 <= wlClow[x,i];
+s.t. wlClow3{x in 1..X, i in 1..F}: wlClow[x,i] <= lClow[x,i];
+s.t. wlClow4{x in 1..X, i in 1..F}: lClow[x,i] + w[i] - 1 <= wlClow[x,i];
+/* dominance between profiles */
+s.t. dominance{k in 1..K, i in 1..F}: Fdir[i] * PTk[(k+1),i] + gamma <= Fdir[i] * PTk[k,i] - ksep * (Fmax[i]-Fmin[i]); 
+/* min and max of profiles evaluations */
+s.t. minprofile1{k in 1..K+1, i in 1..F}: Fmin[i] - ksep * (Fmax[i]-Fmin[i])- gamma <= PTk[k,i];
+s.t. maxprofile1{k in 1..K+1, i in 1..F}: PTk[k,i] <= Fmax[i] + gamma + ksep * (Fmax[i]-Fmin[i]);
+/* alternative outranks lower profile */
+s.t. Slow{x in 1..X}: lambda - B*OnOff[x] <= sum{i in 1..F} wlClow[x,i];
+/* alternative does not outrank upper profile */
+s.t. Supp{x in 1..X}: sum{i in 1..F} wlCupp[x,i] + gamma <= lambda + B*OnOff[x];
+
+
