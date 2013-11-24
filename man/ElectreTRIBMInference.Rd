@@ -23,8 +23,6 @@ ElectreTRIBMInference(performanceTable, assignments,
 
 \value{
   The function returns NULL if there is a problem, or a list structured as follows :
-  
-  lambda = lambda, epsilon = epsilon, weights = weights, profilesPerformances = profilesPerformances)
   \item{lambda}{The majority threshold.}
   \item{epsilon}{The minimal percentage of difference between two evaluations of two consecutive profiles. This value has been maximized to separate the profiles as much as possible.}
   \item{weights}{A vector containing the weights of the criteria. The elements are named according to the criteria IDs.}
@@ -56,9 +54,15 @@ performanceTable <- rbind(
 
 colnames(performanceTable) <- c("dcu","dep","dsf","dca","dsa","dda")
 
-rownames(performanceTable) <- c("a1","a2","a3","a4","a5","a6","a7","a8","a9","a10","a11","a12","a13")
+rownames(performanceTable) <- c("a1","a2","a3",
+                                "a4","a5","a6",
+                                "a7","a8","a9",
+                                "a10","a11","a12","a13")
 
-assignments <-c("valide","valide","valide","valide","avecReserve","avecReserve","avecReserve","avecReserve","nonValide","nonValide","nonValide","nonValide","nonValide")
+assignments <-c("valide","valide","valide","valide",
+                "avecReserve","avecReserve","avecReserve",
+                "avecReserve","nonValide","nonValide",
+                "nonValide","nonValide","nonValide")
 
 names(assignments) <- rownames(performanceTable)
 
@@ -70,7 +74,11 @@ criteriaMinMax <- c("max","max","max","max","max","max")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-x<-ElectreTRIBMInference(performanceTable, assignments, categoriesRanks, criteriaMinMax, alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7","a8","a9","a10","a11","a12","a13"))
+x<-ElectreTRIBMInference(performanceTable, assignments, 
+                        categoriesRanks, criteriaMinMax, 
+                        alternativesIDs = c("a1","a2","a3",
+                        "a4","a5","a6","a7","a8","a9",
+                        "a10","a11","a12","a13"))
 
 ElectreAssignments <- ElectreTRIBM(performanceTable, x$profilesPerformances, 
                                  x$weights, criteriaMinMax, x$lambda)

@@ -37,7 +37,7 @@ colnames(performanceTable) <- c(
   "Space",
   "Price")
 
-assignments <-c("Good","Good","Good","Medium","Medium","Medium","Medium","Bad","Bad","Bad")
+assignments <-c("Bad","Good","Good","Medium","Medium","Medium","Medium","Bad","Bad","Bad")
 
 names(assignments) <- rownames(performanceTable)
 
@@ -49,10 +49,10 @@ criteriaMinMax <- c("max","min","min","max","max","min")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-x<-ElectreTRIBMInference(performanceTable, assignments, categoriesRanks, criteriaMinMax, criteriaIDs = c("HP","Space","Price","MaximalSpeed","ConsumptionTown"))
+x<-ElectreTRIBMInference(performanceTable, assignments, categoriesRanks, criteriaMinMax)
 
 ElectreAssignments<-ElectreTRIBM(performanceTable, x$profilesPerformances, 
-                        x$weights, criteriaMinMax, x$lambda, criteriaIDs = c("HP","Space","Price","MaximalSpeed","ConsumptionTown"))
+                        x$weights, criteriaMinMax, x$lambda)
 
 print(all(ElectreAssignments == assignments))
 

@@ -73,4 +73,5 @@ s.t. Slow{x in 1..X}: lambda <= sum{i in 1..F} wlClow[x,i];
 /* alternative does not outrank upper profile */
 s.t. Supp{x in 1..X}: sum{i in 1..F} wlCupp[x,i] + gamma <= lambda;
 
+solve;
 

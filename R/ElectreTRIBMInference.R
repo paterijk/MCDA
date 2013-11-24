@@ -184,12 +184,12 @@ ElectreTRIBMInference <- function(performanceTable, assignments, categoriesRanks
   
   cat("param gamma:=0.01;\n")
   
-  cat("end;")
+  cat("end;\n")
   sink()
   
-  lp<-initProbGLPK(ptrtype = "glpk_prob")
+  lp<-initProbGLPK()
   
-  tran<-mplAllocWkspGLPK(ptrtype = "tr_wksp")
+  tran<-mplAllocWkspGLPK()
   
   setMIPParmGLPK(PRESOLVE, GLP_ON)
   
@@ -204,34 +204,59 @@ ElectreTRIBMInference <- function(performanceTable, assignments, categoriesRanks
     mplBuildProbGLPK(tran,lp)
   else 
     stop(return_codeGLPK(out))
-  
-#   if (is.null(out))
-#     solveSimplexGLPK(lp)
-#   else 
-#     stop(return_codeGLPK(out))
-  
-  out<-solveMIPGLPK(lp)
+
+  solveMIPGLPK(lp)
   
   if(mipStatusGLPK(lp)==5){
     
+    mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
+    
     solution <- mipColsValGLPK(lp)
-    epsilon <- mipObjValGLPK(lp)
     
-    lambda <- solution[1]
+    varnames <- c()
     
-    weights <- solution[2:(2+numCrit-1)]
+    for (i in 1:length(solution))
+      varnames <- c(varnames,getColNameGLPK(lp,i))
+    
+    lambda <- solution[varnames=="lambda"]
+    
+    weightsnames <- c()
+    
+    for (i in 1:numCrit)
+    {
+      weightsnames <- c(weightsnames,paste("w[",i,"]",sep=""))
+    }
+    
+    weights <- c()
+    
+    for (i in 1:numCrit)
+      weights <- c(weights,solution[varnames==weightsnames[i]])
     
     names(weights) <- colnames(performanceTable)
     
-    b<-2+numCrit + numCrit
-    e<-2+numCrit + numCrit + numCat * numCrit -1
+    ptknames <- matrix(nrow=numCat,ncol=numCrit)
     
-    profilesPerformances <- matrix(solution[b:e],nrow=numCat,ncol=numCrit,byrow=TRUE)
+    for (i in 2:(numCat+1)){
+      for (j in 1:numCrit)
+      {
+        ptknames[i-1,j] <- paste("PTk[",i,",",j,"]",sep="")
+      }
+    }
     
+    profilesPerformances <- matrix(nrow=numCat,ncol=numCrit)
+    
+    for (i in 1:numCat){
+      for (j in 1:numCrit)
+        profilesPerformances[i,j] <- solution[varnames==ptknames[i,j]]
+    }
+    
+    rownames(profilesPerformances) <- names(categoriesRanks)
     colnames(profilesPerformances) <- colnames(performanceTable)
     
-    rownames(profilesPerformances) <- names(categoriesRanks)  
+    epsilon <- solution[varnames=="ksep"]
+    
     return(list(lambda = lambda, epsilon = epsilon, weights = weights, profilesPerformances = profilesPerformances))
+
   }
   else
     return(NULL)
