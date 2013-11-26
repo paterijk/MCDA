@@ -362,8 +362,6 @@ UTASTAR <- function(performanceTable, alternativesRanks, criteriaMinMax, criteri
   
 	lpSolution <- Rglpk_solve_LP(obj, mat, dir, rhs)
 	
-  print(lpSolution)
-	
 	# -------------------------------------------------------
 	
 	# create a structure containing the value functions
@@ -418,7 +416,7 @@ UTASTAR <- function(performanceTable, alternativesRanks, criteriaMinMax, criteri
 	
 	# prepare the output
 	
-	out <- list(optimum = lpSolution$optimum, valueFunctions = valueFunctions, overallValues = overallValues, ranks = outRanks, errors = list(sigmaPlus = errorValuesPlus, sigmaMinus = errorValuesMinus), Kendall = tau)
+	out <- list(optimum = round(lpSolution$optimum, digits=5), valueFunctions = valueFunctions, overallValues = round(overallValues, digits=5), ranks = outRanks, errors = list(sigmaPlus = round(errorValuesPlus, digits=5), sigmaMinus = round(errorValuesMinus, digits=5)), Kendall = tau)
 	
   
 	# -------------------------------------------------------

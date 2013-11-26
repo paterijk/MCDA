@@ -255,7 +255,7 @@ ElectreTRIBMInference <- function(performanceTable, assignments, categoriesRanks
     
     epsilon <- solution[varnames=="ksep"]
     
-    return(list(lambda = lambda, epsilon = epsilon, weights = weights, profilesPerformances = profilesPerformances))
+    return(list(lambda = round(lambda,digits=5), epsilon = round(epsilon,digits=5), weights = round(weights,digits=5), profilesPerformances = round(profilesPerformances,digits=5)))
 
   }
   else

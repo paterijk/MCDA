@@ -416,7 +416,7 @@ UTA <- function(performanceTable, alternativesRanks, criteriaMinMax, criteriaNum
 	
 	# prepare the output
 	
-	out <- list(optimum = lpSolution$optimum, valueFunctions = valueFunctions, overallValues = overallValues, ranks = outRanks, errors = errorValues, Kendall = tau)
+	out <- list(optimum = round(lpSolution$optimum, digits=5), valueFunctions = valueFunctions, overallValues = round(overallValues, digits=5), ranks = outRanks, errors = round(errorValues, digits=5), Kendall = tau)
 	
   
 	# -------------------------------------------------------
