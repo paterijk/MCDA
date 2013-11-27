@@ -1,9 +1,9 @@
 \name{additiveValueFunctionElicitation}
 \alias{additiveValueFunctionElicitation}
 
-\title{Function to elicit a general additive value function.}
+\title{Elicitation of a general additive value function.}
 
-\description{Elicit a general additive value function from a ranking of alternatives.}
+\description{Elicits a general additive value function from a ranking of alternatives.}
 
 \usage{
 additiveValueFunctionElicitation(performanceTable, alternativesRanks, 
@@ -24,9 +24,9 @@ additiveValueFunctionElicitation(performanceTable, alternativesRanks,
 \value{
   The function returns a list structured as follows : 
   \item{optimum}{The value of the objective function.}
-  \item{valueFunctions}{A list containing the value functions which have been determined.}
-  \item{overallValues}{The overall values of the input alternatives.}
-  \item{ranks}{The ranks of the alternatives obtained via the elicited value functions. Ties method = "min".}
+  \item{valueFunctions}{A list containing the value functions which have been determined. Each value function is defined by a matrix of breakpoints, where the first row corresponds to the abscissa (row labelled "x") and where the second row corresponds to the ordinate (row labelled "y").}
+  \item{overallValues}{A vector containing the overall values of the input alternatives.}
+  \item{ranks}{A vector containing the ranks of the alternatives obtained via the elicited value functions. Ties method = "min".}
   \item{Kendall}{Kendall's tau between the input ranking and the one obtained via the elicited value functions.}
   \item{errors}{The errors (sigma) which have to be added to the overall values of the alternatives in order to respect the input ranking.}
 }

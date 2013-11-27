@@ -10,7 +10,7 @@ plotPiecewiseLinearValueFunctions(valueFunctions, criteriaIDs = NULL)
 }
 
 \arguments{
-  \item{valueFunctions}{A list containing, for each criterion, the piecewise linear value functions defined by the coordinates of the break points.}
+  \item{valueFunctions}{A list containing, for each criterion, the piecewise linear value functions defined by the coordinates of the break points. Each value function is defined by a matrix of breakpoints, where the first row corresponds to the abscissa (row labelled "x") and where the second row corresponds to the ordinate (row labelled "y").}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
   }
 

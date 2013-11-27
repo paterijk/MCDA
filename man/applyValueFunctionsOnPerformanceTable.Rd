@@ -1,9 +1,9 @@
 \name{applyValueFunctionsOnPerformanceTable}
 \alias{applyValueFunctionsOnPerformanceTable}
 
-\title{Apply value functions on performance table.}
+\title{Applies value functions on a performance table.}
 
-\description{Transforms a performance table via given value functions.}
+\description{Transforms a performance table via given piecewise linear value functions.}
 
 \usage{
 applyValueFunctionsOnPerformanceTable(valueFunctions, performanceTable, 
@@ -13,7 +13,7 @@ applyValueFunctionsOnPerformanceTable(valueFunctions, performanceTable,
 
 
 \arguments{
-  \item{valueFunctions}{A list containing, for each criterion, the piecewise linear value functions defined by the coordinates of the break points.}
+  \item{valueFunctions}{A list containing, for each criterion, the piecewise linear value functions defined by the coordinates of the break points. Each value function is defined by a matrix of breakpoints, where the first row corresponds to the abscissa (row labelled "x") and where the second row corresponds to the ordinate (row labelled "y").}
   \item{performanceTable}{Matrix or data frame containing the performance table. Each row corresponds to an alternative, and each column to a criterion. Rows (resp. columns) must be named according to the IDs of the alternatives (resp. criteria).}
   \item{criteriaMinMax}{Vector containing the preference direction on each of the criteria. "min" (resp. "max") indicates that the criterion has to be minimized (maximized). The elements are named according to the IDs of the criteria.}
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
@@ -21,7 +21,7 @@ applyValueFunctionsOnPerformanceTable(valueFunctions, performanceTable,
 }
 
 \value{
-  The function returns a performance table which has been transformed throught the given value functions.
+  The function returns a performance table which has been transformed through the given value functions.
 }
 
 \examples{
