@@ -1,10 +1,10 @@
 #############################################################################
 #
-# Copyright Institut Télécom-Télécom Bretagne, 2013
+# Copyright Patrick Meyer and Sébastien Bigaret, 2013
 #
 # Contributors:
 #   Patrick Meyer <patrick.meyer@telecom-bretagne.eu>
-#   Sebastien Bigaret <sebastien.bigaret@telecom-bretagne.eu>
+#   Sébastien Bigaret <sebastien.bigaret@telecom-bretagne.eu>
 #    
 # This software, MCDA, is a package for the R statistical software which 
 # allows to use MCDA algorithms and methods. 
