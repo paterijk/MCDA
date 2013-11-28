@@ -49,20 +49,12 @@ criteriaMinMax <- c("max","min","min","max","max","min")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-# onoff<-ElectreTRIBMIdentifyIncompatibleAssignments(performanceTable, assignments, categoriesRanks, criteriaMinMax, criteriaIDs = c("HP","Space","Price","MaximalSpeed","ConsumptionTown"))
-
 onoff<-ElectreTRIBMIdentifyIncompatibleAssignments(performanceTable, assignments, categoriesRanks, criteriaMinMax, criteriaIDs = c("HP","Space"))
-
 
 filteredAlternativesIDs <- rownames(performanceTable)[!onoff$incompatibleAssignments]
 
-# x<-ElectreTRIBMInference(performanceTable, assignments, categoriesRanks, criteriaMinMax,  criteriaIDs = c("HP","Space","Price","MaximalSpeed","ConsumptionTown"), alternativesIDs = filteredAlternativesIDs)
-
 x<-ElectreTRIBMInference(performanceTable, assignments, categoriesRanks, criteriaMinMax,  criteriaIDs = c("HP","Space"), alternativesIDs = filteredAlternativesIDs)
 
- 
-# ElectreAssignments<-ElectreTRIBM(performanceTable, x$profilesPerformances, 
-#                         x$weights, criteriaMinMax, x$lambda, criteriaIDs = c("HP","Space","Price","MaximalSpeed","ConsumptionTown"), alternativesIDs = filteredAlternativesIDs)
 
 ElectreAssignments<-ElectreTRIBM(performanceTable, x$profilesPerformances, 
                                  x$weights, criteriaMinMax, x$lambda, criteriaIDs = c("HP","Space"), alternativesIDs = filteredAlternativesIDs)
