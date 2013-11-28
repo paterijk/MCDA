@@ -49,11 +49,29 @@ criteriaMinMax <- c("max","min","min","max","max","min")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-x<-ElectreTRIBMInference(performanceTable, assignments, categoriesRanks, criteriaMinMax)
+x<-ElectreTRIBMInference(performanceTable, assignments, categoriesRanks, 
+                         criteriaMinMax, alternativesIDs = c("Peugeot505GR",
+                                                        "CitroenVisaSuperE",
+                                                        "VWGolf1300GLS",
+                                                        "BMW520",
+                                                        "Volvo244DL")
+                         )
 
 ElectreAssignments<-ElectreTRIBM(performanceTable, x$profilesPerformances, 
-                        x$weights, criteriaMinMax, x$lambda)
+                        x$weights, criteriaMinMax, x$lambda,  alternativesIDs = c("Peugeot505GR",
+                                                                                  "CitroenVisaSuperE",
+                                                                                  "VWGolf1300GLS",
+                                                                                  "BMW520",
+                                                                                  "Volvo244DL"))
 
-print(all(ElectreAssignments == assignments))
+print(all(ElectreAssignments == assignments[c("Peugeot505GR",
+                                              "CitroenVisaSuperE",
+                                              "VWGolf1300GLS",
+                                              "BMW520",
+                                              "Volvo244DL")]))
 
-stopifnot(all(assignments == ElectreAssignments))
+stopifnot(all(assignments[c("Peugeot505GR",
+                            "CitroenVisaSuperE",
+                            "VWGolf1300GLS",
+                            "BMW520",
+                            "Volvo244DL")] == ElectreAssignments))
