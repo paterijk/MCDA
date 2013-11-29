@@ -6,8 +6,11 @@
 \description{Transforms a performance table via given piecewise linear value functions.}
 
 \usage{
-applyValueFunctionsOnPerformanceTable(valueFunctions, performanceTable, 
-              criteriaMinMax, alternativesIDs = NULL, criteriaIDs = NULL)
+applyValueFunctionsOnPerformanceTable(valueFunctions, 
+                                      performanceTable, 
+                                      criteriaMinMax, 
+                                      alternativesIDs = NULL, 
+                                      criteriaIDs = NULL)
 }
 
 

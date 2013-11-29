@@ -103,7 +103,7 @@ transformedPerformanceTable <- applyValueFunctionsOnPerformanceTable(
 weightedSum(transformedPerformanceTable,c(1,1,1))
 
 # ----------------------------------------
-# ranking some cars (from the original article on UTA by Siskos and Lagreze, 1982)
+# ranking some cars (from original article on UTA by Siskos and Lagreze, 1982)
 
 # the separation threshold
 
@@ -162,13 +162,13 @@ criteriaNumberOfBreakPoints <- c(5,4,4,5,4,5)
 
 names(criteriaNumberOfBreakPoints) <- colnames(performanceTable)
 
-# lower bounds of the criteria to be used for the determination of value functions
+# lower bounds of the criteria for the determination of value functions
 
 criteriaLBs=c(110,7,6,3,5,20000)
 
 names(criteriaLBs) <- colnames(performanceTable)
 
-# upper bounds of the criteria to be used for the determination of value functions
+# upper bounds of the criteria for the determination of value functions
 
 criteriaUBs=c(190,15,13,13,9,80000)
 
@@ -198,11 +198,14 @@ names(weights)<-colnames(performanceTable)
 
 weightedSum(transformedPerformanceTable,c(1,1,1,1,1,1))
 
-# the same analysis with less extreme value functions from the post-optimality analysis
+# the same analysis with less extreme value functions
+# from the post-optimality analysis
 
 x<-UTASTAR(performanceTable, alternativesRanks, criteriaMinMax, 
         criteriaNumberOfBreakPoints, epsilon, 
-        criteriaLBs = criteriaLBs, criteriaUBs = criteriaUBs, kPostOptimality = 0.01)
+        criteriaLBs = criteriaLBs, 
+        criteriaUBs = criteriaUBs, 
+        kPostOptimality = 0.01)
         
 # plot the value functions obtained
 

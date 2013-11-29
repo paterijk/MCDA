@@ -6,7 +6,8 @@
 \description{Plots piecewise linear value function.}
 
 \usage{
-plotPiecewiseLinearValueFunctions(valueFunctions, criteriaIDs = NULL)
+plotPiecewiseLinearValueFunctions(valueFunctions, 
+                                  criteriaIDs = NULL)
 }
 
 \arguments{

@@ -7,9 +7,12 @@
 preference thresholds attached to criteria. Only a binary discordance condition is considered, i.e. a veto forbids an outranking in any possible concordance situation, or not. This function searches for a set of minimal size which can be removed from the assignment examples in order to make the problem compatible again with this simplified Electre TRI model.}
 
 \usage{
-ElectreTRIBMIdentifyIncompatibleAssignments(performanceTable, assignments, 
-            categoriesRanks, criteriaMinMax, 
-            alternativesIDs = NULL, criteriaIDs = NULL)
+ElectreTRIBMIdentifyIncompatibleAssignments(performanceTable, 
+                                            assignments, 
+                                            categoriesRanks, 
+                                            criteriaMinMax, 
+                                            alternativesIDs = NULL, 
+                                            criteriaIDs = NULL)
 }
 
 \arguments{
@@ -34,7 +37,7 @@ of Operational Research, 178(1): 246--276, 2007.
 }
 
 \examples{
-# ranking some cars (from the original article on UTA by Siskos and Lagreze, 1982)
+# ranking some cars (from original article on UTA by Siskos and Lagreze, 1982)
 
 # the performance table
 
@@ -71,7 +74,8 @@ colnames(performanceTable) <- c(
   "Space",
   "Price")
 
-assignments <-c("Good","Bad","Good","Bad","Medium","Medium","Medium","Good","Bad","Good")
+assignments <-c("Good","Bad","Good","Bad","Medium","Medium",
+                "Medium","Good","Bad","Good")
 
 names(assignments) <- rownames(performanceTable)
 
@@ -83,15 +87,25 @@ criteriaMinMax <- c("max","min","min","max","max","min")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-onoff<-ElectreTRIBMIdentifyIncompatibleAssignments(performanceTable, assignments, categoriesRanks, criteriaMinMax, criteriaIDs = c("HP","Space"))
+onoff<-ElectreTRIBMIdentifyIncompatibleAssignments(performanceTable, 
+                                                    assignments, 
+                                                    categoriesRanks, 
+                                                    criteriaMinMax, 
+                                                    criteriaIDs = 
+                                                    c("HP","Space"))
 
-filteredAlternativesIDs <- rownames(performanceTable)[!onoff$incompatibleAssignments]
+filteredAlts <- rownames(performanceTable)[!onoff$incompatibleAssignments]
 
-x<-ElectreTRIBMInference(performanceTable, assignments, categoriesRanks, criteriaMinMax,  criteriaIDs = c("HP","Space"), alternativesIDs = filteredAlternativesIDs)
+x<-ElectreTRIBMInference(performanceTable, assignments, categoriesRanks, 
+                          criteriaMinMax,  
+                          criteriaIDs = c("HP","Space"), 
+                          alternativesIDs = filteredAlts)
 
 
 ElectreAssignments<-ElectreTRIBM(performanceTable, x$profilesPerformances, 
-                                 x$weights, criteriaMinMax, x$lambda, criteriaIDs = c("HP","Space"), alternativesIDs = filteredAlternativesIDs)
+                                x$weights, criteriaMinMax, x$lambda, 
+                                criteriaIDs = c("HP","Space"), 
+                                alternativesIDs = filteredAlts)
 
 }
 

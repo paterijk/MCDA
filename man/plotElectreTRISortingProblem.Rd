@@ -52,13 +52,13 @@ criteriaMinMax <- c("min","min","max")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-# lower bounds of the criteria to be used for the determination of value functions
+# lower bounds of the criteria for the determination of value functions
 
 criteriaLBs=c(0,5,0)
 
 names(criteriaLBs) <- colnames(performanceTable)
 
-# upper bounds of the criteria to be used for the determination of value functions
+# upper bounds of the criteria for the determination of value functions
 
 criteriaUBs=c(50,50,4)
 
@@ -70,8 +70,10 @@ criteriaWeights <- c(1,3,2)
 
 names(criteriaWeights) <- colnames(performanceTable)
 
-assignments <- assignments<-ElectreTRIBM(performanceTable, categoriesLowerProfiles, 
-                                         criteriaWeights, criteriaMinMax, 3)
+assignments <- assignments<-ElectreTRIBM(performanceTable, 
+                                          categoriesLowerProfiles, 
+                                          criteriaWeights, 
+                                          criteriaMinMax, 3)
 
 names(assignments) <- rownames(performanceTable)
 

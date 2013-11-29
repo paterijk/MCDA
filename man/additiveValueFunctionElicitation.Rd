@@ -38,7 +38,7 @@ Based on the UTA algorithm (E. Jacquet-Lagreze, J. Siskos, Assessing a set of ad
 \examples{
 
 # ----------------------------------------
-# ranking some cars (from the original article on UTA by Siskos and Lagreze, 1982)
+# ranking some cars (from original article on UTA by Siskos and Lagreze, 1982)
 
 # the separation threshold
 
