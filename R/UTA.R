@@ -86,6 +86,17 @@ UTA <- function(performanceTable, alternativesRanks, criteriaMinMax, criteriaNum
 	  criteriaLBs <- criteriaLBs[criteriaIDs]
 	}
   
+	# only the alternatives which are in the ranking should be considered for the calculation
+	
+	reallyActiveAlternatives <- intersect(rownames(performanceTable),names(alternativesRanks))
+	
+	if (length(reallyActiveAlternatives) != 0){
+	  performanceTable <- performanceTable[reallyActiveAlternatives,]
+	  alternativesRanks <- alternativesRanks[reallyActiveAlternatives]
+	} else {
+	  stop("alternatives of alternativesRanks are not compatible with those of performanceTable")
+	}
+  
   # data is filtered, check for some data consistency
   
   # are the upper and lower bounds given in the function compatible with the data in the performance table ?

@@ -67,7 +67,18 @@ additiveValueFunctionElicitation <- function(performanceTable, alternativesRanks
 	  criteriaMinMax <- criteriaMinMax[criteriaIDs]
 	  performanceTable <- performanceTable[,criteriaIDs]
 	}
-    
+  
+  # only the alternatives which are in the ranking should be considered for the calculation
+  
+  reallyActiveAlternatives <- intersect(rownames(performanceTable),names(alternativesRanks))
+  
+  if (length(reallyActiveAlternatives) != 0){
+    performanceTable <- performanceTable[reallyActiveAlternatives,]
+    alternativesRanks <- alternativesRanks[reallyActiveAlternatives]
+  } else {
+    stop("alternatives of alternativesRanks are not compatible with those of performanceTable")
+  }
+  
   # data is filtered, check for some data consistency
     
   # if there are less than 2 criteria or 2 alternatives, there is no MCDA problem
