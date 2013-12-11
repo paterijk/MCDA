@@ -10,7 +10,7 @@ export(
   "UTASTAR",
   "weightedSum",
   
-  "applyValueFunctionsOnPerformanceTable",
+  "applyPiecewiseLinearValueFunctionsOnPerformanceTable",
   
   "plotPiecewiseLinearValueFunctions",
   "plotElectreTRISortingProblem"
