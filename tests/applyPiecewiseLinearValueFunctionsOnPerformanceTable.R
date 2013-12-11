@@ -31,7 +31,7 @@ names(criteriaMinMax) <- colnames(performanceTable)
 
 # the transformed performance table
 
-normalizedPerformanceTable <- applyValueFunctionsOnPerformanceTable(v,performanceTable, criteriaMinMax)
+normalizedPerformanceTable <- applyPiecewiseLinearValueFunctionsOnPerformanceTable(v,performanceTable, criteriaMinMax)
 
 correctResult <- rbind(c(0.08125,0.9,0),
                        c(0.075,0.025,0.0125),

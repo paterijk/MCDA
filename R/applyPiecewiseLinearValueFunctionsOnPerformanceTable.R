@@ -37,7 +37,7 @@
 #
 ##############################################################################
 
-applyValueFunctionsOnPerformanceTable <- function(valueFunctions, performanceTable, criteriaMinMax, alternativesIDs = NULL, criteriaIDs = NULL){
+applyPiecewiseLinearValueFunctionsOnPerformanceTable <- function(valueFunctions, performanceTable, criteriaMinMax, alternativesIDs = NULL, criteriaIDs = NULL){
 	
 	## check the input data
   

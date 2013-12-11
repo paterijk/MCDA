@@ -1,12 +1,12 @@
-\name{applyValueFunctionsOnPerformanceTable}
-\alias{applyValueFunctionsOnPerformanceTable}
+\name{applyPiecewiseLinearValueFunctionsOnPerformanceTable}
+\alias{applyPiecewiseLinearValueFunctionsOnPerformanceTable}
 
 \title{Applies value functions on a performance table.}
 
 \description{Transforms a performance table via given piecewise linear value functions.}
 
 \usage{
-applyValueFunctionsOnPerformanceTable(valueFunctions, 
+applyPiecewiseLinearValueFunctionsOnPerformanceTable(valueFunctions, 
                                       performanceTable, 
                                       criteriaMinMax, 
                                       alternativesIDs = NULL, 
@@ -60,7 +60,7 @@ names(criteriaMinMax) <- colnames(performanceTable)
 
 # the transformed performance table
 
-applyValueFunctionsOnPerformanceTable(v,performanceTable, criteriaMinMax)
+applyPiecewiseLinearValueFunctionsOnPerformanceTable(v,performanceTable, criteriaMinMax)
 }
 
 \keyword{methods}
