@@ -35,10 +35,27 @@ criteriaNumberOfBreakPoints <- c(3,4,4)
 
 names(criteriaNumberOfBreakPoints) <- colnames(performanceTable)
 
-x<-UTASTAR(performanceTable, alternativesRanks, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon)
+x1<-UTASTAR(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon, alternativesRanks = alternativesRanks)
 
-stopifnot(x$Kendall ==1)
+stopifnot(x1$Kendall ==1)
 
-x<-UTASTAR(performanceTable, alternativesRanks, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon, criteriaIDs = c("Price", "Time"), alternativesIDs = c("METRO1","METRO2","TAXI"))
+# let us try the same with the pairwise preferences to test if the results
+# are the same
 
-stopifnot(x$overallValues[1] == x$overallValues[1])
+alternativesPreferences<-rbind(c("RER","METRO1"),
+                               c("METRO2","BUS"),
+                               c("BUS","TAXI"))
+
+alternativesIndifferences<-rbind(c("METRO1","METRO2"))
+
+x1prime <- UTASTAR(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon, alternativesPreferences = alternativesPreferences, alternativesIndifferences = alternativesIndifferences)
+
+stopifnot(all(x1$valueFunctions$Price == x1prime$valueFunctions$Price) && all(x1$valueFunctions$Time == x1prime$valueFunctions$Time) && all(x1$valueFunctions$Comfort == x1prime$valueFunctions$Comfort))
+
+# now some filtering
+
+x2<-UTASTAR(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon, alternativesRanks = alternativesRanks, criteriaIDs = c("Price", "Time"), alternativesIDs = c("METRO1","METRO2","TAXI"))
+
+stopifnot(x2$overallValues[1] == x2$overallValues[2])
+
+
