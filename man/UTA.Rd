@@ -6,8 +6,11 @@
 \description{Elicits value functions from a ranking of alternatives, according to the UTA method.}
 
 \usage{
-UTA(performanceTable, alternativesRanks, criteriaMinMax, 
+UTA(performanceTable, criteriaMinMax, 
     criteriaNumberOfBreakPoints, epsilon, 
+    alternativesRanks = NULL,
+    alternativesPreferences = NULL,
+    alternativesIndifferences = NULL,
     criteriaLBs=NULL, criteriaUBs=NULL,
     alternativesIDs = NULL, criteriaIDs = NULL,
     kPostOptimality = NULL)
@@ -15,10 +18,12 @@ UTA(performanceTable, alternativesRanks, criteriaMinMax,
 
 \arguments{
   \item{performanceTable}{Matrix or data frame containing the performance table. Each row corresponds to an alternative, and each column to a criterion. Rows (resp. columns) must be named according to the IDs of the alternatives (resp. criteria).}
-  \item{alternativesRanks}{Vector containing the ranks of the alternatives. The elements are named according to the IDs of the alternatives.}
   \item{criteriaMinMax}{Vector containing the preference direction on each of the criteria. "min" (resp. "max") indicates that the criterion has to be minimized (maximized). The elements are named according to the IDs of the criteria.}
   \item{criteriaNumberOfBreakPoints}{Vector containing the number of breakpoints of the piecewise linear value functions to be determined. Minimum 2. The elements are named according to the IDs of the criteria.}
   \item{epsilon}{Numeric value containing the minimal difference in value between two consecutive alternatives in the final ranking.}
+  \item{alternativesRanks}{Optional vector containing the ranks of the alternatives. The elements are named according to the IDs of the alternatives. If not present, then at least one of alternativesPreferences or alternativesIndifferences should be given.}
+  \item{alternativesPreferences}{Optional matrix containing the preference constraints on the alternatives. Each line of the matrix corresponds to a constraint of the type alternative a is strictly preferred to alternative b. If not present, then either alternativesRanks or alternativesIndifferences should be given.}
+  \item{alternativesIndifferences}{Optional matrix containing the indifference constraints on the alternatives. Each line of the matrix corresponds to a constraint of the type alternative a is indifferent to alternative b. If not present, then either alternativesRanks or alternativesPreferences should be given.}  
   \item{criteriaLBs}{Vector containing the lower bounds of the criteria to be considered for the elicitation of the value functions. If not specified, the lower bounds present in the performance table are taken.}
   \item{criteriaUBs}{Vector containing the upper bounds of the criteria to be considered for the elicitation of the value functions. If not specified, the upper bounds present in the performance table are taken.}
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
@@ -32,7 +37,7 @@ UTA(performanceTable, alternativesRanks, criteriaMinMax,
   \item{valueFunctions}{A list containing the value functions which have been determined. Each value function is defined by a matrix of breakpoints, where the first row corresponds to the abscissa (row labelled "x") and where the second row corresponds to the ordinate (row labelled "y").}
   \item{overallValues}{A vector of the overall values of the input alternatives.}
   \item{ranks}{A vector of the ranks of the alternatives obtained via the elicited value functions. Ties method = "min".}
-  \item{Kendall}{Kendall's tau between the input ranking and the one obtained via the elicited value functions.}
+  \item{Kendall}{Kendall's tau between the input ranking and the one obtained via the elicited value functions. NULL if no input ranking is given but alternativesPreferences or alternativesIndifferences.}
   \item{errors}{A vector of the errors (sigma) which have to be added to the overall values of the alternatives in order to respect the input ranking.}
   \item{minimumWeightsPO}{In case a post-optimality analysis is performed, the minimal weight of each criterion, else NULL.}
   \item{maximumWeightsPO}{In case a post-optimality analysis is performed, the maximal weight of each criterion, else NULL.}
@@ -79,8 +84,9 @@ criteriaNumberOfBreakPoints <- c(3,4,4)
 
 names(criteriaNumberOfBreakPoints) <- colnames(performanceTable)
 
-x<-UTA(performanceTable, alternativesRanks, criteriaMinMax, 
-        criteriaNumberOfBreakPoints, epsilon)
+x<-UTA(performanceTable, criteriaMinMax, 
+        criteriaNumberOfBreakPoints, epsilon, 
+        alternativesRanks = alternativesRanks)
 
 # plot the value functions obtained
 
@@ -88,7 +94,7 @@ plotPiecewiseLinearValueFunctions(x$valueFunctions)
 
 # apply the value functions on the original performance table
 
-transformedPerformanceTable <- applyValueFunctionsOnPerformanceTable(
+transformedPerformanceTable <- applyPiecewiseLinearValueFunctionsOnPerformanceTable(
   x$valueFunctions, 
   performanceTable, 
   criteriaMinMax)
@@ -169,8 +175,9 @@ criteriaUBs=c(190,15,13,13,9,80000)
 
 names(criteriaUBs) <- colnames(performanceTable)
 
-x<-UTA(performanceTable, alternativesRanks, criteriaMinMax, 
+x<-UTA(performanceTable, criteriaMinMax, 
         criteriaNumberOfBreakPoints, epsilon, 
+        alternativesRanks = alternativesRanks,
         criteriaLBs = criteriaLBs, criteriaUBs = criteriaUBs)
         
 
@@ -180,7 +187,7 @@ plotPiecewiseLinearValueFunctions(x$valueFunctions)
 
 # apply the value functions on the original performance table
 
-transformedPerformanceTable <- applyValueFunctionsOnPerformanceTable(
+transformedPerformanceTable <- applyPiecewiseLinearValueFunctionsOnPerformanceTable(
       x$valueFunctions, 
       performanceTable, 
       criteriaMinMax)
@@ -196,8 +203,9 @@ weightedSum(transformedPerformanceTable,c(1,1,1,1,1,1))
 # the same analysis with less extreme value functions 
 # from the post-optimality analysis
 
-x<-UTA(performanceTable, alternativesRanks, criteriaMinMax, 
-        criteriaNumberOfBreakPoints, epsilon, 
+x<-UTA(performanceTable, criteriaMinMax, 
+        criteriaNumberOfBreakPoints, epsilon,
+        alternativesRanks = alternativesRanks,
         criteriaLBs = criteriaLBs, 
         criteriaUBs = criteriaUBs, 
         kPostOptimality = 0.01)
@@ -208,7 +216,7 @@ plotPiecewiseLinearValueFunctions(x$averageValueFunctionsPO)
 
 # apply the value functions on the original performance table
 
-transformedPerformanceTable <- applyValueFunctionsOnPerformanceTable(
+transformedPerformanceTable <- applyPiecewiseLinearValueFunctionsOnPerformanceTable(
       x$averageValueFunctionsPO, 
       performanceTable, 
       criteriaMinMax)
@@ -225,8 +233,9 @@ weightedSum(transformedPerformanceTable,c(1,1,1,1,1,1))
 # ----------------------------------------
 # Let us consider only 2 criteria : Price and MaximalSpeed. What happens ? 
 
-x<-UTA(performanceTable, alternativesRanks, criteriaMinMax, 
-        criteriaNumberOfBreakPoints, epsilon, 
+x<-UTA(performanceTable, criteriaMinMax, 
+        criteriaNumberOfBreakPoints, epsilon,
+        alternativesRanks = alternativesRanks,
         criteriaLBs = criteriaLBs, criteriaUBs = criteriaUBs,
         criteriaIDs = c("MaximalSpeed","Price"))
         
@@ -238,7 +247,7 @@ plotPiecewiseLinearValueFunctions(x$valueFunctions,
 
 # apply the value functions on the original performance table
 
-transformedPerformanceTable <- applyValueFunctionsOnPerformanceTable(
+transformedPerformanceTable <- applyPiecewiseLinearValueFunctionsOnPerformanceTable(
   x$valueFunctions, 
   performanceTable, 
   criteriaMinMax, 
@@ -253,6 +262,22 @@ names(weights)<-colnames(performanceTable)
 
 weightedSum(transformedPerformanceTable,
           weights, criteriaIDs = c("MaximalSpeed","Price"))
+
+# ----------------------------------------
+# An example without alternativesRanks, but with alternativesPreferences
+# and alternativesIndifferences
+
+alternativesPreferences <- rbind(c("Peugeot 505 GR","Opel Record 2000 LS"),
+                                c("Opel Record 2000 LS","Citroen Visa Super E"))
+
+alternativesIndifferences <- rbind(c("Peugeot 104 ZS","Citroen Dyane"))
+
+x<-UTA(performanceTable, criteriaMinMax, 
+        criteriaNumberOfBreakPoints, epsilon = 0.1,
+        alternativesPreferences = alternativesPreferences,
+        alternativesIndifferences = alternativesIndifferences,
+        criteriaLBs = criteriaLBs, criteriaUBs = criteriaUBs
+        )
 
 }
 

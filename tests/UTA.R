@@ -35,10 +35,35 @@ criteriaNumberOfBreakPoints <- c(3,4,4)
 
 names(criteriaNumberOfBreakPoints) <- colnames(performanceTable)
 
-x<-UTA(performanceTable, alternativesRanks, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon)
+x1<-UTA(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon, alternativesRanks = alternativesRanks)
 
-stopifnot(x$Kendall ==1)
+stopifnot
 
-x<-UTA(performanceTable, alternativesRanks, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon, criteriaIDs = c("Price", "Time"), alternativesIDs = c("METRO1","METRO2","TAXI"))
+# let us try the same with the pairwise preferences to test if the results
+# are the same
 
-stopifnot(x$overallValues[1] == x$overallValues[1])
+alternativesPreferences<-rbind(c("RER","METRO1"),
+                               c("METRO2","BUS"),
+                               c("BUS","TAXI"))
+
+alternativesIndifferences<-rbind(c("METRO1","METRO2"))
+
+x1prime <- UTA(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon, alternativesPreferences = alternativesPreferences, alternativesIndifferences = alternativesIndifferences)
+
+stopifnot(all(x1$valueFunctions$Price == x1prime$valueFunctions$Price) && all(x1$valueFunctions$Time == x1prime$valueFunctions$Time) && all(x1$valueFunctions$Comfort == x1prime$valueFunctions$Comfort))
+
+# consider only two criteria
+
+x2<-UTA(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon, alternativesRanks = alternativesRanks, criteriaIDs = c("Price", "Time"), alternativesIDs = c("RER","METRO1","METRO2","TAXI"))
+
+stopifnot(x2$overallValues[2] == x2$overallValues[3])
+
+# back to pairwise preferences with filtering
+
+alternativesPreferences<-rbind(c("RER","METRO1"))
+
+alternativesIndifferences<-rbind(c("METRO1","METRO2"))
+
+x3<-UTA(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints, epsilon, alternativesRanks = NULL, alternativesPreferences = alternativesPreferences, alternativesIndifferences = alternativesIndifferences, criteriaIDs = c("Price", "Time"), alternativesIDs = c("RER","METRO1","METRO2","TAXI"))
+
+stopifnot(x3$overallValues[2] == x3$overallValues[3])
