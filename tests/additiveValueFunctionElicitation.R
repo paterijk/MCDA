@@ -35,10 +35,25 @@ criteriaNumberOfBreakPoints <- c(3,4,4)
 
 names(criteriaNumberOfBreakPoints) <- colnames(performanceTable)
 
-x<-additiveValueFunctionElicitation(performanceTable, alternativesRanks, criteriaMinMax, epsilon)
+x1<-additiveValueFunctionElicitation(performanceTable, criteriaMinMax, epsilon, alternativesRanks=alternativesRanks)
 
-stopifnot(x$Kendall ==1)
+stopifnot(x1$Kendall ==1)
 
-x<-additiveValueFunctionElicitation(performanceTable, alternativesRanks, criteriaMinMax, epsilon, criteriaIDs = c("Price", "Time"), alternativesIDs = c("METRO1","METRO2","TAXI"))
+# let us try the same with the pairwise preferences to test if the results
+# are the same
 
-stopifnot(x$overallValues[1] == x$overallValues[1])
+alternativesPreferences<-rbind(c("RER","METRO1"),
+                               c("METRO2","BUS"),
+                               c("BUS","TAXI"))
+
+alternativesIndifferences<-rbind(c("METRO1","METRO2"))
+
+x1prime <- additiveValueFunctionElicitation(performanceTable, criteriaMinMax, epsilon, alternativesPreferences = alternativesPreferences, alternativesIndifferences = alternativesIndifferences)
+
+stopifnot(all(x1$valueFunctions$Price == x1prime$valueFunctions$Price) && all(x1$valueFunctions$Time == x1prime$valueFunctions$Time) && all(x1$valueFunctions$Comfort == x1prime$valueFunctions$Comfort))
+
+# and some filtering
+
+x2<-additiveValueFunctionElicitation(performanceTable, criteriaMinMax, epsilon, alternativesRanks = alternativesRanks, criteriaIDs = c("Price", "Time"), alternativesIDs = c("METRO1","METRO2","TAXI"))
+
+stopifnot(x2$overallValues[1] == x2$overallValues[2])

@@ -6,17 +6,22 @@
 \description{Elicits a general additive value function from a ranking of alternatives.}
 
 \usage{
-additiveValueFunctionElicitation(performanceTable, alternativesRanks, 
+additiveValueFunctionElicitation(performanceTable,  
                                   criteriaMinMax, epsilon, 
+                                  alternativesRanks = NULL,
+                                  alternativesPreferences = NULL,
+                                  alternativesIndifferences = NULL,
                                   alternativesIDs = NULL, 
                                   criteriaIDs = NULL)
 }
 
 \arguments{
   \item{performanceTable}{Matrix or data frame containing the performance table. Each row corresponds to an alternative, and each column to a criterion. Rows (resp. columns) must be named according to the IDs of the alternatives (resp. criteria).}
-  \item{alternativesRanks}{Vector containing the ranks of the alternatives. The elements are named according to the IDs of the alternatives.}
   \item{criteriaMinMax}{Vector containing the preference direction on each of the criteria. "min" (resp. "max") indicates that the criterion has to be minimized (maximized). The elements are named according to the IDs of the criteria.}
   \item{epsilon}{Numeric value containing the minimal difference in value between two consecutive alternatives in the final ranking.}
+  \item{alternativesRanks}{Optional vector containing the ranks of the alternatives. The elements are named according to the IDs of the alternatives. If not present, then at least one of alternativesPreferences or alternativesIndifferences should be given.}
+  \item{alternativesPreferences}{Optional matrix containing the preference constraints on the alternatives. Each line of the matrix corresponds to a constraint of the type alternative a is strictly preferred to alternative b. If not present, then either alternativesRanks or alternativesIndifferences should be given.}
+  \item{alternativesIndifferences}{Optional matrix containing the indifference constraints on the alternatives. Each line of the matrix corresponds to a constraint of the type alternative a is indifferent to alternative b. If not present, then either alternativesRanks or alternativesPreferences should be given.}  
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
   }
@@ -91,8 +96,9 @@ criteriaMinMax <- c("max","min","min","max","max","min")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-x<-additiveValueFunctionElicitation(performanceTable, alternativesRanks, 
-                                      criteriaMinMax, epsilon)
+x<-additiveValueFunctionElicitation(performanceTable,  
+                                      criteriaMinMax, epsilon,
+                                      alternativesRanks = alternativesRanks)
 
 }
 
