@@ -227,8 +227,16 @@ UTASTAR <- function(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoint
     
     alphai <- criteriaNumberOfBreakPoints[i]
     
+    options(digits=20)
+    
     for (j in 1:alphai)
       tmp<-c(tmp,mini + (j-1)/(alphai-1) * (maxi - mini))
+    
+    # due to this formula, the minimum and maximum values might not be exactly the same than the real minimum and maximum values in the performance table
+    # to be sure there is no rounding problem, we recopy these values in tmp (important for the later comparisons to these values)
+    
+    tmp[1] <- mini
+    tmp[alphai] <- maxi
     
     # if the criterion has to be maximized, the worst value is in the first position
     # else, we sort the vector the other way around to have the worst value in the first position
