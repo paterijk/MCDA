@@ -150,6 +150,12 @@ plotElectreTRISortingProblem <- function(performanceTable, categoriesLowerProfil
   for (i in 1:(numCat-1)){
     text(c(1:numCrit), normalizedProfiles[i,], labels = categoriesLowerProfiles[i,], pos=1)
   }
+  
+  text(1, ylim[2], labels = dimnames(performanceTable)[[2]][1], pos=4)
+  
+   for (i in 2:(numCrit)){
+    text(i, ylim[2], labels = dimnames(performanceTable)[[2]][i], pos=2)
+   }
     
   for (i in (1:numAlt))
     points(1:numCrit,normalizedPerformanceTable[i,],type="b",pch=which(assignments[rownames(performanceTable)[i]]==rownames(categoriesLowerProfiles)), col=i)
