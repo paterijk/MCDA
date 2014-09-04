@@ -1,5 +1,9 @@
 ## Namespace for RXMCDA
 
+importFrom(Rglpk, Rglpk_solve_LP)
+importFrom(Kendall, Kendall)
+import(glpkAPI)
+
 ## Generics and functions defined in this package
 export(
   "additiveValueFunctionElicitation",
@@ -8,12 +12,13 @@ export(
   "ElectreTRIBMIdentifyIncompatibleAssignments",
   "UTA",
   "UTASTAR",
+  "UTADIS",
   "weightedSum",
   
   "applyPiecewiseLinearValueFunctionsOnPerformanceTable",
+  "assignAlternativesToCategoriesByThresholds",
   
   "plotPiecewiseLinearValueFunctions",
   "plotElectreTRISortingProblem"
-  
 )
 
