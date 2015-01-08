@@ -17,6 +17,7 @@ export(
   
   "applyPiecewiseLinearValueFunctionsOnPerformanceTable",
   "assignAlternativesToCategoriesByThresholds",
+  "normalizePerformanceTable",
   
   "plotElectreTRISortingProblem",
   "plotPiecewiseLinearValueFunctions",
