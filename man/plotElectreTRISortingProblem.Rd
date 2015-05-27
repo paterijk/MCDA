@@ -1,12 +1,12 @@
-\name{plotElectreTRISortingProblem}
-\alias{plotElectreTRISortingProblem}
+\name{plotMRSortSortingProblem}
+\alias{plotMRSortSortingProblem}
 
 \title{Plot the categories and assignments of an Electre TRI-like sorting problem (via separation profiles).}
 
 \description{The profiles shown are the separation profiles between the classes. They are stored as the lower profiles of the categories.}
 
 \usage{
-plotElectreTRISortingProblem(performanceTable, categoriesLowerProfiles, 
+plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles, 
                           assignments, criteriaMinMax, 
                           criteriaUBs, criteriaLBs, 
                           alternativesIDs = NULL, criteriaIDs = NULL)
@@ -70,14 +70,14 @@ criteriaWeights <- c(1,3,2)
 
 names(criteriaWeights) <- colnames(performanceTable)
 
-assignments <- assignments<-ElectreTRIBM(performanceTable, 
+assignments <- assignments<-MRSort(performanceTable, 
                                           categoriesLowerProfiles, 
                                           criteriaWeights, 
                                           criteriaMinMax, 3)
 
 names(assignments) <- rownames(performanceTable)
 
-plotElectreTRISortingProblem(performanceTable, categoriesLowerProfiles, 
+plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles, 
                               assignments, criteriaMinMax, 
                               criteriaUBs, criteriaLBs)
 }

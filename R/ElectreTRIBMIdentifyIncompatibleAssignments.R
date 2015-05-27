@@ -37,7 +37,7 @@
 #
 ##############################################################################
 
-ElectreTRIBMIdentifyIncompatibleAssignments <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, alternativesIDs = NULL, criteriaIDs = NULL){
+MRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, alternativesIDs = NULL, criteriaIDs = NULL){
   
   ## check the input data
   

@@ -1,5 +1,5 @@
-\name{ElectreTRIBMInference}
-\alias{ElectreTRIBMInference}
+\name{MRSortInference}
+\alias{MRSortInference}
 
 \title{Identification of profiles, weights and majority threshold for an Electre TRI-like sorting method axiomatized by Bouyssou and Marchant.}
 
@@ -7,7 +7,7 @@
 preference thresholds attached to criteria. Only a binary discordance condition is considered, i.e. a veto forbids an outranking in any possible concordance situation, or not. The identification of the profiles, weights and majority threshold are done by taking into account assignment examples.}
 
 \usage{
-ElectreTRIBMInference(performanceTable, assignments, 
+MRSortInference(performanceTable, assignments, 
             categoriesRanks, criteriaMinMax, 
             alternativesIDs = NULL, criteriaIDs = NULL)
 }
@@ -74,13 +74,13 @@ criteriaMinMax <- c("max","max","max","max","max","max")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-x<-ElectreTRIBMInference(performanceTable, assignments, 
+x<-MRSortInference(performanceTable, assignments, 
                         categoriesRanks, criteriaMinMax, 
                         alternativesIDs = c("a1","a2","a3",
                         "a4","a5","a6","a7","a8","a9",
                         "a10","a11","a12","a13"))
 
-ElectreAssignments <- ElectreTRIBM(performanceTable, x$profilesPerformances, 
+ElectreAssignments <- MRSort(performanceTable, x$profilesPerformances, 
                                  x$weights, criteriaMinMax, x$lambda)
 
 }

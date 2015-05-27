@@ -37,7 +37,7 @@
 #
 ##############################################################################
 
-ElectreTRIBM <- function(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, majorityThreshold, criteriaVetos = NULL, alternativesIDs = NULL, criteriaIDs = NULL, categoriesIDs = NULL){
+MRSort <- function(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, majorityThreshold, criteriaVetos = NULL, alternativesIDs = NULL, criteriaIDs = NULL, categoriesIDs = NULL){
   
   ## check the input data
   

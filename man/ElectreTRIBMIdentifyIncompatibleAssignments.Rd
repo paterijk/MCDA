@@ -1,5 +1,5 @@
-\name{ElectreTRIBMIdentifyIncompatibleAssignments}
-\alias{ElectreTRIBMIdentifyIncompatibleAssignments}
+\name{MRSortIdentifyIncompatibleAssignments}
+\alias{MRSortIdentifyIncompatibleAssignments}
 
 \title{Searches assignment examples which are incompatible with the Electre TRI-like sorting method axiomatized by Bouyssou and Marchant.}
 
@@ -7,7 +7,7 @@
 preference thresholds attached to criteria. Only a binary discordance condition is considered, i.e. a veto forbids an outranking in any possible concordance situation, or not. This function searches for a set of minimal size which can be removed from the assignment examples in order to make the problem compatible again with this simplified Electre TRI model.}
 
 \usage{
-ElectreTRIBMIdentifyIncompatibleAssignments(performanceTable, 
+MRSortIdentifyIncompatibleAssignments(performanceTable, 
                                             assignments, 
                                             categoriesRanks, 
                                             criteriaMinMax, 
@@ -87,7 +87,7 @@ criteriaMinMax <- c("max","min","min","max","max","min")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-onoff<-ElectreTRIBMIdentifyIncompatibleAssignments(performanceTable, 
+onoff<-MRSortIdentifyIncompatibleAssignments(performanceTable, 
                                                     assignments, 
                                                     categoriesRanks, 
                                                     criteriaMinMax, 
@@ -96,13 +96,13 @@ onoff<-ElectreTRIBMIdentifyIncompatibleAssignments(performanceTable,
 
 filteredAlts <- rownames(performanceTable)[!onoff$incompatibleAssignments]
 
-x<-ElectreTRIBMInference(performanceTable, assignments, categoriesRanks, 
+x<-MRSortInference(performanceTable, assignments, categoriesRanks, 
                           criteriaMinMax,  
                           criteriaIDs = c("HP","Space"), 
                           alternativesIDs = filteredAlts)
 
 
-ElectreAssignments<-ElectreTRIBM(performanceTable, x$profilesPerformances, 
+ElectreAssignments<-MRSort(performanceTable, x$profilesPerformances, 
                                 x$weights, criteriaMinMax, x$lambda, 
                                 criteriaIDs = c("HP","Space"), 
                                 alternativesIDs = filteredAlts)

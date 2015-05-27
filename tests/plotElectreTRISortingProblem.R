@@ -46,9 +46,9 @@ criteriaWeights <- c(1,3,2)
 
 names(criteriaWeights) <- colnames(performanceTable)
 
-assignments <- assignments<-ElectreTRIBM(performanceTable, categoriesLowerProfiles, 
+assignments <- assignments<-MRSort(performanceTable, categoriesLowerProfiles, 
                                          criteriaWeights, criteriaMinMax, 3)
 
 names(assignments) <- rownames(performanceTable)
 
-plotElectreTRISortingProblem(performanceTable, categoriesLowerProfiles, assignments, criteriaMinMax, criteriaUBs, criteriaLBs)
+plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles, assignments, criteriaMinMax, criteriaUBs, criteriaLBs)

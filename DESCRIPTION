@@ -1,6 +1,6 @@
 Package: MCDA
-Version: 0.0.8
-Date: 2015-01-08
+Version: 0.0.9
+Date: 2015-05-27
 Title: Functions to Support the Multicriteria Decision Aiding Process
 Author: Patrick Meyer, Sébastien Bigaret. 
 Maintainer: Patrick Meyer <patrick.meyer@telecom-bretagne.eu>

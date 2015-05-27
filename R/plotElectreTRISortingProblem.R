@@ -37,7 +37,7 @@
 #
 ##############################################################################
 
-plotElectreTRISortingProblem <- function(performanceTable, categoriesLowerProfiles, assignments, criteriaMinMax, criteriaUBs, criteriaLBs, alternativesIDs = NULL, criteriaIDs = NULL){
+plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, assignments, criteriaMinMax, criteriaUBs, criteriaLBs, alternativesIDs = NULL, criteriaIDs = NULL){
   
   ## check the input data
   

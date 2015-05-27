@@ -41,20 +41,20 @@ criteriaWeights <- c(1,3,2)
 names(criteriaWeights) <- colnames(performanceTable)
 
 
-# ElectreTRIBM
+# MRSort
 
-assignments<-ElectreTRIBM(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, 3, criteriaVetos = criteriaVetos)
+assignments<-MRSort(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, 3, criteriaVetos = criteriaVetos)
 
 stopifnot(all(assignments == c("Good","Medium","Bad","Bad","Bad")))
 
 # un peu de filtrage
 
-assignments<-ElectreTRIBM(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, 2, categoriesIDs = c("Medium","Bad"), criteriaIDs = c("Price","Time"), alternativesIDs = c("RER", "BUS"))
+assignments<-MRSort(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, 2, categoriesIDs = c("Medium","Bad"), criteriaIDs = c("Price","Time"), alternativesIDs = c("RER", "BUS"))
 
 stopifnot(all(assignments == c("Medium","Bad")))
 
 # un test pour combiner tous les filtrages avec le veto
 
-assignments<-ElectreTRIBM(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, 2, criteriaVetos = criteriaVetos, categoriesIDs = c("Medium","Bad"), criteriaIDs = c("Price","Time"), alternativesIDs = c("RER", "BUS"))
+assignments<-MRSort(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, 2, criteriaVetos = criteriaVetos, categoriesIDs = c("Medium","Bad"), criteriaIDs = c("Price","Time"), alternativesIDs = c("RER", "BUS"))
 
 stopifnot(all(assignments == c("Medium","Bad")))

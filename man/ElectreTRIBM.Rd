@@ -1,5 +1,5 @@
-\name{ElectreTRIBM}
-\alias{ElectreTRIBM}
+\name{MRSort}
+\alias{MRSort}
 
 \title{Electre TRI-like sorting method axiomatized by Bouyssou and Marchant.}
 
@@ -7,7 +7,7 @@
 preference thresholds attached to criteria. Only a binary discordance condition is considered, i.e. a veto forbids an outranking in any possible concordance situation, or not.}
 
 \usage{
-ElectreTRIBM(performanceTable, categoriesLowerProfiles, 
+MRSort(performanceTable, categoriesLowerProfiles, 
             criteriaWeights, criteriaMinMax, majorityThreshold, 
             criteriaVetos = NULL, alternativesIDs = NULL, 
             criteriaIDs = NULL, categoriesIDs = NULL)
@@ -78,9 +78,9 @@ criteriaWeights <- c(1,3,2)
 names(criteriaWeights) <- colnames(performanceTable)
 
 
-# ElectreTRIBM
+# MRSort
 
-assignments<-ElectreTRIBM(performanceTable, categoriesLowerProfiles, 
+assignments<-MRSort(performanceTable, categoriesLowerProfiles, 
                           criteriaWeights, criteriaMinMax, 3, 
                           criteriaVetos = criteriaVetos)
  
@@ -88,7 +88,7 @@ print(assignments)
 
 # un peu de filtrage
 
-assignments<-ElectreTRIBM(performanceTable, categoriesLowerProfiles, 
+assignments<-MRSort(performanceTable, categoriesLowerProfiles, 
                           criteriaWeights, criteriaMinMax, 2, 
                           categoriesIDs = c("Medium","Bad"), 
                           criteriaIDs = c("Price","Time"), 

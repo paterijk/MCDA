@@ -7,9 +7,9 @@ import(glpkAPI)
 ## Generics and functions defined in this package
 export(
   "additiveValueFunctionElicitation",
-  "ElectreTRIBM",
-  "ElectreTRIBMInference",
-  "ElectreTRIBMIdentifyIncompatibleAssignments",
+  "MRSort",
+  "MRSortInference",
+  "MRSortIdentifyIncompatibleAssignments",
   "UTA",
   "UTASTAR",
   "UTADIS",
@@ -19,7 +19,7 @@ export(
   "assignAlternativesToCategoriesByThresholds",
   "normalizePerformanceTable",
   
-  "plotElectreTRISortingProblem",
+  "plotMRSortSortingProblem",
   "plotPiecewiseLinearValueFunctions",
   "plotRadarPerformanceTable"
 )

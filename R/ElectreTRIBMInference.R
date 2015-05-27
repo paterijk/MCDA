@@ -37,7 +37,7 @@
 #
 ##############################################################################
 
-ElectreTRIBMInference <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, alternativesIDs = NULL, criteriaIDs = NULL){
+MRSortInference <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, alternativesIDs = NULL, criteriaIDs = NULL){
   
   ## check the input data
   
