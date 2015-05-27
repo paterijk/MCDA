@@ -88,7 +88,7 @@ MRSortInference <- function(performanceTable, assignments, categoriesRanks, crit
   
   tempPath <- tempdir()
   
-  modelFile <- system.file("extdata","ElectreTRIBMInferenceModel.gmpl", package="MCDA")
+  modelFile <- system.file("extdata","MRSortInferenceModel.gmpl", package="MCDA")
   
   dataFile <- tempfile()
   

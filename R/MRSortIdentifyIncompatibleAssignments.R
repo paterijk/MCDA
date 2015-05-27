@@ -88,7 +88,7 @@ MRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments,
   
   tempPath <- tempdir()
   
-  modelFile <- system.file("extdata","ElectreTRIBMIdentifyIncompatibleAssignmentsModel.gmpl", package="MCDA")
+  modelFile <- system.file("extdata","MRSortIdentifyIncompatibleAssignmentsModel.gmpl", package="MCDA")
   
   dataFile <- tempfile()
   
