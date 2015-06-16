@@ -1,10 +1,10 @@
 Package: MCDA
-Version: 0.0.9
-Date: 2015-05-27
+Version: 0.0.10
+Date: 2015-06-10
 Title: Functions to Support the Multicriteria Decision Aiding Process
-Author: Patrick Meyer, Sébastien Bigaret. 
+Author: Patrick Meyer, Sébastien Bigaret, Richard Hodgett
 Maintainer: Patrick Meyer <patrick.meyer@telecom-bretagne.eu>
-Description: MCDA, which stands for Multicriteria Decision Aiding, implements functions which can be useful to support the analyst in the decision aiding process involving multiple, conflicting criteria. These functions include, but are not limited to, data pre-processing tools, preference elicitation procedures, aggregation functions, as well as post-processing techniques and data visualisation functions. 
+Description: Functions which can be useful to support the analyst in the Multicriteria Decision Aiding (MCDA) process involving multiple, conflicting criteria. 
 Imports: Rglpk, Kendall, glpkAPI
 License: CeCILL-2
 Encoding: UTF-8

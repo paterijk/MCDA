@@ -2,8 +2,8 @@ MCDA
 ----
 
 MCDA is a package for the GNU R statistical software
-which allows to use MCDA functions and methods in R. 
+which implements MCDA functions in R. 
 
-MCDA is copyrighted by Patrick Meyer and Sébastien
-Bigaret, released under the CeCILL license (v2)
+MCDA is copyrighted by Patrick Meyer, Sébastien
+Bigaret and Richard Hodgett released under the CeCILL license (v2)
 and maintained by Patrick Meyer (patrick.meyer@telecom-bretagne.eu). 

@@ -7,9 +7,12 @@ import(glpkAPI)
 ## Generics and functions defined in this package
 export(
   "additiveValueFunctionElicitation",
+  "AHP",
+  "MARE",
   "MRSort",
   "MRSortInference",
   "MRSortIdentifyIncompatibleAssignments",
+  "TOPSIS",
   "UTA",
   "UTASTAR",
   "UTADIS",
@@ -19,6 +22,7 @@ export(
   "assignAlternativesToCategoriesByThresholds",
   "normalizePerformanceTable",
   
+  "plotMARE",
   "plotMRSortSortingProblem",
   "plotPiecewiseLinearValueFunctions",
   "plotRadarPerformanceTable"
