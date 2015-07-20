@@ -1,10 +1,11 @@
 #############################################################################
 #
-# Copyright Patrick Meyer and Sébastien Bigaret, 2013
+# Copyright Patrick Meyer, Sébastien Bigaret and Alexandru Olteanu, 2015
 #
 # Contributors:
 #   Patrick Meyer <patrick.meyer@telecom-bretagne.eu>
 #   Sébastien Bigaret <sebastien.bigaret@telecom-bretagne.eu>
+#   Alexandru Olteanu <al.olteanu@gmail.com>
 #  	
 # This software, MCDA, is a package for the R statistical software which 
 # allows to use MCDA algorithms and methods. 
@@ -37,10 +38,9 @@
 #
 ##############################################################################
 
-MRSortInference <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, alternativesIDs = NULL, criteriaIDs = NULL){
+MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto = FALSE, readableWeights = FALSE, readableProfiles = FALSE, alternativesIDs = NULL, criteriaIDs = NULL){
   
   ## check the input data
-  
   if (!((is.matrix(performanceTable) || (is.data.frame(performanceTable))))) 
     stop("wrong performanceTable, should be a matrix or a data frame")
   
@@ -52,6 +52,15 @@ MRSortInference <- function(performanceTable, assignments, categoriesRanks, crit
   
   if (!(is.vector(criteriaMinMax)))
     stop("criteriaMinMax should be a vector")
+  
+  if (!is.logical(veto))
+    stop("veto should be a boolean")
+  
+  if (!is.logical(readableWeights))
+    stop("readableWeights should be a boolean")
+  
+  if (!is.logical(readableProfiles))
+    stop("readableProfiles should be a boolean")
   
   if (!(is.null(alternativesIDs) || is.vector(alternativesIDs)))
     stop("alternativesIDs should be a vector")
@@ -88,7 +97,33 @@ MRSortInference <- function(performanceTable, assignments, categoriesRanks, crit
   
   tempPath <- tempdir()
   
+  # get model file depending on function options
+  
   modelFile <- system.file("extdata","MRSortInferenceModel.gmpl", package="MCDA")
+  if(veto)
+    modelFile <- system.file("extdata","MRSortVInferenceModel.gmpl", package="MCDA")
+  
+  if(readableWeights && readableProfiles)
+  {
+    modelFile <- system.file("extdata","MRSortInferenceModelSpreadWeightsProfiles.gmpl", package="MCDA")
+    if(veto)
+      modelFile <- system.file("extdata","MRSortVInferenceModelSpreadWeightsProfiles.gmpl", package="MCDA")
+  }
+  else
+  {
+    if(readableWeights)
+    {
+      modelFile <- system.file("extdata","MRSortInferenceModelSpreadWeights.gmpl", package="MCDA")
+      if(veto)
+        modelFile <- system.file("extdata","MRSortVInferenceModelSpreadWeights.gmpl", package="MCDA")
+    }
+    if(readableProfiles)
+    {
+      modelFile <- system.file("extdata","MRSortInferenceModelSpreadProfiles.gmpl", package="MCDA")
+      if(veto)
+        modelFile <- system.file("extdata","MRSortVInferenceModelSpreadProfiles.gmpl", package="MCDA")
+    }
+  }
   
   dataFile <- tempfile()
   
@@ -170,19 +205,7 @@ MRSortInference <- function(performanceTable, assignments, categoriesRanks, crit
       cat(";\n\n")
   }
   
-  cat("param M :=\n")
-  for (i in 1:numCrit){
-    cat(i)
-    cat("\t")
-    cat(apply(performanceTable, 2, max)[i])
-    if (i!=numCrit)
-      cat("\n")
-    else
-      cat(";\n\n")
-    
-  }
-  
-  cat("param gamma:=0.01;\n")
+  cat("param gamma:=0.001;\n")
   
   cat("end;\n")
   sink()
@@ -192,6 +215,8 @@ MRSortInference <- function(performanceTable, assignments, categoriesRanks, crit
   tran<-mplAllocWkspGLPK()
   
   setMIPParmGLPK(PRESOLVE, GLP_ON)
+  
+  termOutGLPK(GLP_OFF)
   
   out<-mplReadModelGLPK(tran, dataFile, skip=0)
   
@@ -204,7 +229,7 @@ MRSortInference <- function(performanceTable, assignments, categoriesRanks, crit
     mplBuildProbGLPK(tran,lp)
   else 
     stop(return_codeGLPK(out))
-
+  
   solveMIPGLPK(lp)
   
   if(mipStatusGLPK(lp)==5){
@@ -253,10 +278,32 @@ MRSortInference <- function(performanceTable, assignments, categoriesRanks, crit
     rownames(profilesPerformances) <- names(categoriesRanks)
     colnames(profilesPerformances) <- colnames(performanceTable)
     
-    epsilon <- solution[varnames=="ksep"]
+    vetoPerformances <- NULL
     
-    return(list(lambda = round(lambda,digits=5), epsilon = round(epsilon,digits=5), weights = round(weights,digits=5), profilesPerformances = round(profilesPerformances,digits=5)))
-
+    if(veto)
+    {
+      ptvnames <- matrix(nrow=numCat,ncol=numCrit)
+      
+      for (i in 2:(numCat+1)){
+        for (j in 1:numCrit)
+        {
+          ptvnames[i-1,j] <- paste("PTv[",i,",",j,"]",sep="")
+        }
+      }
+      
+      vetoPerformances <- matrix(nrow=numCat,ncol=numCrit)
+      
+      for (i in 1:numCat){
+        for (j in 1:numCrit)
+          vetoPerformances[i,j] <- solution[varnames==ptvnames[i,j]]
+      }
+      
+      rownames(vetoPerformances) <- names(categoriesRanks)
+      colnames(vetoPerformances) <- colnames(performanceTable)
+    }
+    
+    return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances))
+    
   }
   else
     return(NULL)

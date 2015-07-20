@@ -38,7 +38,7 @@
 #
 ##############################################################################
 
-MRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto = FALSE, incompatibleSetsLimit = 100, largerIncompatibleSetsMargin = 0, alternativesIDs = NULL, criteriaIDs = NULL){
+LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, majorityRule = "", incompatibleSetsLimit = 100, largerIncompatibleSetsMargin = 0, alternativesIDs = NULL, criteriaIDs = NULL){
   
   ## check the input data
   if (!((is.matrix(performanceTable) || (is.data.frame(performanceTable))))) 
@@ -53,8 +53,10 @@ MRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments,
   if (!(is.vector(criteriaMinMax)))
     stop("criteriaMinMax should be a vector")
   
-  if (!is.logical(veto))
-    stop("veto should be a boolean")
+  if (!is.character(majorityRule))
+    stop("majorityRule should be a string")
+  else if (!(majorityRule %in% c("","V","D","v","d","dV","Dv","dv")))
+    stop("majorityRule needs to take values in {'','V','D','v','d','dV','Dv','dv'}")
   
   if (!is.numeric(incompatibleSetsLimit))
     stop("incompatibleSetsLimit should be numeric")
@@ -180,9 +182,9 @@ MRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments,
   
   # get first model file
   
-  modelFile <- system.file("extdata","MRSortIdentifyMinimalInvalidAssignmentsSet.gmpl", package="MCDA")
-  if(veto)
-    modelFile <- system.file("extdata","MRSortVIdentifyMinimalInvalidAssignmentsSet.gmpl", package="MCDA")
+  modelfilename <- paste("MRSort", c("","V","D","DV1","DV2","DV3","DV4","DV5")[match(majorityRule,c("","V","D","v","d","dV","Dv","dv"))], "IdentifyMinimalInvalidAssignmentsSet.gmpl", sep = "")
+  
+  modelFile <- system.file("extdata",modelfilename, package="MCDA")
   
   # write data file
   
@@ -259,9 +261,9 @@ MRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments,
     
     # get second model file
     
-    modelFile <- system.file("extdata","MRSortIdentifyInvalidAssignmentsSet.gmpl", package="MCDA")
-    if(veto)
-      modelFile <- system.file("extdata","MRSortVIdentifyInvalidAssignmentsSet.gmpl", package="MCDA")
+    modelfilename <- paste("MRSort", c("","V","D","DV1","DV2","DV3","DV4","DV5")[match(majorityRule,c("","V","D","v","d","dV","Dv","dv"))], "IdentifyInvalidAssignmentsSet.gmpl", sep = "")
+    
+    modelFile <- system.file("extdata",modelfilename, package="MCDA")
     
     # create new data content
     

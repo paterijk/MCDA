@@ -13,7 +13,7 @@ rownames(performanceTable) <- c("a1","a2","a3","a4","a5","a6","a7","a8","a9","a1
 
 colnames(performanceTable) <- c("c1","c2","c3")
 
-assignments <-c("P","P","P","F","F","F","F","F","F","P","F","F","F","F","F","F","F","F","F","F","F","F","F","F")
+assignments <-c("P","P","P","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F","F")
 
 names(assignments) <- rownames(performanceTable)
 
@@ -25,24 +25,15 @@ criteriaMinMax <- c("max","max","max")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-incompatibleAssignmentsSets<-MRSortIdentifyIncompatibleAssignments(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto = TRUE,
-                                                                   alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7","a8","a9","a10"))
-
-print(incompatibleAssignmentsSets)
-
-filteredAlternativesIDs <- setdiff(c("a1","a2","a3","a4","a5","a6","a7","a8","a9"),incompatibleAssignmentsSets[[1]])
-
-print(filteredAlternativesIDs)
-
 x<-MRSortInferenceExact(performanceTable, assignments, categoriesRanks, 
-                        criteriaMinMax, veto = TRUE, readableWeights = TRUE, readableProfiles = TRUE,
-                        alternativesIDs = filteredAlternativesIDs)
+                         criteriaMinMax, veto = TRUE, readableWeights = TRUE, readableProfiles = TRUE,
+                         alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7"))
 
 print(x)
 
 ElectreAssignments<-MRSort(performanceTable, x$profilesPerformances, 
-                           x$weights, criteriaMinMax, x$lambda, criteriaVetos=x$vetoPerformances, alternativesIDs = filteredAlternativesIDs)
+                           x$weights, criteriaMinMax, x$lambda, criteriaVetos=x$vetoPerformances, alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7"))
 
-print(all(ElectreAssignments == assignments[filteredAlternativesIDs]))
+print(all(ElectreAssignments == assignments[c("a1","a2","a3","a4","a5","a6","a7")]))
 
-stopifnot(all(assignments[filteredAlternativesIDs] == ElectreAssignments))
+stopifnot(all(assignments[c("a1","a2","a3","a4","a5","a6","a7")] == ElectreAssignments))

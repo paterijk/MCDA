@@ -28,6 +28,8 @@ var lambda >= 0.5, <= 1;
 var w{i in 1..F} >=0, <=1;
 /* performance table - profiles */
 var PTk{k in 1..(K+1), i in 1..F};
+/* on off variables to remove constraints */
+var OnOff{x in 1..X} binary;
 /* local concordance to upper profile */
 var lCupp{x in 1..X, i in 1..F} binary;
 /* local concordance to lower profile */
@@ -39,7 +41,7 @@ var wlClow{x in 1..X, i in 1..F};
 /* ******************************** */
 /* ****** objective function ****** */
 /* ******************************** */
-minimize obj: 0;
+minimize obj: sum{x in 1..X} (OnOff[x]);
 /* ************************* */
 /* ****** constraints ****** */
 /* ************************* */
@@ -65,9 +67,9 @@ s.t. wlClow4{x in 1..X, i in 1..F}: lClow[x,i] + w[i] - 1 <= wlClow[x,i];
 /* dominance between profiles */
 s.t. dominance{k in 1..K, i in 1..F}: Fdir[i] * PTk[(k+1),i] <= Fdir[i] * PTk[k,i]; 
 /* alternative outranks lower profile */
-s.t. Slow{x in 1..X}: lambda <= sum{i in 1..F} wlClow[x,i];
+s.t. Slow{x in 1..X}: lambda - OnOff[x] <= sum{i in 1..F} wlClow[x,i];
 /* alternative does not outrank upper profile */
-s.t. Supp{x in 1..X}: sum{i in 1..F} wlCupp[x,i] + gamma <= lambda;
+s.t. Supp{x in 1..X}: sum{i in 1..F} wlCupp[x,i] + gamma <= lambda + OnOff[x];
 
 solve;
 

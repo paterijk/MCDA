@@ -1,0 +1,140 @@
+/* ************************ */
+/* ****** MRSort dv ****** */
+/* ************************ */
+/* alternatives */
+param X;
+/* criteria */
+param F;
+/* criteria preference direction*/
+param Fdir{i in 1..F};
+/* criteria min*/
+param Fmin{i in 1..F};
+/* criteria max*/
+param Fmax{i in 1..F};
+/* categories */
+param K;
+/* assignments */
+param A{x in 1..X};
+/* performance table - alternatives */
+param PTx{x in 1..X, i in 1..F};
+/* separation for inequalities and parameters */
+param gamma;
+/* *********************** */
+/* ****** variables ****** */
+/* *********************** */
+/* majority threshold */
+var lambda >= 0.5, <= 1;
+/* weights */
+var w{i in 1..F} >=0, <=1;
+/* performance table - profiles */
+var PTk{k in 1..(K+1), i in 1..F};
+/* performance table - dictators */
+var PTd{k in 1..(K+1), i in 1..F};
+/* performance table - vetoes */
+var PTv{k in 1..(K+1), i in 1..F};
+/* local concordance to upper profile */
+var lCupp{x in 1..X, i in 1..F} binary;
+/* local concordance to lower profile */
+var lClow{x in 1..X, i in 1..F} binary;
+/* local dictator to upper profile */
+var lDupp{x in 1..X, i in 1..F} binary;
+/* local dictator to lower profile */
+var lDlow{x in 1..X, i in 1..F} binary;
+/* local veto to upper profile */
+var lVupp{x in 1..X, i in 1..F} binary;
+/* local veto to lower profile */
+var lVlow{x in 1..X, i in 1..F} binary;
+/* weighted local concordance to upper profile */
+var wlCupp{x in 1..X, i in 1..F};
+/* weighted local concordance to lower profile */
+var wlClow{x in 1..X, i in 1..F};
+/* global dictator to upper profile */
+var gDupp{x in 1..X} binary;
+/* global dictator to lower profile */
+var gDlow{x in 1..X} binary;
+/* global veto to upper profile */
+var gVupp{x in 1..X} binary;
+/* global veto to lower profile */
+var gVlow{x in 1..X} binary;
+/* global S to upper profile */
+var gSupp{x in 1..X};
+/* global S to lower profile */
+var gSlow{x in 1..X};
+/* distances between profiles */
+var delta{i in 1..F} >= 0;
+/* ******************************** */
+/* ****** objective function ****** */
+/* ******************************** */
+minimize obj: (K-1) * sum{i in 1..F}(1-delta[i]) + sum{k in 2..K, i in 1..F}(Fdir[i] * (PTd[1,i] - PTd[k,i]) / (Fmax[i] - Fmin[i] + 2 * gamma)) + sum{k in 2..K, i in 1..F}(Fdir[i] * (PTv[k,i] - PTv[K+1,i]) / (Fmax[i] - Fmin[i] + 2 * gamma));
+/* ************************* */
+/* ****** constraints ****** */
+/* ************************* */
+/* normalized weights */
+s.t. normalisedWeights: sum{i in 1..F} w[i] = 1;
+/* constrain profile values */
+s.t. bottomP{i in 1..F}: PTk[K+1,i] = (Fmax[i] + gamma) * (1 - Fdir[i]) / 2 + (Fmin[i] - gamma) * (Fdir[i] + 1) / 2;
+s.t. topP{i in 1..F}: PTk[1,i] = (Fmax[i] + gamma) * (Fdir[i] + 1) / 2 + (Fmin[i] - gamma) * (1 - Fdir[i]) / 2;
+s.t. bottomD{i in 1..F}: PTd[K+1,i] = PTk[K+1,i];
+s.t. topD{i in 1..F}: PTd[1,i] = PTk[1,i];
+s.t. bottomV{i in 1..F}: PTv[K+1,i] = PTk[K+1,i];
+s.t. topV{i in 1..F}: PTv[1,i] = PTk[1,i];
+/* constraints on the local concordance */
+s.t. lCupp1{x in 1..X, i in 1.. F}: Fdir[i] * (PTx[x,i] - PTk[A[x],i]) + gamma <= lCupp[x,i] * (Fmax[i] - Fmin[i] + 1);
+s.t. lCupp2{x in 1..X, i in 1.. F}: (lCupp[x,i] - 1) * (Fmax[i] - Fmin[i] + 1) <= Fdir[i] * (PTx[x,i] - PTk[A[x],i]);
+s.t. lClow1{x in 1..X, i in 1.. F}: Fdir[i] * (PTx[x,i] - PTk[A[x]+1,i]) + gamma <= lClow[x,i] * (Fmax[i] - Fmin[i] + 1);
+s.t. lClow2{x in 1..X, i in 1.. F}: (lClow[x,i] - 1) * (Fmax[i] - Fmin[i] + 1) <= Fdir[i] * (PTx[x,i] - PTk[A[x]+1,i]);
+/* constraints on the local dictator */
+s.t. lDupp1{x in 1..X, i in 1.. F}: Fdir[i] * (PTx[x,i] - PTd[A[x],i]) + gamma <= lDupp[x,i] * (Fmax[i] - Fmin[i] + 1);
+s.t. lDupp2{x in 1..X, i in 1.. F}: (lDupp[x,i] - 1) * (Fmax[i] - Fmin[i] + 1) <= Fdir[i] * (PTx[x,i] - PTd[A[x],i]);
+s.t. lDlow1{x in 1..X, i in 1.. F}: Fdir[i] * (PTx[x,i] - PTd[A[x]+1,i]) + gamma <= lDlow[x,i] * (Fmax[i] - Fmin[i] + 1);
+s.t. lDlow2{x in 1..X, i in 1.. F}: (lDlow[x,i] - 1) * (Fmax[i] - Fmin[i] + 1) <= Fdir[i] * (PTx[x,i] - PTd[A[x]+1,i]);
+/* constraints on the local veto */
+s.t. lVupp1{x in 1..X, i in 1.. F}: Fdir[i] * (PTx[x,i] - PTv[A[x],i]) <= (1 - lVupp[x,i]) * (Fmax[i] - Fmin[i] + 1);
+s.t. lVupp2{x in 1..X, i in 1.. F}: -lVupp[x,i] * (Fmax[i] - Fmin[i] + 1) + gamma <= Fdir[i] * (PTx[x,i] - PTv[A[x],i]);
+s.t. lVlow1{x in 1..X, i in 1.. F}: Fdir[i] * (PTx[x,i] - PTv[A[x]+1,i]) <= (1 - lVlow[x,i]) * (Fmax[i] - Fmin[i] + 1);
+s.t. lVlow2{x in 1..X, i in 1.. F}: -lVlow[x,i] * (Fmax[i] - Fmin[i] + 1) + gamma <= Fdir[i] * (PTx[x,i] - PTv[A[x]+1,i]);
+/* constraints on the weighted local concordance */
+s.t. wlCupp1{x in 1..X, i in 1..F}: wlCupp[x,i] <= w[i];
+s.t. wlCupp2{x in 1..X, i in 1..F}: 0 <= wlCupp[x,i];
+s.t. wlCupp3{x in 1..X, i in 1..F}: wlCupp[x,i] <= lCupp[x,i];
+s.t. wlCupp4{x in 1..X, i in 1..F}: lCupp[x,i] + w[i] - 1 <= wlCupp[x,i];
+s.t. wlClow1{x in 1..X, i in 1..F}: wlClow[x,i] <= w[i];
+s.t. wlClow2{x in 1..X, i in 1..F}: 0 <= wlClow[x,i];
+s.t. wlClow3{x in 1..X, i in 1..F}: wlClow[x,i] <= lClow[x,i];
+s.t. wlClow4{x in 1..X, i in 1..F}: lClow[x,i] + w[i] - 1 <= wlClow[x,i];
+/* constraints on the global dictator */
+s.t. gDupp1{x in 1..X, i in 1..F}: gDupp[x] >= lDupp[x,i];
+s.t. gDupp2{x in 1..X}: gDupp[x] <= sum{i in 1..F} lDupp[x,i];
+s.t. gDlow1{x in 1..X, i in 1..F}: gDlow[x] >= lDlow[x,i];
+s.t. gDlow2{x in 1..X}: gDlow[x] <= sum{i in 1..F} lDlow[x,i];
+/* constraints on the global veto */
+s.t. gVupp1{x in 1..X, i in 1..F}: gVupp[x] >= lVupp[x,i];
+s.t. gVupp2{x in 1..X}: gVupp[x] <= sum{i in 1..F} lVupp[x,i];
+s.t. gVlow1{x in 1..X, i in 1..F}: gVlow[x] >= lVlow[x,i];
+s.t. gVlow2{x in 1..X}: gVlow[x] <= sum{i in 1..F} lVlow[x,i];
+/* constraints on the global S */
+s.t. gSupp1{x in 1..X}: gSupp[x] <= sum{i in 1..F} wlCupp[x,i] + gDupp[x];
+s.t. gSupp2{x in 1..X}: gSupp[x] >= gDupp[x] - gVupp[x];
+s.t. gSupp3{x in 1..X}: gSupp[x] <= 1 - gVupp[x] + gDupp[x];
+s.t. gSupp4{x in 1..X}: gSupp[x] >= sum{i in 1..F} wlCupp[x,i] - gVupp[x];
+s.t. gSupp5{x in 1..X}: gSupp[x] >= sum{i in 1..F} wlCupp[x,i] - 2 + gDupp[x] + gVupp[x];
+s.t. gSupp6{x in 1..X}: gSupp[x] <= sum{i in 1..F} wlCupp[x,i] + 2 - gDupp[x] - gVupp[x];
+s.t. gSlow1{x in 1..X}: gSlow[x] <= sum{i in 1..F} wlClow[x,i] + gDlow[x];
+s.t. gSlow2{x in 1..X}: gSlow[x] >= gDlow[x] - gVlow[x];
+s.t. gSlow3{x in 1..X}: gSlow[x] <= 1 - gVlow[x] + gDlow[x];
+s.t. gSlow4{x in 1..X}: gSlow[x] >= sum{i in 1..F} wlClow[x,i] - gVlow[x];
+s.t. gSlow5{x in 1..X}: gSlow[x] >= sum{i in 1..F} wlClow[x,i] - 2 + gDlow[x] + gVlow[x];
+s.t. gSlow6{x in 1..X}: gSlow[x] <= sum{i in 1..F} wlClow[x,i] + 2 - gDlow[x] - gVlow[x];
+/* dominance between profiles */
+s.t. dominanceP{k in 1..K, i in 1..F}: Fdir[i] * PTk[(k+1),i] <= Fdir[i] * PTk[k,i] - delta[i] * (Fmax[i]-Fmin[i]+1); 
+/* dominance between profiles and dictator profiles */
+s.t. dominancePD{k in 2..K, i in 1..F}: Fdir[i] * PTk[k,i] + gamma <= Fdir[i] * PTd[k,i];
+/* dominance between profiles and veto profiles */
+s.t. dominancePV{k in 2..K, i in 1..F}: Fdir[i] * PTv[k,i] + gamma <= Fdir[i] * PTk[k,i];
+/* alternative outranks lower profile */
+s.t. Slow{x in 1..X}: lambda <= gSlow[x];
+/* alternative does not outrank upper profile */
+s.t. Supp{x in 1..X}: gSupp[x] + gamma <= lambda;
+
+solve;
+

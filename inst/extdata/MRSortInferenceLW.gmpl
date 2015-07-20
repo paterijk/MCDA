@@ -1,0 +1,39 @@
+/* ************************ */
+/* ****** parameters ****** */
+/* ************************ */
+/* alternatives */
+param X;
+/* criteria */
+param F;
+/* separation for inequalities and parameters */
+param gamma;
+/* local concordance to upper profile */
+param lCupp{x in 1..X, i in 1..F};
+/* local concordance to lower profile */
+param lClow{x in 1..X, i in 1..F};
+/* *********************** */
+/* ****** variables ****** */
+/* *********************** */
+/* majority threshold */
+var lambda >= 0.5, <= 1;
+/* weights */
+var w{i in 1..F} >= gamma, <=1;
+/* variables used for identifying valid constraints */
+var x1{x in 1..X} >=0;
+var x2{x in 1..X} >=0;
+/* ******************************** */
+/* ****** objective function ****** */
+/* ******************************** */
+minimize obj: sum{x in 1..X} (x1[x]+x2[x]);
+/* ************************* */
+/* ****** constraints ****** */
+/* ************************* */
+/* normalized weights */
+s.t. normalisedWeights: sum{i in 1..F} w[i] = 1;
+/* no dictators */
+s.t. nondictatordWeights{i in 1..F}: w[i] + gamma <= lambda;
+/* alternative should outrank lower profile */
+s.t. Slow{x in 1..X}: sum{i in 1..F} (lClow[x,i]*w[i]) + x1[x] >= lambda;
+/* alternative should not outrank upper profile */
+s.t. Supp{x in 1..X}: sum{i in 1..F} (lCupp[x,i]*w[i]) - x2[x] + gamma <= lambda;
+solve;

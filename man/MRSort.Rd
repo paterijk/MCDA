@@ -4,7 +4,9 @@
 \title{Electre TRI-like sorting method axiomatized by Bouyssou and Marchant.}
 
 \description{This simplification of the Electre TRI method uses the pessimistic assignment rule, without indifference or
-preference thresholds attached to criteria. Only a binary discordance condition is considered, i.e. a veto forbids an outranking in any possible concordance situation, or not.}
+preference thresholds attached to criteria. 
+Only a binary discordance condition is considered, i.e. a veto forbids an outranking 
+in any possible concordance situation, or not.}
 
 \usage{
 MRSort(performanceTable, categoriesLowerProfiles, 
@@ -14,12 +16,26 @@ MRSort(performanceTable, categoriesLowerProfiles,
 }
 
 \arguments{
-  \item{performanceTable}{Matrix or data frame containing the performance table. Each row corresponds to an alternative, and each column to a criterion. Rows (resp. columns) must be named according to the IDs of the alternatives (resp. criteria).}
-  \item{categoriesLowerProfiles}{Matrix containing, in each row, the lower profiles of the categories. The columns are named according to the criteria, and the rows are named according to the categories. The index of the row in the matrix corresponds to the rank of the category.}
-  \item{criteriaWeights}{Vector containing the weights of the criteria. The elements are named according to the IDs of the criteria.}
-  \item{criteriaMinMax}{Vector containing the preference direction on each of the criteria. "min" (resp. "max") indicates that the criterion has to be minimized (maximized). The elements are named according to the IDs of the criteria.}
-  \item{majorityThreshold}{The cut threshold for the concordance condition. Should be at least half of the sum of the weights.}
-  \item{criteriaVetos}{Matrix containing in each row a vector defining the veto values for the lower profile of the category. NA values mean that no veto is defined. A veto threshold for criterion i and category k represents the performance below which an alternative is forbidden to outrank the lower profile of category k, and thus is forbidden to be assigned to the category k. The rows are named according to the categories, whereas the columns are named according to the criteria.}
+  \item{performanceTable}{Matrix or data frame containing the performance table. 
+  Each row corresponds to an alternative, and each column to a criterion. 
+  Rows (resp. columns) must be named according to the IDs of the alternatives (resp. criteria).}
+  \item{categoriesLowerProfiles}{Matrix containing, in each row, the lower profiles of the categories. 
+  The columns are named according to the criteria, and the rows are named according to the categories. 
+  The index of the row in the matrix corresponds to the rank of the category.}
+  \item{criteriaWeights}{Vector containing the weights of the criteria. 
+  The elements are named according to the IDs of the criteria.}
+  \item{criteriaMinMax}{Vector containing the preference direction on each of the criteria. 
+  "min" (resp. "max") indicates that the criterion has to be minimized (maximized). 
+  The elements are named according to the IDs of the criteria.}
+  \item{majorityThreshold}{The cut threshold for the concordance condition. 
+  Should be at least half of the sum of the weights.}
+  \item{criteriaVetos}{Matrix containing in each row a vector defining the veto values for 
+  the lower profile of the category. NA values mean that no veto is defined. 
+  A veto threshold for criterion i and category k represents the performance below which 
+  an alternative is forbidden to outrank the lower profile of category k, and thus is 
+  forbidden to be assigned to the category k. 
+  The rows are named according to the categories, whereas the columns are named 
+  according to the criteria.}
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
   \item{categoriesIDs}{Vector containing IDs of categories, according to which the data should be filtered.}
@@ -31,8 +47,8 @@ MRSort(performanceTable, categoriesLowerProfiles,
 
 \references{
 Bouyssou, D. and Marchant, T. An axiomatic approach to noncompen-
-satory sorting methods in MCDM, II: more than two categories. European Journal
-of Operational Research, 178(1): 246--276, 2007.
+satory sorting methods in MCDM, II: more than two categories. 
+European Journal of Operational Research, 178(1): 246--276, 2007.
 }
 
 \examples{
