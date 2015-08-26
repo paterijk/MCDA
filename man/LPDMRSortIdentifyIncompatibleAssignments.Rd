@@ -1,7 +1,7 @@
 \name{LPDMRSortIdentifyIncompatibleAssignments}
 \alias{LPDMRSortIdentifyIncompatibleAssignments}
 
-\title{Identifies all sets of assignment examples which are incompatible with the MRSort sorting method extended to handle large performance differences by Meyer and Olteanu.}
+\title{Identifies all sets of assignment examples which are incompatible with the MRSort sorting method extended to handle large performance differences.}
 
 \description{MRSort is a simplified ElectreTRI method that uses the pessimistic assignment rule, without indifference or preference thresholds attached to criteria. LPDMRSort considers both a binary discordance and a binary concordance conditions including several interactions between them. This function outputs all (or a fixed number of) sets of incompatible assignment examples ranging in size from the minimal size and up to a given threshold. 
 The retrieved sets are also not contained in each other.}
@@ -59,7 +59,7 @@ European Journal of Operational Research, 178(1): 246--276, 2007.
 
 Meyer, P. and Olteanu, A-L. Integrating large positive and negative performance 
 differences in majority-rule sorting models.
-European Journal of Operational Research, , 2015.
+European Journal of Operational Research, submitted , 2015.
 }
 
 \examples{
@@ -133,8 +133,6 @@ for(i in 1:1)# change to 7 in order to perform all tests
                                 alternativesIDs = filteredAlternativesIDs)
   
   print(all(ElectreAssignments == assignments[i,filteredAlternativesIDs]))
-  
-  stopifnot(all(assignments[i,filteredAlternativesIDs] == ElectreAssignments))
 }
 }
 

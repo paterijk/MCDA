@@ -1,10 +1,9 @@
 \name{MRSortInferenceExact}
 \alias{MRSortInferenceExact}
 
-\title{Identification of profiles, weights and majority threshold for an Electre TRI-like 
-sorting method axiomatized by Bouyssou and Marchant.}
+\title{Identification of profiles, weights and majority threshold for the MRSort sorting method using an exact approach.}
 
-\description{This simplification of the Electre TRI method uses the pessimistic assignment rule,
+\description{The MRSort method, a simplification of the Electre TRI method, uses the pessimistic assignment rule,
 without indifference or preference thresholds attached to criteria. 
 Only a binary discordance condition is considered, i.e. a veto forbids an outranking in any
 possible concordance situation, or not. 

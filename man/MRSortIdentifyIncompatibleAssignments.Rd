@@ -1,11 +1,9 @@
 \name{MRSortIdentifyIncompatibleAssignments}
 \alias{MRSortIdentifyIncompatibleAssignments}
 
-\title{Identifies all sets of assignment examples which are incompatible with the 
-Electre TRI-like sorting method axiomatized by Bouyssou and Marchant.}
+\title{Identifies all sets of assignment examples which are incompatible with the MRSort method.}
 
-\description{This simplification of the Electre TRI method uses the pessimistic assignment rule,
-without indifference or preference thresholds attached to criteria. 
+\description{This MRSort method, which is a simplification of the Electre TRI method, uses the pessimistic assignment rule, without indifference or preference thresholds attached to criteria. 
 Only a binary discordance condition is considered, i.e. a veto forbids an outranking in any
 possible concordance situation, or not. 
 This function outputs for all (or a fixed number of) sets of incompatible assignment examples

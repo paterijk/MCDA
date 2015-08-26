@@ -2,8 +2,7 @@
 \alias{LPDMRSortInferenceExact}
 
 \title{Identification of profiles, weights, majority threshold and veto and dictator thresholds
-for the MRSort sorting approach extended to handle large performance differences 
-by Meyer and Olteanu.}
+for the MRSort sorting approach extended to handle large performance differences.}
 
 \description{MRSort is a simplified ElectreTRI method that uses the pessimistic assignment rule,
 without indifference or preference thresholds attached to criteria. 
@@ -77,7 +76,7 @@ European Journal of Operational Research, 178(1): 246--276, 2007.
 
 Meyer, P. and Olteanu, A-L. Integrating large positive and negative performance 
 differences in majority-rule sorting models. 
-European Journal of Operational Research, , 2015.
+European Journal of Operational Research, submitted, 2015.
 }
 
 \examples{
@@ -142,8 +141,6 @@ for(i in 1:1)# change to 7 in order to perform all tests
   print(x)
   
   print(all(ElectreAssignments == assignments[i,]))
-  
-  stopifnot(all(assignments[i,] == ElectreAssignments))
 }
 }
 

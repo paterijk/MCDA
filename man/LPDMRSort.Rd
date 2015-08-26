@@ -1,7 +1,7 @@
 \name{LPDMRSort}
 \alias{LPDMRSort}
 
-\title{MRSort that takes into account large performance differences as extended by Meyer and Olteanu.}
+\title{MRSort that takes into account large performance differences.}
 
 \description{MRSort is a simplified ElectreTRI method that uses the pessimistic assignment rule,
 without indifference or preference thresholds attached to criteria. LPDMRSort considers both a
@@ -68,7 +68,7 @@ European Journal of Operational Research, 178(1): 246--276, 2007.
 
 Meyer, P. and Olteanu, A-L. Integrating large positive and negative
 performance differences in majority-rule sorting models.
-European Journal of Operational Research, , 2015.
+European Journal of Operational Research, submitted, 2015.
 }
 
 \examples{
@@ -148,8 +148,6 @@ for(i in 1:7)
                                 majorityRule = majorityRules[i])
 
   print(all(ElectreAssignments == assignments[i,]))
-
-  stopifnot(all(assignments[i,]== ElectreAssignments))
 }
 }
 

@@ -2,7 +2,7 @@
 \alias{MRSortInferenceApprox}
 
 \title{Identification of profiles, weights, majority threshold and veto thresholds for 
-MRSort using a metaheuristic approach by Olteanu and Meyer.}
+MRSort using a metaheuristic approach.}
 
 \description{MRSort is a simplification of the Electre TRI method that uses the pessimistic assignment rule, without indifference or preference thresholds attached to criteria. 
 Only a binary discordance condition is considered, i.e. a veto forbids an outranking in any possible concordance situation, or not. The identification of the profiles, weights, 
