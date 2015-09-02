@@ -7,6 +7,7 @@ importFrom("graphics", "arrows", "axis", "layout", "legend", "lines","par", "plo
 importFrom("stats", "runif")
 
 import(glpkAPI)
+import(Rgraphviz)
 
 ## Generics and functions defined in this package
 export(
@@ -33,6 +34,7 @@ export(
   "plotMARE",
   "plotMRSortSortingProblem",
   "plotPiecewiseLinearValueFunctions",
-  "plotRadarPerformanceTable"
+  "plotRadarPerformanceTable",
+  "plotAlternativesValuesPreorder"
 )
 
