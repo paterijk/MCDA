@@ -96,8 +96,7 @@ plotPiecewiseLinearValueFunctions(x$valueFunctions)
 
 transformedPerformanceTable <- applyPiecewiseLinearValueFunctionsOnPerformanceTable(
   x$valueFunctions, 
-  performanceTable, 
-  criteriaMinMax)
+  performanceTable)
 
 # calculate the overall score of each alternative
 
@@ -189,8 +188,7 @@ plotPiecewiseLinearValueFunctions(x$valueFunctions)
 
 transformedPerformanceTable <- applyPiecewiseLinearValueFunctionsOnPerformanceTable(
       x$valueFunctions, 
-      performanceTable, 
-      criteriaMinMax)
+      performanceTable)
 
 # calculate the overall score of each alternative
 
@@ -218,8 +216,7 @@ plotPiecewiseLinearValueFunctions(x$averageValueFunctionsPO)
 
 transformedPerformanceTable <- applyPiecewiseLinearValueFunctionsOnPerformanceTable(
       x$averageValueFunctionsPO, 
-      performanceTable, 
-      criteriaMinMax)
+      performanceTable)
 
 # calculate the overall score of each alternative
 
@@ -250,7 +247,6 @@ plotPiecewiseLinearValueFunctions(x$valueFunctions,
 transformedPerformanceTable <- applyPiecewiseLinearValueFunctionsOnPerformanceTable(
   x$valueFunctions, 
   performanceTable, 
-  criteriaMinMax, 
   criteriaIDs = c("MaximalSpeed","Price")
   )
 

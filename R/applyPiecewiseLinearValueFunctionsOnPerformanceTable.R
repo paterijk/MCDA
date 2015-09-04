@@ -37,7 +37,7 @@
 #
 ##############################################################################
 
-applyPiecewiseLinearValueFunctionsOnPerformanceTable <- function(valueFunctions, performanceTable, criteriaMinMax, alternativesIDs = NULL, criteriaIDs = NULL){
+applyPiecewiseLinearValueFunctionsOnPerformanceTable <- function(valueFunctions, performanceTable, alternativesIDs = NULL, criteriaIDs = NULL){
   
   ## check the input data
   
@@ -89,6 +89,27 @@ applyPiecewiseLinearValueFunctionsOnPerformanceTable <- function(valueFunctions,
   
   if (!test)
     stop("performanceTable ranges do not lie in valueFunctions ranges")
+  
+  
+  ## reorder points of value functions to make them increasing w.r.t. y
+  
+  for (i in 1:numCrit){
+    valueFunctions[[i]] <- valueFunctions[[i]][,order(valueFunctions[[i]][2,])]
+  }
+  
+  ## determine if criteria are to be minimized or maximized according to the value functions
+  
+  criteriaMinMax<-c()
+  
+  for (i in 1:numCrit){
+    if (all(diff(valueFunctions[[i]][1,])>=0)){
+      criteriaMinMax <- c(criteriaMinMax, "max")
+    }
+    else if (all(diff(valueFunctions[[i]][1,])<=0)){
+      criteriaMinMax <- c(criteriaMinMax, "min")
+    }
+    else stop("non monotonic value function")
+  }
   
   # determine first how many breakpoints in each value function
   

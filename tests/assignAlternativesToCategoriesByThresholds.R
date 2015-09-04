@@ -43,7 +43,7 @@ names(categoriesRanks) <- c("good","medium","bad")
 
 x<-UTADIS(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints, alternativesAssignments, categoriesRanks,0.1)
 
-npt <- applyPiecewiseLinearValueFunctionsOnPerformanceTable(x$valueFunctions, performanceTable, criteriaMinMax)
+npt <- applyPiecewiseLinearValueFunctionsOnPerformanceTable(x$valueFunctions, performanceTable)
 
 scores <- weightedSum(npt, c(1,1,1))
 

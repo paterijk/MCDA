@@ -8,7 +8,6 @@
 \usage{
 applyPiecewiseLinearValueFunctionsOnPerformanceTable(valueFunctions, 
                                       performanceTable, 
-                                      criteriaMinMax, 
                                       alternativesIDs = NULL, 
                                       criteriaIDs = NULL)
 }
@@ -18,7 +17,6 @@ applyPiecewiseLinearValueFunctionsOnPerformanceTable(valueFunctions,
 \arguments{
   \item{valueFunctions}{A list containing, for each criterion, the piecewise linear value functions defined by the coordinates of the break points. Each value function is defined by a matrix of breakpoints, where the first row corresponds to the abscissa (row labelled "x") and where the second row corresponds to the ordinate (row labelled "y").}
   \item{performanceTable}{Matrix or data frame containing the performance table. Each row corresponds to an alternative, and each column to a criterion. Rows (resp. columns) must be named according to the IDs of the alternatives (resp. criteria).}
-  \item{criteriaMinMax}{Vector containing the preference direction on each of the criteria. "min" (resp. "max") indicates that the criterion has to be minimized (maximized). The elements are named according to the IDs of the criteria.}
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
 }
@@ -52,15 +50,9 @@ rownames(performanceTable) <- c("RER","METRO1","METRO2","BUS","TAXI")
 
 colnames(performanceTable) <- c("Price","Time","Comfort")
 
-# criteria to be minimized or maximized
-
-criteriaMinMax <- c("min","min","max")
-
-names(criteriaMinMax) <- colnames(performanceTable)
-
 # the transformed performance table
 
-applyPiecewiseLinearValueFunctionsOnPerformanceTable(v,performanceTable, criteriaMinMax)
+applyPiecewiseLinearValueFunctionsOnPerformanceTable(v,performanceTable)
 }
 
 \keyword{methods}

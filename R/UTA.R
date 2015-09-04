@@ -512,7 +512,7 @@ UTA <- function(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints, e
   # -------------------------------------------------------
   
   if ((numAlt >= 3) && !is.null(alternativesRanks))
-    tau = Kendall(alternativesRanks,outRanks)$tau[1]
+    tau = cor(alternativesRanks,outRanks,method="kendall")
   else
     tau = NULL
   
