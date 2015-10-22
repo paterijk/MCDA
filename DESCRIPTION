@@ -1,11 +1,12 @@
 Package: MCDA
 Version: 0.0.12
-Date: 2015-09-02
+Date: 2015-10-22
 Title: Functions to Support the Multicriteria Decision Aiding Process
 Author: Patrick Meyer, Sébastien Bigaret, Richard Hodgett, Alexandru-Liviu Olteanu
 Maintainer: Patrick Meyer <patrick.meyer@telecom-bretagne.eu>
 Description: Functions which can be useful to support the analyst in the Multicriteria Decision Aiding (MCDA) process involving multiple, conflicting criteria. 
-Imports: Rglpk, glpkAPI, Rgraphviz
+Imports: Rglpk, glpkAPI
+Suggests: Rgraphviz
 License: CeCILL-2
 Encoding: UTF-8
 URL: https://github.com/paterijk/MCDA

@@ -39,6 +39,10 @@
 
 plotAlternativesValuesPreorder <- function(alternativesValues, decreasing = TRUE, alternativesIDs = NULL){
   
+  # if (!require(Rgraphviz)) stop("Rgraphviz package could not be loaded")
+  
+  if (!requireNamespace("Rgraphviz", quietly = TRUE)) stop("Rgraphviz package could not be loaded")
+  
   ## check the input data
 
   if (!(is.vector(alternativesValues)))
@@ -110,5 +114,5 @@ plotAlternativesValuesPreorder <- function(alternativesValues, decreasing = TRUE
   
   graph <- new("graphNEL", nodes=labels, edgeL=edg, edgemode="directed")
   
-  plot(graph, attrs = list(node = list(shape = "box", fixedsize = FALSE)))  
+  Rgraphviz::plot(graph, attrs = list(node = list(shape = "box", fixedsize = FALSE)))  
 }
