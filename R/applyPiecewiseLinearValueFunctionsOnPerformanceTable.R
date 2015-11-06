@@ -102,10 +102,10 @@ applyPiecewiseLinearValueFunctionsOnPerformanceTable <- function(valueFunctions,
   criteriaMinMax<-c()
   
   for (i in 1:numCrit){
-    if (all(diff(valueFunctions[[i]][1,])>=0)){
+    if (all(diff(valueFunctions[[i]][1,]) %>=% 0)){
       criteriaMinMax <- c(criteriaMinMax, "max")
     }
-    else if (all(diff(valueFunctions[[i]][1,])<=0)){
+    else if (all(diff(valueFunctions[[i]][1,]) %<=% 0)){
       criteriaMinMax <- c(criteriaMinMax, "min")
     }
     else stop("non monotonic value function")
