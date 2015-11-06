@@ -4,6 +4,8 @@ importFrom(Rglpk, Rglpk_solve_LP)
 importFrom("grDevices", "palette", "rainbow")
 importFrom("graphics", "arrows", "axis", "layout", "legend", "lines","par", "plot", "plot.new", "points", "text", "title")
 importFrom("stats", "runif")
+importFrom("methods", "new")
+importFrom("stats", "cor")
 import(glpkAPI)
 
 ## Generics and functions defined in this package
