@@ -78,8 +78,8 @@ UTADIS <- function(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints
     performanceTable <- performanceTable[alternativesIDs,] 
     alternativesAssignments <- alternativesAssignments[alternativesIDs]
   }
-    
-    
+  
+  
   
   if (!is.null(criteriaIDs)){
     criteriaMinMax <- criteriaMinMax[criteriaIDs]
@@ -277,7 +277,7 @@ UTADIS <- function(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints
   # that will give us the positions in the lower bounds vector of the categories
   
   newCategoriesRanks <- rank(categoriesRanks)
-    
+  
   for (i in 1:length(alternativesAssignments)){
     # determine which lower bound should be activated for the comparison
     # none if it is an assignment in the lowest category
@@ -445,6 +445,18 @@ UTADIS <- function(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints
   }
   
   names(valueFunctions) <- colnames(performanceTable)
+  
+  # it might happen on certain computers that these value functions 
+  # do NOT respect the monotonicity constraints (especially because of too small differences and computer arithmetics)
+  # therefore we check if they do, and if not, we "correct" them
+  
+  for (i in 1:numCrit){
+    for (j in 1:(criteriaNumberOfBreakPoints[i]-1)){
+      if (valueFunctions[[i]][2,j] > valueFunctions[[i]][2,j+1]){
+        valueFunctions[[i]][2,j+1] <- valueFunctions[[i]][2,j] 
+      }
+    }
+  }
   
   # -------------------------------------------------------
   

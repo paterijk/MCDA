@@ -299,7 +299,7 @@ UTA <- function(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints, e
   indifferenceConstraints <-matrix(nrow=0, ncol=sum(criteriaNumberOfBreakPoints)+numAlt)
   
   if (!is.null(alternativesRanks)){
-
+    
     # determine now in which order the alternatives should be treated for the constraints
     indexOrder <- c()
     orderedAlternativesRanks <- sort(alternativesRanks)
@@ -488,6 +488,18 @@ UTA <- function(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoints, e
   }
   
   names(valueFunctions) <- colnames(performanceTable)
+  
+  # it might happen on certain computers that these value functions 
+  # do NOT respect the monotonicity constraints (especially because of too small differences and computer arithmetics)
+  # therefore we check if they do, and if not, we "correct" them
+  
+  for (i in 1:numCrit){
+    for (j in 1:(criteriaNumberOfBreakPoints[i]-1)){
+      if (valueFunctions[[i]][2,j] > valueFunctions[[i]][2,j+1]){
+        valueFunctions[[i]][2,j+1] <- valueFunctions[[i]][2,j] 
+      }
+    }
+  }
   
   # -------------------------------------------------------
   

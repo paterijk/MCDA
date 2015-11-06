@@ -230,34 +230,34 @@ weightedSum(transformedPerformanceTable,c(1,1,1,1,1,1))
 # ----------------------------------------
 # Let us consider only 2 criteria : Price and MaximalSpeed. What happens ? 
 
-x<-UTA(performanceTable, criteriaMinMax, 
-        criteriaNumberOfBreakPoints, epsilon,
-        alternativesRanks = alternativesRanks,
-        criteriaLBs = criteriaLBs, criteriaUBs = criteriaUBs,
-        criteriaIDs = c("MaximalSpeed","Price"))
+# x<-UTA(performanceTable, criteriaMinMax, 
+#         criteriaNumberOfBreakPoints, epsilon,
+#         alternativesRanks = alternativesRanks,
+#         criteriaLBs = criteriaLBs, criteriaUBs = criteriaUBs,
+#         criteriaIDs = c("MaximalSpeed","Price"))
         
 
 # plot the value functions obtained
 
-plotPiecewiseLinearValueFunctions(x$valueFunctions, 
-                                  criteriaIDs = c("MaximalSpeed","Price"))
+# plotPiecewiseLinearValueFunctions(x$valueFunctions, 
+#                                   criteriaIDs = c("MaximalSpeed","Price"))
 
 # apply the value functions on the original performance table
 
-transformedPerformanceTable <- applyPiecewiseLinearValueFunctionsOnPerformanceTable(
-  x$valueFunctions, 
-  performanceTable, 
-  criteriaIDs = c("MaximalSpeed","Price")
-  )
+# transformedPerformanceTable <- applyPiecewiseLinearValueFunctionsOnPerformanceTable(
+#   x$valueFunctions, 
+#   performanceTable, 
+#   criteriaIDs = c("MaximalSpeed","Price")
+#   )
 
 # calculate the overall score of each alternative
 
-weights<-c(1,1,1,1,1,1)
+# weights<-c(1,1,1,1,1,1)
 
-names(weights)<-colnames(performanceTable)
+# names(weights)<-colnames(performanceTable)
 
-weightedSum(transformedPerformanceTable,
-          weights, criteriaIDs = c("MaximalSpeed","Price"))
+# weightedSum(transformedPerformanceTable,
+#          weights, criteriaIDs = c("MaximalSpeed","Price"))
 
 # ----------------------------------------
 # An example without alternativesRanks, but with alternativesPreferences

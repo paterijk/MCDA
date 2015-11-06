@@ -496,6 +496,19 @@ UTASTAR <- function(performanceTable, criteriaMinMax, criteriaNumberOfBreakPoint
   
   names(valueFunctions) <- colnames(performanceTable)
   
+  # it might happen on certain computers that these value functions 
+  # do NOT respect the monotonicity constraints (especially because of too small differences and computer arithmetics)
+  # therefore we check if they do, and if not, we "correct" them
+  
+  for (i in 1:numCrit){
+    for (j in 1:(criteriaNumberOfBreakPoints[i]-1)){
+      if (valueFunctions[[i]][2,j] > valueFunctions[[i]][2,j+1]){
+        valueFunctions[[i]][2,j+1] <- valueFunctions[[i]][2,j] 
+      }
+    }
+  }
+  
+  
   # -------------------------------------------------------
   
   overallValues <- as.vector(t(a[,1:sum(criteriaNumberOfBreakPoints)]%*%lpSolution$solution[1:sum(criteriaNumberOfBreakPoints)]))
