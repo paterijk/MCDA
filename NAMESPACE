@@ -12,6 +12,7 @@ import(glpkAPI)
 export(
   "additiveValueFunctionElicitation",
   "AHP",
+  "pairwiseConsistencyMeasures",
   "MARE",
   "MRSort",
   "MRSortInferenceExact",
