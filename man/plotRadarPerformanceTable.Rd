@@ -10,7 +10,8 @@ plotRadarPerformanceTable(performanceTable,
                             criteriaMinMax=NULL, 
                             alternativesIDs = NULL, 
                             criteriaIDs = NULL, 
-                            overlay=FALSE)
+                            overlay=FALSE,
+                            bw=FALSE)
 }
 
 \arguments{
@@ -19,6 +20,7 @@ plotRadarPerformanceTable(performanceTable,
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the data should be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
   \item{overlay}{Boolean value indicating if the plots should be overlayed on one plot (TRUE), or not (FALSE)}
+  \item{bw}{Boolean value indicating if the plots should be in black/white (TRUE) or color (FALSE)}
   }
 
 \examples{
@@ -39,7 +41,7 @@ names(criteriaMinMax) <- c("g1","g2","g3","g4","g5","g6")
 plotRadarPerformanceTable(performanceTable, criteriaMinMax, 
                           alternativesIDs = c("x1","x2","x3","x4"), 
                           criteriaIDs = c("g1","g3","g4","g5","g6"), 
-                          overlay=FALSE)
+                          overlay=FALSE, bw=FALSE)
 
 # plotRadarPerformanceTable(performanceTable, criteriaMinMax, 
 #                          alternativesIDs = c("x1","x2"), 

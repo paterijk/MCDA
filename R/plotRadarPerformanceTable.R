@@ -93,7 +93,7 @@ webplot = function(data, alternativeID = NULL, criteriaIDs = NULL, main = NULL, 
 }
 
 
-plotRadarPerformanceTable <- function(performanceTable, criteriaMinMax=NULL, alternativesIDs = NULL, criteriaIDs = NULL, overlay=FALSE){
+plotRadarPerformanceTable <- function(performanceTable, criteriaMinMax=NULL, alternativesIDs = NULL, criteriaIDs = NULL, overlay=FALSE, bw=FALSE){
   
   ## check the input data
   
@@ -131,20 +131,46 @@ plotRadarPerformanceTable <- function(performanceTable, criteriaMinMax=NULL, alt
     par(mfcol=c(1,1))
     palette(rainbow(dim(performanceTable)[1], s = 0.6, v = 0.75))
     
-    webplot(performanceTable, alternativeID=1, main="", col=1)
-    
-    for (i in 2:dim(performanceTable)[1]){
-      webplot(performanceTable, alternativeID=i, col=i, add=T)
+    if (bw){
+      webplot(performanceTable, alternativeID=1, main="", col="black", lty=1)  
+    } else{
+      webplot(performanceTable, alternativeID=1, main="", col=1)  
     }
     
-    legend("bottomright", lty = 1, lwd = 2, col = c(1:dim(performanceTable)[1]), row.names(performanceTable), bty = "n")  
+    if (bw){
+      for (i in 2:dim(performanceTable)[1]){
+        webplot(performanceTable, alternativeID=i, col="black", lty=((i-1)%%5+1),add=T)
+      }
+    } else{
+      for (i in 2:dim(performanceTable)[1]){
+        webplot(performanceTable, alternativeID=i, col=i, add=T)
+      }
+    }
+    
+    if (bw){
+      tmp <- c(1)
+      for (i in 2:dim(performanceTable)[1]){
+        tmp <- c(tmp, ((i-1)%%5+1))
+      }
+      legend("bottomright", lty = tmp, lwd = 2, col = "black", row.names(performanceTable), bty = "n")  
+    }else{
+      legend("bottomright", lty = 1, lwd = 2, col = c(1:dim(performanceTable)[1]), row.names(performanceTable), bty = "n")    
+    }
+    
   }
   else{
     palette(rainbow(dim(performanceTable)[1], s = 0.6, v = 0.75))
     par(mfcol = c(ceiling(sqrt(dim(performanceTable)[1])), ceiling(sqrt(dim(performanceTable)[1]))))
-    for (i in 1:dim(performanceTable)[1]){
-      webplot(performanceTable, alternativeID=i, col=i, add=F)
+    if (bw){
+      for (i in 1:dim(performanceTable)[1]){
+        webplot(performanceTable, alternativeID=i, col="black", lty=((i-1)%%5+1), add=F)
+      }
+    } else{
+      for (i in 1:dim(performanceTable)[1]){
+        webplot(performanceTable, alternativeID=i, col=i, add=F)
+      }  
     }
+    
   }
   
   
