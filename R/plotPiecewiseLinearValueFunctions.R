@@ -60,7 +60,7 @@ plotPiecewiseLinearValueFunctions <- function(valueFunctions, criteriaIDs = NULL
   
 	# plotting symbol and color 
   
-	par(pch=22, col="red")
+	par(pch=22, col="black")
   
 	# determine how many plots per row and column
   
