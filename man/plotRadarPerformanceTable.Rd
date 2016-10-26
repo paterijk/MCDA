@@ -11,7 +11,8 @@ plotRadarPerformanceTable(performanceTable,
                             alternativesIDs = NULL, 
                             criteriaIDs = NULL, 
                             overlay=FALSE,
-                            bw=FALSE)
+                            bw=FALSE,
+                            lwd=2)
 }
 
 \arguments{
@@ -21,6 +22,7 @@ plotRadarPerformanceTable(performanceTable,
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
   \item{overlay}{Boolean value indicating if the plots should be overlayed on one plot (TRUE), or not (FALSE)}
   \item{bw}{Boolean value indicating if the plots should be in black/white (TRUE) or color (FALSE)}
+  \item{lwd}{Value indicating the line width of the plot.}
   }
 
 \examples{
