@@ -15,7 +15,8 @@ MRSortInferenceExact(performanceTable, assignments,
             categoriesRanks, criteriaMinMax, 
             veto = FALSE, readableWeights = FALSE,
             readableProfiles = FALSE,
-            alternativesIDs = NULL, criteriaIDs = NULL)
+            alternativesIDs = NULL, criteriaIDs = NULL,
+            solver = "glpk")
 }
 
 \arguments{
@@ -34,6 +35,7 @@ MRSortInferenceExact(performanceTable, assignments,
   \item{readableProfiles}{Boolean parameter indicating whether the profiles are to be spaced more evenly or not.}
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the data should be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
+  \item{solver}{String specifying if the glpk solver (glpk) should be used, or the cplex (cplex) solver. By default glpk. The cplex solver requires to install the cplex binary and the cplex C API, as well as the cplexAPI R package.}
 }
 
 \value{
