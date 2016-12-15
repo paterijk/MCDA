@@ -38,7 +38,7 @@
 #
 ##############################################################################
 
-MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto = FALSE, readableWeights = FALSE, readableProfiles = FALSE, alternativesIDs = NULL, criteriaIDs = NULL, solver = "glpk"){
+MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto = FALSE, readableWeights = FALSE, readableProfiles = FALSE, alternativesIDs = NULL, criteriaIDs = NULL, solver = "glpk", cplexTimeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
   
   ## check the input data
   if (!((is.matrix(performanceTable) || (is.data.frame(performanceTable))))) 
@@ -210,21 +210,49 @@ MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks,
   cat("end;\n")
   sink()
   
+  lp<-initProbGLPK()
+  
+  tran<-mplAllocWkspGLPK()
+  
+  setMIPParmGLPK(PRESOLVE, GLP_ON)
+  
+  termOutGLPK(GLP_OFF)
+  
+  out<-mplReadModelGLPK(tran, dataFile, skip=0)
+  
+  if (is.null(out))
+    out <- mplGenerateGLPK(tran)
+  else 
+    stop(return_codeGLPK(out))
+  
+  if (is.null(out))
+    mplBuildProbGLPK(tran,lp)
+  else 
+    stop(return_codeGLPK(out))
+  
   if (solver == "cplex")
   {
     
     if (!requireNamespace("cplexAPI", quietly = TRUE)) stop("cplexAPI package could not be loaded")
     
-    
-    # convert gmpl problem to cplex LP problem with glpsol
     cplexOutFile <- tempfile()
-    system(paste("glpsol --check --math ",dataFile, " --wlp ", cplexOutFile, sep=""))
+    
+    writeLPGLPK(lp, cplexOutFile)
     
     # Open a CPLEX environment
     env <- cplexAPI::openEnvCPLEX()
     
     # Create a problem object
     prob <- cplexAPI::initProbCPLEX(env)
+    
+    if (!is.null(cplexTimeLimit))
+      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_TILIM,cplexTimeLimit)
+    
+    if (!is.null(cplexIntegralityTolerance))
+      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_EPINT,cplexIntegralityTolerance)
+    
+    if (!is.null(cplexThreads))
+      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_THREADS,cplexThreads)
     
     # Read MIP problem from cplexOutFile
     out <- cplexAPI::readCopyProbCPLEX(env, prob, cplexOutFile, ftype = "LP")
@@ -235,102 +263,26 @@ MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks,
     else
       stop(out)
     
-    if (cplexAPI::getStatCPLEX(env,prob) == 101){
+    solverStatus <- cplexAPI::getStatCPLEX(env,prob)
+    
+    error <- TRUE
+    
+    if ((cplexAPI::getStatCPLEX(env,prob) == 101) | (cplexAPI::getStatCPLEX(env,prob) == 102)){
       solution <- cplexAPI::solutionCPLEX(env,prob)$x
       
       varnames <- cplexAPI::getColNameCPLEX(env,prob, 0,length(solution)-1)
       
-      lambda <- solution[varnames=="lambda"]
+      paro <- "("
+      parc <- ")"
       
-      weightsnames <- c()
-      
-      for (i in 1:numCrit)
-      {
-        weightsnames <- c(weightsnames,paste("w(",i,")",sep=""))
-      }
-      
-      weights <- c()
-      
-      for (i in 1:numCrit)
-        weights <- c(weights,solution[varnames==weightsnames[i]])
-      
-      names(weights) <- colnames(performanceTable)
-      
-      ptknames <- matrix(nrow=numCat,ncol=numCrit)
-       
-      for (i in 2:(numCat+1)){
-         for (j in 1:numCrit)
-         {
-           ptknames[i-1,j] <- paste("PTk(",i,",",j,")",sep="")
-         }
-       }
-       
-      profilesPerformances <- matrix(nrow=numCat,ncol=numCrit)
-       
-      for (i in 1:numCat){
-         for (j in 1:numCrit)
-           profilesPerformances[i,j] <- solution[varnames==ptknames[i,j]]
-      }
-       
-      rownames(profilesPerformances) <- names(categoriesRanks)
-      colnames(profilesPerformances) <- colnames(performanceTable)
-       
-      vetoPerformances <- NULL
-       
-      if(veto)
-       {
-         ptvnames <- matrix(nrow=numCat,ncol=numCrit)
-         
-         for (i in 2:(numCat+1)){
-           for (j in 1:numCrit)
-           {
-             ptvnames[i-1,j] <- paste("PTv(",i,",",j,")",sep="")
-           }
-         }
-         
-         vetoPerformances <- matrix(nrow=numCat,ncol=numCrit)
-         
-         for (i in 1:numCat){
-           for (j in 1:numCrit)
-             vetoPerformances[i,j] <- solution[varnames==ptvnames[i,j]]
-         }
-         
-         rownames(vetoPerformances) <- names(categoriesRanks)
-         colnames(vetoPerformances) <- colnames(performanceTable)
-       }
-      
-      
-      return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances))
-      
+      error <- FALSE
     }
-    else
-      return(NULL)
     
-    
-  }
-  if (solver == "glpk"){
-    
-    lp<-initProbGLPK()
-    
-    tran<-mplAllocWkspGLPK()
-    
-    setMIPParmGLPK(PRESOLVE, GLP_ON)
-    
-    termOutGLPK(GLP_OFF)
-    
-    out<-mplReadModelGLPK(tran, dataFile, skip=0)
-    
-    if (is.null(out))
-      out <- mplGenerateGLPK(tran)
-    else 
-      stop(return_codeGLPK(out))
-    
-    if (is.null(out))
-      mplBuildProbGLPK(tran,lp)
-    else 
-      stop(return_codeGLPK(out))
+  } else if (solver == "glpk"){
     
     solveMIPGLPK(lp)
+    
+    solverStatus <- mipStatusGLPK(lp)
     
     if(mipStatusGLPK(lp)==5){
       
@@ -343,69 +295,74 @@ MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks,
       for (i in 1:length(solution))
         varnames <- c(varnames,getColNameGLPK(lp,i))
       
-      lambda <- solution[varnames=="lambda"]
+      paro <- "["
+      parc <- "]"
       
-      weightsnames <- c()
-      
-      for (i in 1:numCrit)
+      error <- FALSE
+    }
+  }
+  
+  if (!error){
+    lambda <- solution[varnames=="lambda"]
+    
+    weightsnames <- c()
+    
+    for (i in 1:numCrit)
+    {
+      weightsnames <- c(weightsnames,paste("w",paro,i,parc,sep=""))
+    }
+    
+    weights <- c()
+    
+    for (i in 1:numCrit)
+      weights <- c(weights,solution[varnames==weightsnames[i]])
+    
+    names(weights) <- colnames(performanceTable)
+    
+    ptknames <- matrix(nrow=numCat,ncol=numCrit)
+    
+    for (i in 2:(numCat+1)){
+      for (j in 1:numCrit)
       {
-        weightsnames <- c(weightsnames,paste("w[",i,"]",sep=""))
+        ptknames[i-1,j] <- paste("PTk",paro,i,",",j,parc,sep="")
       }
-      
-      weights <- c()
-      
-      for (i in 1:numCrit)
-        weights <- c(weights,solution[varnames==weightsnames[i]])
-      
-      names(weights) <- colnames(performanceTable)
-      
-      ptknames <- matrix(nrow=numCat,ncol=numCrit)
+    }
+    
+    profilesPerformances <- matrix(nrow=numCat,ncol=numCrit)
+    
+    for (i in 1:numCat){
+      for (j in 1:numCrit)
+        profilesPerformances[i,j] <- solution[varnames==ptknames[i,j]]
+    }
+    
+    rownames(profilesPerformances) <- names(categoriesRanks)
+    colnames(profilesPerformances) <- colnames(performanceTable)
+    
+    vetoPerformances <- NULL
+    
+    if(veto)
+    {
+      ptvnames <- matrix(nrow=numCat,ncol=numCrit)
       
       for (i in 2:(numCat+1)){
         for (j in 1:numCrit)
         {
-          ptknames[i-1,j] <- paste("PTk[",i,",",j,"]",sep="")
+          ptvnames[i-1,j] <- paste("PTv",paro,i,",",j,parc,sep="")
         }
       }
       
-      profilesPerformances <- matrix(nrow=numCat,ncol=numCrit)
+      vetoPerformances <- matrix(nrow=numCat,ncol=numCrit)
       
       for (i in 1:numCat){
         for (j in 1:numCrit)
-          profilesPerformances[i,j] <- solution[varnames==ptknames[i,j]]
+          vetoPerformances[i,j] <- solution[varnames==ptvnames[i,j]]
       }
       
-      rownames(profilesPerformances) <- names(categoriesRanks)
-      colnames(profilesPerformances) <- colnames(performanceTable)
-      
-      vetoPerformances <- NULL
-      
-      if(veto)
-      {
-        ptvnames <- matrix(nrow=numCat,ncol=numCrit)
-        
-        for (i in 2:(numCat+1)){
-          for (j in 1:numCrit)
-          {
-            ptvnames[i-1,j] <- paste("PTv[",i,",",j,"]",sep="")
-          }
-        }
-        
-        vetoPerformances <- matrix(nrow=numCat,ncol=numCrit)
-        
-        for (i in 1:numCat){
-          for (j in 1:numCrit)
-            vetoPerformances[i,j] <- solution[varnames==ptvnames[i,j]]
-        }
-        
-        rownames(vetoPerformances) <- names(categoriesRanks)
-        colnames(vetoPerformances) <- colnames(performanceTable)
-      }
-      
-      return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances))
-      
+      rownames(vetoPerformances) <- names(categoriesRanks)
+      colnames(vetoPerformances) <- colnames(performanceTable)
     }
-    else
-      return(NULL)
-  }
+    
+    return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances, solverStatus = solverStatus))  
+  } else
+    return(list(solverStatus = solverStatus))
 }
