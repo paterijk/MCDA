@@ -16,7 +16,9 @@ LPDMRSortInferenceExact(performanceTable, assignments,
             categoriesRanks, criteriaMinMax, 
             majorityRule = "", readableWeights = FALSE,
             readableProfiles = FALSE, minmaxLPD = FALSE,
-            alternativesIDs = NULL, criteriaIDs = NULL)
+            alternativesIDs = NULL, criteriaIDs = NULL,
+            solver="glpk",cplexTimeLimit = NULL,
+            cplexIntegralityTolerance = NULL, cplexThreads = NULL)
 }
 
 \arguments{
@@ -54,10 +56,14 @@ LPDMRSortInferenceExact(performanceTable, assignments,
   the data should be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data 
   should be filtered.}
+  \item{solver}{String specifying if the glpk solver (glpk) should be used, or the cplex (cplex) solver. By default glpk. The cplex solver requires to install the cplex binary and the cplex C API, as well as the cplexAPI R package.}
+  \item{cplexTimeLimit}{If the cplex solver is used, allows to fix a time limit of the execution, in seconds. By default NULL (which corresponds to the default value of cplex).}
+  \item{cplexIntegralityTolerance}{If the cplex solver is used, allows to fix a tolerance for integrality. By default NULL (which corresponds to the default value of cplex).}
+  \item{cplexThreads}{If the cplex solver is used, allows to the number of threads for the calculation. By default NULL (which corresponds to the default value of cplex).}
 }
 
 \value{
-  The function returns NULL if there is a problem, or a list structured as follows :
+  The function returns a list structured as follows :
   \item{lambda}{The majority threshold.}
   \item{weights}{A vector containing the weights of the criteria. 
   The elements are named according to the criteria IDs.}
@@ -67,6 +73,7 @@ LPDMRSortInferenceExact(performanceTable, assignments,
   \item{vetoPerformances}{A matrix containing the veto profiles of the categories. 
   The columns are named according to the criteria, whereas the rows are named according 
   to the categories. The veto profile of the lower category can be considered as a dummy profile.}
+  \item{solverStatus}{The solver status as given by glpk or cplex.}
 }
 
 \references{

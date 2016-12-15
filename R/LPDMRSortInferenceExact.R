@@ -38,7 +38,7 @@
 #
 ##############################################################################
 
-LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, majorityRule = "", readableWeights = FALSE, readableProfiles = FALSE, minmaxLPD = FALSE, alternativesIDs = NULL, criteriaIDs = NULL){
+LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, majorityRule = "", readableWeights = FALSE, readableProfiles = FALSE, minmaxLPD = FALSE, alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", cplexTimeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
   
   ## check the input data
   if (!((is.matrix(performanceTable) || (is.data.frame(performanceTable))))) 
@@ -226,18 +226,92 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
   else 
     stop(return_codeGLPK(out))
   
-  solveMIPGLPK(lp)
+  if (solver == "cplex")
+  {
+    
+    if (!requireNamespace("cplexAPI", quietly = TRUE)) stop("cplexAPI package could not be loaded")
+    
+    cplexOutFile <- tempfile()
+    
+    writeLPGLPK(lp, cplexOutFile)
+    
+    # Open a CPLEX environment
+    env <- cplexAPI::openEnvCPLEX()
+    
+    # Create a problem object
+    prob <- cplexAPI::initProbCPLEX(env)
+    
+    if (!is.null(cplexTimeLimit))
+      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_TILIM,cplexTimeLimit)
+    
+    if (!is.null(cplexIntegralityTolerance))
+      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_EPINT,cplexIntegralityTolerance)
+    
+    if (!is.null(cplexThreads))
+      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_THREADS,cplexThreads)
+    
+    # Read MIP problem from cplexOutFile
+    out <- cplexAPI::readCopyProbCPLEX(env, prob, cplexOutFile, ftype = "LP")
+    
+    # solve the problem
+    if (out == 0)
+      cplexAPI::mipoptCPLEX(env,prob)
+    else
+      stop(out)
+    
+    solverStatus <- cplexAPI::getStatCPLEX(env,prob)
+    
+    error <- TRUE
+    
+    if ((cplexAPI::getStatCPLEX(env,prob) == 101) | (cplexAPI::getStatCPLEX(env,prob) == 102)){
+      solution <- cplexAPI::solutionCPLEX(env,prob)$x
+      
+      varnames <- cplexAPI::getColNameCPLEX(env,prob, 0,length(solution)-1)
+      
+      paro <- "("
+      parc <- ")"
+      
+      error <- FALSE
+    }
+    
+  } else if (solver == "glpk"){
+    
+    solveMIPGLPK(lp)
+    
+    solverStatus <- mipStatusGLPK(lp)
+    
+    if(mipStatusGLPK(lp)==5){
+      
+      mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
+      
+      solution <- mipColsValGLPK(lp)
+      
+      varnames <- c()
+      
+      for (i in 1:length(solution))
+        varnames <- c(varnames,getColNameGLPK(lp,i))
+      
+      paro <- "["
+      parc <- "]"
+      
+      error <- FALSE
+    }
+  }
   
-  if(mipStatusGLPK(lp)==5){
-    
-    mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
-    
-    solution <- mipColsValGLPK(lp)
-    
-    varnames <- c()
-    
-    for (i in 1:length(solution))
-      varnames <- c(varnames,getColNameGLPK(lp,i))
+  if (!error){  
+  
+  # solveMIPGLPK(lp)
+  # 
+  # if(mipStatusGLPK(lp)==5){
+  #   
+  #   mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
+  #   
+  #   solution <- mipColsValGLPK(lp)
+  #   
+  #   varnames <- c()
+  #   
+  #   for (i in 1:length(solution))
+  #     varnames <- c(varnames,getColNameGLPK(lp,i))
     
     lambda <- solution[varnames=="lambda"]
     
@@ -245,7 +319,7 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
     
     for (i in 1:numCrit)
     {
-      weightsnames <- c(weightsnames,paste("w[",i,"]",sep=""))
+      weightsnames <- c(weightsnames,paste("w",paro,i,parc,sep=""))
     }
     
     weights <- c()
@@ -260,7 +334,7 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
     for (i in 2:(numCat+1)){
       for (j in 1:numCrit)
       {
-        ptknames[i-1,j] <- paste("PTk[",i,",",j,"]",sep="")
+        ptknames[i-1,j] <- paste("PTk",paro,i,",",j,parc,sep="")
       }
     }
     
@@ -283,7 +357,7 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
       for (i in 2:(numCat+1)){
         for (j in 1:numCrit)
         {
-          ptvnames[i-1,j] <- paste("PTv[",i,",",j,"]",sep="")
+          ptvnames[i-1,j] <- paste("PTv",paro,i,",",j,parc,sep="")
         }
       }
       
@@ -307,7 +381,7 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
       for (i in 2:(numCat+1)){
         for (j in 1:numCrit)
         {
-          ptdnames[i-1,j] <- paste("PTd[",i,",",j,"]",sep="")
+          ptdnames[i-1,j] <- paste("PTd",paro,i,",",j,parc,sep="")
         }
       }
       
@@ -322,9 +396,9 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
       colnames(dictatorPerformances) <- colnames(performanceTable)
     }
     
-    return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances, dictatorPerformances = dictatorPerformances))
+    return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances, dictatorPerformances = dictatorPerformances, solverStatus = solverStatus))
     
   }
   else
-    return(NULL)
+    return(list(solverStatus = solverStatus))
 }
