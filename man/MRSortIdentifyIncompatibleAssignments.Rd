@@ -18,7 +18,10 @@ MRSortIdentifyIncompatibleAssignments(performanceTable,
                                       incompatibleSetsLimit = 100,
                                       largerIncompatibleSetsMargin = 0, 
                                       alternativesIDs = NULL, 
-                                      criteriaIDs = NULL)
+                                      criteriaIDs = NULL,
+                                      solver="glpk",
+                                      cplexIntegralityTolerance = NULL,
+                                      cplexThreads = NULL)
 }
 
 \arguments{
@@ -39,11 +42,14 @@ MRSortIdentifyIncompatibleAssignments(performanceTable,
   retrieved, if this is 1 then sets also larger by 1 element will be retrieved.}
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
+  \item{solver}{String specifying if the glpk solver (glpk) should be used, or the cplex (cplex) solver. By default glpk. The cplex solver requires to install the cplex binary and the cplex C API, as well as the cplexAPI R package.}
+  \item{cplexIntegralityTolerance}{If the cplex solver is used, allows to fix a tolerance for integrality. By default NULL (which corresponds to the default value of cplex).}
+  \item{cplexThreads}{If the cplex solver is used, allows to the number of threads for the calculation. By default NULL (which corresponds to the default value of cplex).}
 }
 
 \value{
-  The function returns NULL if there is a problem, 
-  or a list containing the incompatible sets of alternatives as vectors.
+    The function returns NULL if there is a problem, 
+  or a list containing a list of incompatible sets of alternatives as vectors and the status of the execution (1 if OK, 0 if something went wrong).
 }
 
 \references{
@@ -92,7 +98,7 @@ incompatibleAssignmentsSets<-MRSortIdentifyIncompatibleAssignments(
 print(incompatibleAssignmentsSets)
 
 filteredAlternativesIDs <- setdiff(c("a1","a2","a3","a4","a5","a6","a7","a8","a9"),
-                                   incompatibleAssignmentsSets[[1]])
+                                   incompatibleAssignmentsSets[[1]][1])
 
 print(filteredAlternativesIDs)
 

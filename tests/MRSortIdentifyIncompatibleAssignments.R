@@ -30,7 +30,7 @@ incompatibleAssignmentsSets<-MRSortIdentifyIncompatibleAssignments(performanceTa
 
 print(incompatibleAssignmentsSets)
 
-filteredAlternativesIDs <- setdiff(c("a1","a2","a3","a4","a5","a6","a7","a8","a9"),incompatibleAssignmentsSets[[1]])
+filteredAlternativesIDs <- setdiff(c("a1","a2","a3","a4","a5","a6","a7","a8","a9"),incompatibleAssignmentsSets[[1]][1])
 
 print(filteredAlternativesIDs)
 
