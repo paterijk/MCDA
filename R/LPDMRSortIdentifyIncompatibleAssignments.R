@@ -38,7 +38,7 @@
 #
 ##############################################################################
 
-LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, majorityRule = "", incompatibleSetsLimit = 100, largerIncompatibleSetsMargin = 0, alternativesIDs = NULL, criteriaIDs = NULL){
+LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, majorityRule = "", incompatibleSetsLimit = 100, largerIncompatibleSetsMargin = 0, alternativesIDs = NULL, criteriaIDs = NULL, solver = "glpk", cplexIntegralityTolerance = NULL, cplexThreads = NULL){
   
   ## check the input data
   if (!((is.matrix(performanceTable) || (is.data.frame(performanceTable))))) 
@@ -222,22 +222,81 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
   else 
     stop(return_codeGLPK(out))
   
-  solveMIPGLPK(lp)
+  if (solver == "cplex")
+  {
+    
+    if (!requireNamespace("cplexAPI", quietly = TRUE)) stop("cplexAPI package could not be loaded")
+    
+    cplexOutFile <- tempfile()
+    
+    writeLPGLPK(lp, cplexOutFile)
+    
+    # Open a CPLEX environment
+    env <- cplexAPI::openEnvCPLEX()
+    
+    # Create a problem object
+    prob <- cplexAPI::initProbCPLEX(env)
+    
+    # if (!is.null(cplexTimeLimit))
+    #  cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_TILIM,cplexTimeLimit)
+    
+    if (!is.null(cplexIntegralityTolerance))
+      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_EPINT,cplexIntegralityTolerance)
+    
+    if (!is.null(cplexThreads))
+      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_THREADS,cplexThreads)
+    
+    # Read MIP problem from cplexOutFile
+    out <- cplexAPI::readCopyProbCPLEX(env, prob, cplexOutFile, ftype = "LP")
+    
+    # solve the problem
+    if (out == 0)
+      cplexAPI::mipoptCPLEX(env,prob)
+    else
+      stop(out)
+    
+    solverStatus <- cplexAPI::getStatCPLEX(env,prob)
+    
+    error <- TRUE
+    
+    if ((cplexAPI::getStatCPLEX(env,prob) == 101) | (cplexAPI::getStatCPLEX(env,prob) == 102)){
+      solution <- cplexAPI::solutionCPLEX(env,prob)$x
+      
+      varnames <- cplexAPI::getColNameCPLEX(env,prob, 0,length(solution)-1)
+      
+      paro <- "("
+      parc <- ")"
+      
+      error <- FALSE
+    }
+    
+  } else if (solver == "glpk"){
+    
+    solveMIPGLPK(lp)
+    
+    solverStatus <- mipStatusGLPK(lp)
+    
+    if(mipStatusGLPK(lp)==5){
+      
+      mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
+      
+      solution <- mipColsValGLPK(lp)
+      
+      varnames <- c()
+      
+      for (i in 1:length(solution))
+        varnames <- c(varnames,getColNameGLPK(lp,i))
+      
+      paro <- "["
+      parc <- "]"
+      
+      error <- FALSE
+    }
+  }
+    
+  if (!error){
   
-  if(mipStatusGLPK(lp)==5){
-    
-    mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
-    
-    solution <- mipColsValGLPK(lp)
-    
-    # get variable names
-    
-    varnames <- c()
-    
-    for (i in 1:length(solution))
-      varnames <- c(varnames,getColNameGLPK(lp,i))
-    
-    # get size of minimal incompatible assignments set and one such set
+   # get size of minimal incompatible assignments set and one such set
     
     minIncompatibleSetsSize <- 0
     
@@ -245,7 +304,7 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
     
     for (i in 1:numAlt)
     {
-      if(solution[varnames==paste("OnOff[",i,"]",sep="")] == 1)
+      if(solution[varnames==paste("OnOff",paro,i,parc,sep="")] == 1)
       {
         incompatibleSet <- c(incompatibleSet,alternativesIDs[i])
         minIncompatibleSetsSize <- minIncompatibleSetsSize + 1
@@ -272,7 +331,7 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
       datacontent2a <- paste(datacontent2a, i, sep = " ")
     datacontent2a <- paste(datacontent2a, ":= \n1\t", sep = "")
     for(i in 1:numAlt)
-      datacontent2a <- paste(datacontent2a, solution[varnames==paste("OnOff[",i,"]",sep="")], sep = " ")
+      datacontent2a <- paste(datacontent2a, solution[varnames==paste("OnOff",paro,i,parc,sep="")], sep = " ")
     
     datacontent2b <- paste("param PrevOnOffLimit := \n1\t ", minIncompatibleSetsSize, sep ="")
 
@@ -338,27 +397,89 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
         else 
           stop(return_codeGLPK(out))
         
-        solveMIPGLPK(lp)
-        
-        if(mipStatusGLPK(lp)==5)
+        if (solver == "cplex")
         {
-          # found new incompatible assignments set
           
-          mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
+          if (!requireNamespace("cplexAPI", quietly = TRUE)) stop("cplexAPI package could not be loaded")
           
-          solution <- mipColsValGLPK(lp)
+          cplexOutFile <- tempfile()
           
-          varnames <- c()
+          writeLPGLPK(lp, cplexOutFile)
           
-          for (i in 1:length(solution))
-            varnames <- c(varnames,getColNameGLPK(lp,i))
+          # Open a CPLEX environment
+          env <- cplexAPI::openEnvCPLEX()
+          
+          # Create a problem object
+          prob <- cplexAPI::initProbCPLEX(env)
+          
+          # if (!is.null(cplexTimeLimit))
+          #   cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_TILIM,cplexTimeLimit)
+          
+          if (!is.null(cplexIntegralityTolerance))
+            cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_EPINT,cplexIntegralityTolerance)
+          
+          if (!is.null(cplexThreads))
+            cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_THREADS,cplexThreads)
+          
+          # Read MIP problem from cplexOutFile
+          out <- cplexAPI::readCopyProbCPLEX(env, prob, cplexOutFile, ftype = "LP")
+          
+          # solve the problem
+          if (out == 0)
+            cplexAPI::mipoptCPLEX(env,prob)
+          else
+            stop(out)
+          
+          solverStatus <- cplexAPI::getStatCPLEX(env,prob)
+          
+          error <- TRUE
+          
+          if ((cplexAPI::getStatCPLEX(env,prob) == 101) | (cplexAPI::getStatCPLEX(env,prob) == 102)){
+            solution <- cplexAPI::solutionCPLEX(env,prob)$x
+            
+            varnames <- cplexAPI::getColNameCPLEX(env,prob, 0,length(solution)-1)
+            
+            paro <- "("
+            parc <- ")"
+            
+            error <- FALSE
+          }
+          
+        } else if (solver == "glpk"){
+          
+          solveMIPGLPK(lp)
+          
+          solverStatus <- mipStatusGLPK(lp)
+          
+          error <- TRUE
+          
+          if(mipStatusGLPK(lp)==5){
+            
+            mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
+            
+            solution <- mipColsValGLPK(lp)
+            
+            varnames <- c()
+            
+            for (i in 1:length(solution))
+              varnames <- c(varnames,getColNameGLPK(lp,i))
+            
+            paro <- "["
+            parc <- "]"
+            
+            error <- FALSE
+          }
+        }
+        
+        
+        if (!error){
           
           # get incompatible assignments set
           
           incompatibleSet <- c()
           
           for (i in 1:numAlt)
-            if(solution[varnames==paste("OnOff[",i,"]",sep="")] == 1)
+            if(solution[varnames==paste("OnOff",paro,i,parc,sep="")] == 1)
               incompatibleSet <- c(incompatibleSet,alternativesIDs[i])
           
           # add set
@@ -369,7 +490,7 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
           
           datacontent2a <- paste(datacontent2a, "\n", length(incompatibleSets), "\t", sep = "")
           for(i in 1:numAlt)
-            datacontent2a <- paste(datacontent2a, solution[varnames==paste("OnOff[",i,"]",sep="")], sep = " ")
+            datacontent2a <- paste(datacontent2a, solution[varnames==paste("OnOff",paro,i,parc,sep="")], sep = " ")
           
           datacontent2b <- paste(datacontent2b, "\n", length(incompatibleSets), "\t", incompatibleSetSize, sep ="")
           
@@ -383,9 +504,9 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
       incompatibleSetSize <- incompatibleSetSize + 1
     }
     
-    return(incompatibleSets)
+    return(list(incompatibleSets = incompatibleSets, status = 1))
     
   }
   else
-    return(NULL)
+    return(list(status = 0))
 }

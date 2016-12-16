@@ -39,7 +39,7 @@ for(i in 1:1)# change to 7 in order to perform all tests
   
   #print(incompatibleAssignmentsSets)
   
-  filteredAlternativesIDs <- setdiff(rownames(performanceTable),incompatibleAssignmentsSets[[1]])
+  filteredAlternativesIDs <- setdiff(rownames(performanceTable),incompatibleAssignmentsSets[[1]][1])
   
   #print(filteredAlternativesIDs)
   
