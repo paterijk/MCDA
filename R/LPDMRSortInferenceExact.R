@@ -280,6 +280,8 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
     
     solverStatus <- mipStatusGLPK(lp)
     
+    error <- TRUE
+    
     if(mipStatusGLPK(lp)==5){
       
       mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
