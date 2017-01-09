@@ -109,6 +109,8 @@ s.t. gSlow3{x in 1..X}: gSlow[x] >= sum{i in 1..F} wlClow[x,i];
 s.t. dominanceP{k in 1..K, i in 1..F}: Fdir[i] * PTk[(k+1),i] <= Fdir[i] * PTk[k,i] ; 
 /* dominance between profiles and dictator profiles */
 s.t. dominancePD{k in 2..K, i in 1..F}: Fdir[i] * PTk[k,i] + gamma <= Fdir[i] * PTd[k,i];
+/* dominance between dictator profiles */
+s.t. dominanceD{k in 1..K, i in 1..F}: Fdir[i] * PTd[(k+1),i] <= Fdir[i] * PTd[k,i]; 
 /* alternative outranks lower profile */
 s.t. Slow{x in 1..X}: lambda - OnOff[x] <= gSlow[x];
 /* alternative does not outrank upper profile */
