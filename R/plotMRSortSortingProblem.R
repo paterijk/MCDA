@@ -1,4 +1,4 @@
-plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, assignments, criteriaMinMax, criteriaUBs, criteriaLBs, alternativesIDs = NULL, criteriaIDs = NULL){
+plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, assignments, criteriaMinMax, criteriaUBs, criteriaLBs, categoriesDictators = NULL, categoriesVetoes = NULL, majorityRule = NULL, criteriaWeights = NULL, majorityThreshold = NULL, alternativesIDs = NULL, criteriaIDs = NULL){
   
   ## check the input data
   
@@ -13,6 +13,27 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
   
   if (!(is.vector(criteriaMinMax)))
     stop("criteriaMinMax should be a vector")
+  
+  if (!(is.vector(criteriaLBs)))
+    stop("criteriaLBs should be a vector")
+  
+  if (!(is.vector(criteriaUBs)))
+    stop("criteriaUBs should be a vector")
+  
+  if (!(is.null(categoriesDictators) || is.matrix(categoriesDictators)))
+    stop("categoriesDictators should be a matrix")
+  
+  if (!(is.null(categoriesVetoes) || is.matrix(categoriesVetoes)))
+    stop("categoriesVetoes should be a matrix")
+  
+  if (!(is.null(criteriaWeights) || is.vector(criteriaWeights)))
+    stop("criteriaWeights should be a vector")
+  
+  if (!(is.null(majorityThreshold) || is.numeric(majorityThreshold)))
+    stop("majorityThreshold should be a number")
+  
+  if (!(is.null(majorityRule) || (majorityRule %in% c("V","D","v","d","dV","Dv","dv"))))
+    stop("majorityRule should be: 'V' , 'D', 'v', 'd', 'dV', 'Dv', 'dv'")
   
   if (!(is.null(alternativesIDs) || is.vector(alternativesIDs)))
     stop("alternativesIDs should be a vector")
@@ -32,6 +53,12 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
     performanceTable <- performanceTable[,criteriaIDs]
     criteriaMinMax <- criteriaMinMax[criteriaIDs]
     categoriesLowerProfiles <- categoriesLowerProfiles[,criteriaIDs]
+    if (!is.null(criteriaWeights))
+      criteriaWeights <- criteriaWeights[,criteriaIDs]
+    if (!is.null(categoriesDictators))
+      categoriesDictators <- categoriesDictators[,criteriaIDs]
+    if (!is.null(categoriesVetoes))
+      categoriesVetoes <- categoriesVetoes[,criteriaIDs]
     criteriaUBs <- criteriaUBs[criteriaIDs]
     criteriaLBs <- criteriaLBs[criteriaIDs]
   }
@@ -42,6 +69,33 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
   
   if (is.null(dim(performanceTable))) 
     stop("less than 2 criteria or 2 alternatives")
+  
+  # get model assignments
+  
+  model.assignments <- assignments
+  if (!is.null(criteriaWeights) && !is.null(majorityThreshold))
+  {
+    if (is.null(categoriesDictators) && is.null(categoriesVetoes))
+      model.assignments <- MRSort(performanceTable, categoriesLowerProfiles, 
+                                  criteriaWeights, criteriaMinMax, majorityThreshold)
+    else
+    {
+      if (is.null(majorityRule))
+      {
+        if (is.null(categoriesDictators) && !is.null(categoriesVetoes))
+          majorityRule <- "D"
+        else if (!is.null(categoriesDictators) && is.null(categoriesVetoes))
+          majorityRule <- "V"
+        else
+          stop("majorityRule should be: 'V' , 'D', 'v', 'd', 'dV', 'Dv', 'dv'")
+      }
+      model.assignments <- LPDMRSort(performanceTable, categoriesLowerProfiles, 
+                                     criteriaWeights, criteriaMinMax, majorityThreshold, 
+                                     criteriaVetos=categoriesVetoes, 
+                                     criteriaDictators=categoriesDictators, 
+                                     majorityRule = majorityRule)
+    }
+  }
   
   # -------------------------------------------------------
   
@@ -75,56 +129,123 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
     }
   }
   
-  col.rainbow <- rainbow(numAlt)
-  
-  palette(col.rainbow)
-  
-  ylim=c(min(normalizedPerformanceTable)-0.1,max(normalizedPerformanceTable)+0.1)
-  
-  # Expand right side of clipping rect to make room for the legend
-  # par(xpd=T, mar=par()$mar+c(0,0,0,6))
-  
-  # par(mfrow=c(1,2))
-  
-  #layout(c(1, 2), widths=c(7, 1))
-  
-  layout(matrix(c(1,2),1), widths = c(4,2))
-  
-  plot(1:numCrit,normalizedProfiles[1,],
-       type="l",
-       col="black",
-       ylim=ylim,
-       xlab = "",
-       ylab="",
-       xaxt="n",
-       yaxt="n",
-       lwd=2,
-       lty=2)
-  # the other profiles (except the lower one)
-  for (i in (2:numCat-1))
-    lines(1:numCrit,normalizedProfiles[i,],col="black", lwd=2, lty=2)
-  for (i in 1:numCrit){
-    lines(c(i,i),ylim, col="gray")
-  }
-  axis(1,at=c(1:numCrit),labels=colnames(performanceTable))
-  
-  for (i in 1:(numCat-1)){
-    text(c(1:numCrit), normalizedProfiles[i,], labels = categoriesLowerProfiles[i,], pos=1)
-  }
-  
-  text(1, ylim[2], labels = dimnames(performanceTable)[[2]][1], pos=4)
-  
-   for (i in 2:(numCrit)){
-    text(i, ylim[2], labels = dimnames(performanceTable)[[2]][i], pos=2)
-   }
+  if (!is.null(categoriesDictators))
+  {
+    normalizedDictators <- matrix(nrow=numCat,ncol=numCrit)
     
-  for (i in (1:numAlt))
-    points(1:numCrit,normalizedPerformanceTable[i,],type="b",pch=which(assignments[rownames(performanceTable)[i]]==rownames(categoriesLowerProfiles)), col=i)
+    for (j in 1:numCat){
+      for (i in 1:numCrit){
+        if(criteriaMinMax[i] == "min")
+          normalizedDictators[j,i] <- 1-(categoriesDictators[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+        else
+          normalizedDictators[j,i] <- (categoriesDictators[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+        if (normalizedDictators[j,i] > 1)
+          normalizedDictators[j,i] <- 1.5
+        else if (normalizedDictators[j,i] < 0)
+          normalizedDictators[j,i] <- -0.5
+      }
+    }
+  }
   
-  par(mar=c(0, 0, 0, 0))
+  if (!is.null(categoriesVetoes))
+  {
+    normalizedVetoes <- matrix(nrow=numCat,ncol=numCrit)
+    
+    for (j in 1:numCat){
+      for (i in 1:numCrit){
+        if(criteriaMinMax[i] == "min")
+          normalizedVetoes[j,i] <- 1-(categoriesVetoes[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+        else
+          normalizedVetoes[j,i] <- (categoriesVetoes[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+        if (normalizedVetoes[j,i] > 1)
+          normalizedVetoes[j,i] <- 1.5
+        else if (normalizedVetoes[j,i] < 0)
+          normalizedVetoes[j,i] <- -0.5
+      }
+    }
+  }
+  
+  # color palette when number of categories outside ColorBrewer range
+  col.cat <- rainbow(numAlt)
+  
+  if (numCat >= 3 && numCat <= 11)
+    col.cat <- brewer.pal(numCat,"Dark2")
+  
+  names(col.cat) <- rownames(categoriesLowerProfiles)
+  
+  palette(col.cat)
+  
+  # color palette for alternatives lines - the color of the category to which the model assigned them
+  col.alt.lines <- col.cat[model.assignments]
+  
+  # color palette for alternatives markers - the color of the category to which they should have been assigned
+  col.alt.markers <- col.cat[assignments]
+  
+  # name profiles as delimiting categories
+  profiles.names <- paste(rownames(categoriesLowerProfiles)[1:numCat-1],rownames(categoriesLowerProfiles)[2:numCat],sep = "-")
+  
+  ylim=c(-0.1, 1.1)
+  
+  layout(matrix(c(1:(numCat-1),rep(numCat,numCat-1)),2,numCat-1, byrow = TRUE), widths = rep(1,numCat-1), heights = c(7,1))
+  
+  par(mar=c(2, 2, 6, 2))
+  
+  # one plot for each pair of consecutive categories
+  
+  for(i in rev(1:(numCat-1)))
+  {
+    plot(1:numCrit, normalizedProfiles[i,], type="l", col="black", ylim=ylim, xlab = "", ylab="", xaxt="n", yaxt="n", lwd=2, lty=2)
+    
+    # title of the two categories
+    title(profiles.names[i])
+    
+    # dictator region
+    if (!is.null(categoriesDictators))
+      polygon(c(1,1:numCrit,numCrit),c(criteriaUBs[1] + (criteriaUBs[1]-criteriaLBs[1])/2,normalizedDictators[i,],criteriaUBs[numCrit] + (criteriaUBs[numCrit]-criteriaLBs[numCrit])/2), col = "grey80", border = NA)
+    
+    # veto region
+    if (!is.null(categoriesVetoes))
+      polygon(c(1,1:numCrit,numCrit),c(criteriaLBs[1] - (criteriaUBs[1]-criteriaLBs[1])/2,normalizedVetoes[i,],criteriaLBs[numCrit] - (criteriaUBs[numCrit]-criteriaLBs[numCrit])/2), col = "grey80", border = NA)
+    
+    # criteria axes
+    for (j in 1:numCrit){
+      lines(c(j,j),ylim, col="gray")
+    }
+    
+    # criteria names at the top
+    axis(3,at=c(1:numCrit),labels=colnames(performanceTable))
+    
+    # criteria weights at the bottom
+    if (!is.null(criteriaWeights))
+      axis(1,at=c(1:numCrit),labels=criteriaWeights)
+    
+    # profiles values
+    text(c(1:numCrit), normalizedProfiles[i,], labels = categoriesLowerProfiles[i,], pos=1)
+    
+    if (!is.null(categoriesDictators))
+      text(c(1:numCrit), normalizedDictators[i,], labels = categoriesDictators[i,], pos=1)
+    
+    if (!is.null(categoriesVetoes))
+      text(c(1:numCrit), normalizedVetoes[i,], labels = categoriesVetoes[i,], pos=1)
+    
+    # alternatives
+    
+    for (j in (1:numAlt))
+      points(1:numCrit,normalizedPerformanceTable[j,],type="l",pch=26, col=col.alt.lines[j], lwd=2)
+    
+    for (j in (1:numAlt))
+      points(1:numCrit,normalizedPerformanceTable[j,],type="p",pch=((j-1)%%25) + 1, col=col.alt.markers[j], lwd=2)
+    
+  }
+  
+  par(mar=c(1, 3, 1, 3))
+  
   plot.new()
   
-  legend("center", c(rownames(performanceTable),rownames(categoriesLowerProfiles)), cex=0.8, col=c(c(1:numAlt),rep("black",numCat)), 
-         lwd=1, bty="n",pch=c(rep(0,numAlt),c(1:numCat)));
-  
+  if (!is.null(majorityThreshold))
+    legend("center", c(paste("majorityThreshold =",majorityThreshold,'  '),rownames(performanceTable),rownames(categoriesLowerProfiles)), cex=0.8, col=c('black',col.alt.lines,col.cat), 
+         lwd=2, bty="n",pch=c(26,c(1:numAlt),rep(26,numCat)), lty = c(0,rep(1,numAlt),rep(1,numCat)), horiz = TRUE)
+  else
+    legend("center", c(rownames(performanceTable),rownames(categoriesLowerProfiles)), cex=0.8, col=c(col.alt.lines,col.cat), 
+           lwd=2, bty="n",pch=c(c(1:numAlt),rep(26,numCat)), lty = c(rep(1,numAlt),rep(1,numCat)), horiz = TRUE)
 }

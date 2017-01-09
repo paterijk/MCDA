@@ -2,11 +2,12 @@
 
 importFrom(Rglpk, Rglpk_solve_LP)
 importFrom("grDevices", "palette", "rainbow")
-importFrom("graphics", "arrows", "axis", "layout", "legend", "lines","par", "plot", "plot.new", "points", "text", "title")
+importFrom("graphics", "arrows", "axis", "layout", "legend", "lines","par", "plot", "plot.new", "points", "text", "title", "polygon")
 importFrom("stats", "runif")
 importFrom("methods", "new")
 importFrom("stats", "cor")
 import(glpkAPI)
+import(RColorBrewer)
 
 ## Generics and functions defined in this package
 export(

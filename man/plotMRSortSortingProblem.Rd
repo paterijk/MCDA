@@ -8,7 +8,9 @@
 \usage{
 plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles, 
                           assignments, criteriaMinMax, 
-                          criteriaUBs, criteriaLBs, 
+                          criteriaUBs, criteriaLBs,
+                          categoriesDictators = NULL, categoriesVetoes = NULL,
+                          majorityRule = NULL, criteriaWeights = NULL, majorityThreshold = NULL, 
                           alternativesIDs = NULL, criteriaIDs = NULL)
 }
 
@@ -19,10 +21,15 @@ plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles,
   \item{criteriaMinMax}{Vector containing the preference direction on each of the criteria. "min" (resp. "max") indicates that the criterion has to be minimized (maximized). The elements are named according to the IDs of the criteria.}
   \item{criteriaLBs}{Vector containing the lower bounds of the criteria to be considered for the plotting. The elements are named according to the IDs of the criteria.}
   \item{criteriaUBs}{Vector containing the upper bounds of the criteria to be considered for the plotting. The elements are named according to the IDs of the criteria.}
-\item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
+  \item{categoriesDictators}{Matrix containing, in each row, the lower dictator profiles of the categories. The columns are named according to the criteria, and the rows are named according to the categories. The index of the row in the matrix corresponds to the rank of the category.}
+  \item{categoriesVetoes}{Matrix containing, in each row, the lower veto profiles of the categories. The columns are named according to the criteria, and the rows are named according to the categories. The index of the row in the matrix corresponds to the rank of the category.}
+  \item{majorityRule}{A string containing one of the following values: 'V' , 'D', 'v', 'd', 'dV', 'Dv', 'dv'. This indicates the type of majority rule that will be used by the MRSort model. 'V' stands for MRSort with vetoes, 'D' stands for MRSort with dictators, 'v' stands for MRSort with vetoes weakened by dictators, 'd' stands for MRSort with dictators weakened by vetoes, 'dV' stands for MRSort with vetoes dominating dictators, 'Dv' stands for MRSort with dictators dominating vetoes, while 'dv' stands for MRSort with conflicting vetoes and dictators.}
+  \item{criteriaWeights}{Vector containing the criteria weights. The elements are named according to the IDs of the criteria.}
+  \item{majorityThreshold}{A value corresponding to the majority threshold. Along with the criteria weights, this value is used to determine when a coalition of criteria is sufficient in order to assert that an alternative is at least as good as a category profile.}
+  \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
 }
-
+  
 \examples{
 # the performance table
 
