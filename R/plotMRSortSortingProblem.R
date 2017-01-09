@@ -244,8 +244,8 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
   
   if (!is.null(majorityThreshold))
     legend("center", c(paste("majorityThreshold =",majorityThreshold,'  '),rownames(performanceTable),rownames(categoriesLowerProfiles)), cex=0.8, col=c('black',col.alt.lines,col.cat), 
-         lwd=2, bty="n",pch=c(26,c(1:numAlt),rep(26,numCat)), lty = c(0,rep(1,numAlt),rep(1,numCat)), horiz = TRUE)
+         lwd=2, bty="n",pch=c('.',c(1:numAlt),rep('.',numCat)), lty = c(0,rep(1,numAlt),rep(1,numCat)), horiz = TRUE)
   else
     legend("center", c(rownames(performanceTable),rownames(categoriesLowerProfiles)), cex=0.8, col=c(col.alt.lines,col.cat), 
-           lwd=2, bty="n",pch=c(c(1:numAlt),rep(26,numCat)), lty = c(rep(1,numAlt),rep(1,numCat)), horiz = TRUE)
+           lwd=2, bty="n",pch=c(c(1:numAlt),rep('.',numCat)), lty = c(rep(1,numAlt),rep(1,numCat)), horiz = TRUE)
 }
