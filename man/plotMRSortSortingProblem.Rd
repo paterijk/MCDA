@@ -10,8 +10,9 @@ plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles,
                           assignments, criteriaMinMax, 
                           criteriaUBs, criteriaLBs,
                           categoriesDictators = NULL, categoriesVetoes = NULL,
-                          majorityRule = NULL, criteriaWeights = NULL, majorityThreshold = NULL, 
-                          alternativesIDs = NULL, criteriaIDs = NULL)
+                          majorityRule = NULL, criteriaWeights = NULL, 
+                          majorityThreshold = NULL, alternativesIDs = NULL,
+                          criteriaIDs = NULL)
 }
 
 \arguments{
