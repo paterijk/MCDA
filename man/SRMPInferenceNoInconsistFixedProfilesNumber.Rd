@@ -31,7 +31,7 @@ SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMinMax, pr
 }
 
 \value{
-  The function returns a list containing the criteria weights and the inferred reference profiles.
+  The function returns a list containing the criteria weights, the inferred reference profiles, their lexicographic order, the status code of the mixed-integer linear solver as well as a human-readable message pertaining to it.
 }
 
 \references{
