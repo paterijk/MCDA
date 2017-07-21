@@ -16,7 +16,7 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
   if (!(is.vector(lexicographicOrder)))
     stop("lexicographicOrder should be a vector")
   
-  if (!(is.null(timeLimit))
+  if (!(is.null(timeLimit)))
   {
     if(!is.numeric(timeLimit))
       stop("timeLimit should be numeric")
@@ -250,7 +250,7 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
     prob <- cplexAPI::initProbCPLEX(env)
     
     if (!is.null(cplexTimeLimit))
-      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_TILIM,cplexTimeLimit)
+      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_TILIM,timeLimit*1000)
     
     if (!is.null(cplexIntegralityTolerance))
       cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_EPINT,cplexIntegralityTolerance)
@@ -285,7 +285,7 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
   } else if (solver == "glpk"){
     
     if(!is.null(timeLimit))
-      setSimplexParmGLPK(TM_LIM, timeLimit)
+      setMIPParmGLPK(TM_LIM, timeLimit * 1000)
     
     solveMIPGLPK(lp)
     
@@ -346,12 +346,22 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
     colnames(referenceProfiles) <- colnames(performanceTable)
     
     
-    return(list(weights = weights, referenceProfiles = referenceProfiles, solverStatus = solverStatus))
+    return(list(weights = weights, referenceProfiles = referenceProfiles, solverStatus = solverStatus, humanReadableStatus = "Solution is optimal."))
     
   }
   else
   {
-    humanReadableStatusList = c("Solution status is undefined.","Solution is feasible.","Solution is infeasible.","Problem has no feasible solution.","Solution is optimal.","Problem has no unbounded solution.")
-    return(list(solverStatus = solverStatus, humanReadableStatus = humanReadableStatusList[solverStatus]))
+    humanReadableStatus <- "Unknown"
+    if(solverStatus %in% c(5,101,102))
+      humanReadableStatus <- "Solution is optimal"
+    else if(solverStatus %in% c(3,4,103,102))
+      humanReadableStatus <- "Solution is infeasible"
+    else if(solverStatus %in% c(111,112))
+      humanReadableStatus <- "Memory limit"
+    else if(solverStatus %in% c(107,108))
+      humanReadableStatus <- "Time limit"
+    else if(solverStatus %in% c(6,118))
+      humanReadableStatus <- "No unbounded solution"
+    return(list(solverStatus = solverStatus, humanReadableStatus = humanReadableStatus))
   }
 }
