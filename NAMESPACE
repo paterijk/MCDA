@@ -8,20 +8,25 @@ importFrom("methods", "new")
 importFrom("stats", "cor")
 import(glpkAPI)
 import(RColorBrewer)
+import(combinat)
 
 ## Generics and functions defined in this package
 export(
   "additiveValueFunctionElicitation",
   "AHP",
-  "pairwiseConsistencyMeasures",
   "MARE",
+  "LPDMRSort",
+  "LPDMRSortInferenceExact",
+  "LPDMRSortIdentifyIncompatibleAssignments",
   "MRSort",
   "MRSortInferenceExact",
   "MRSortInferenceApprox",
   "MRSortIdentifyIncompatibleAssignments",
-  "LPDMRSort",
-  "LPDMRSortInferenceExact",
-  "LPDMRSortIdentifyIncompatibleAssignments",
+  "pairwiseConsistencyMeasures",
+  "SRMP",
+  "SRMPInferenceNoInconsist",
+  "SRMPInferenceNoInconsistFixedLexicographicOrder",
+  "SRMPInferenceNoInconsistFixedProfilesNumber",
   "TOPSIS",
   "UTA",
   "UTASTAR",
