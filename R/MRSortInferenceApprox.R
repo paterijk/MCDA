@@ -286,7 +286,7 @@ InitModel <-function(performanceTable, assignments, categoriesRanks, criteriaMin
     if(criteriaMinMax[j] == "max")
       model.params$vetoPerformances[,j] <- rep(apply(performanceTable, 2, min)[j] - model.params$gamma, times = numCat-1)
     else
-      model.params$vetoPerformances[j] <- rep(apply(performanceTable, 2, max)[j] + model.params$gamma, times = numCat-1)
+      model.params$vetoPerformances[,j] <- rep(apply(performanceTable, 2, max)[j] + model.params$gamma, times = numCat-1)
   }
   
   # go thorough each criterion
@@ -515,6 +515,7 @@ InferLW <-function(performanceTable, assignments, categoriesRanks, criteriaMinMa
         cat("1")
       else
       {
+        print(alternatives[i])
         if((critdir * performanceTable[alternatives[i],j]) %>=% (critdir * model.params$profilesPerformances[categ,j]))
           cat("1")
         else
