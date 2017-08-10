@@ -20,8 +20,8 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
   {
     if(!is.numeric(timeLimit))
       stop("timeLimit should be numeric")
-    if(timeLimit <= 0)
-      stop("timeLimit should be strictly pozitive")
+    if(timeLimit <= 1)
+      stop("timeLimit should be strictly positive (and ideally above one second)")
   }
 
   if (!(is.null(alternativesIDs) || is.vector(alternativesIDs)))
