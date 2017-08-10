@@ -70,6 +70,8 @@ SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfil
   
   startTime <- Sys.time()
   
+  result <- (list(humanReadableStatus = "No solution found in the given time limit"))
+  
   for(i in 1:maxProfilesNumber)
   {
     currentTime <- Sys.time()
@@ -77,7 +79,11 @@ SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfil
     timeLeft <- NULL
     
     if(!is.null(timeLimit))
+    {
       timeLeft <- as.double(timeLimit - as.double(currentTime - startTime))
+      if(timeLeft < 1)
+        return(result)
+    }
     
     result <- SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMinMax, i, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, solver, timeLeft, cplexIntegralityTolerance, cplexThreads)
     
