@@ -6,12 +6,12 @@
 \description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method only outputs a result when an SRMP model consistent with the provided pairwise comparisons exists. The method will search for a model with the minimum possible number of profiles up to a given maximum value.}
 
 \usage{
-SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMinMax, maxProfilesNumber,
-                                            preferencePairs, indifferencePairs = NULL,
-                                            alternativesIDs = NULL, criteriaIDs = NULL,
-                                            solver="glpk", timeLimit = NULL,
-                                            cplexIntegralityTolerance = NULL,
-                                            cplexThreads = NULL)
+SRMPInferenceNoInconsist(performanceTable, criteriaMinMax, maxProfilesNumber,
+                        preferencePairs, indifferencePairs = NULL,
+                        alternativesIDs = NULL, criteriaIDs = NULL,
+                        solver="glpk", timeLimit = NULL,
+                        cplexIntegralityTolerance = NULL,
+                        cplexThreads = NULL)
 }
 
 \arguments{

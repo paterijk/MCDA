@@ -19,11 +19,11 @@ SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfil
   maxProfilesNumber <- as.integer(maxProfilesNumber)
   
   if (!(is.null(timeLimit)))
-      {
-        if(!is.numeric(timeLimit))
-          stop("timeLimit should be numeric")
-        if(timeLimit <= 0)
-          stop("timeLimit should be strictly pozitive")
+  {
+    if(!is.numeric(timeLimit))
+      stop("timeLimit should be numeric")
+    if(timeLimit <= 1)
+      stop("timeLimit should be strictly positive (and ideally above one second)")
   }
 
   if (!(is.null(alternativesIDs) || is.vector(alternativesIDs)))
@@ -88,7 +88,7 @@ SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfil
     result <- SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMinMax, i, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, solver, timeLeft, cplexIntegralityTolerance, cplexThreads)
     
     if(result$solverStatus == 5)
-      return(list(weights = result$weights, referenceProfilesNumber = i, referenceProfiles = result$referenceProfiles, lexicographicOrder = lexicographicOrder, solverStatus = result$solverStatus, humanReadableStatus = result$humanReadableStatus))
+      return(list(weights = result$weights, referenceProfilesNumber = i, referenceProfiles = result$referenceProfiles, lexicographicOrder = result$lexicographicOrder, solverStatus = result$solverStatus, humanReadableStatus = result$humanReadableStatus))
   }
   
   return(result)
