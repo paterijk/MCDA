@@ -1,4 +1,4 @@
-SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", timeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
+SRMPInference <- function(performanceTable, criteriaMinMax, maxProfilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", timeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
   
   ## check the input data
   if (!(is.matrix(performanceTable) || is.data.frame(performanceTable))) 
@@ -70,7 +70,7 @@ SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfil
   
   startTime <- Sys.time()
   
-  result <- (list(humanReadableStatus = "No solution found in the given time limit"))
+  bestResult <- (list(fitness = 0, humanReadableStatus = "No solution was found. Might be due to the time constraint, if one was provided."))
   
   for(i in 1:maxProfilesNumber)
   {
@@ -85,11 +85,14 @@ SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfil
         return(result)
     }
     
-    result <- SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMinMax, i, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, solver, timeLeft, cplexIntegralityTolerance, cplexThreads)
+    result <- SRMPInferenceFixedProfilesNumber(performanceTable, criteriaMinMax, i, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, solver, timeLeft, cplexIntegralityTolerance, cplexThreads)
     
-    if(result$solverStatus == 5)
-      return(list(weights = result$weights, referenceProfilesNumber = i, referenceProfiles = result$referenceProfiles, lexicographicOrder = result$lexicographicOrder, solverStatus = result$solverStatus, humanReadableStatus = result$humanReadableStatus))
+    if(result$fitness > bestResult$fitness)
+      bestResult <- list(weights = result$weights, referenceProfilesNumber = i, referenceProfiles = result$referenceProfiles, lexicographicOrder = result$lexicographicOrder, fitness = result$fitness, solverStatus = result$solverStatus, humanReadableStatus = result$humanReadableStatus)
+    
+    if(bestResult$fitness == 1)
+      return(bestResult)
   }
   
-  return(result)
+  return(bestResult)
 }

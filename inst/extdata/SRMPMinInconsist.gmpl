@@ -1,0 +1,71 @@
+/* ************************ */
+/* ****** parameters ****** */
+/* ************************ */
+/* number of alternatives */
+param n;
+/* number of criteria */
+param m;
+/* criteria preference direction*/
+param dir{i in 1..m};
+/* criteria min*/
+param min{i in 1..m};
+/* criteria max*/
+param max{i in 1..m};
+/* number of reference points */
+param p;
+/* number of binary comparisons */
+param q;
+/* lexicographic order */
+param LO{l in 1..p};
+/* binary comparisons */
+param BC{i in 1..q, j in 1..2};
+/* performance table - alternatives */
+param A{i in 1..n, j in 1..m};
+/* separation for inequalities and parameters */
+param gamma;
+/* *********************** */
+/* ****** variables ****** */
+/* *********************** */
+/* weights */
+var w{i in 1..m} >=0, <=1;
+/* performance table - reference profiles */
+var P{k in 1..p, j in 1..m};
+/* local concordance to a reference point */
+var lC{i in 1..n, j in 1..m, k in 1..p} binary;
+/* weighted local concordance to a reference point */
+var wlC{i in 1..n, j in 1..m, k in 1..p};
+/* series of variables used to model the ranking rule */
+var s{i in 1..q, k in 1..(p+1)} binary;
+/* ******************************** */
+/* ****** objective function ****** */
+/* ******************************** */
+maximize obj: sum{i in 1..q}s[i,1];
+/* ************************* */
+/* ****** constraints ****** */
+/* ************************* */
+/* normalized weights */
+s.t. normalisedWeights: sum{j in 1..m} w[j] = 1;
+/* non-dictator weights */
+s.t. nondictatorWeights{j in 1..m}: 0.5 >= w[j];
+/* non-zero weights */
+s.t. nonzeroWeights{j in 1..m}: w[j] >= gamma;
+/* constrain reference point values */
+s.t. bottomP{j in 1..m}: dir[j] * P[1,j] >= max[j] * (1 - dir[j]) / 2 + min[j] * (dir[j] + 1) / 2;
+s.t. topP{j in 1..m}: max[j] * (dir[j] + 1) / 2 + min[j] * (1 - dir[j]) / 2 >= dir[j] * P[p,j];
+/* dominance between reference points */
+s.t. dominanceP{k in 1..p-1, j in 1..m}: dir[j] * P[(k+1),j] >= dir[j] * P[k,j];
+/* constraints on the local concordance */
+s.t. lC1{i in 1..n, j in 1..m, k in 1..p}: dir[j] * (A[i,j] - P[k,j]) >= dir[j] * (max[j]-min[j]+1) * (lC[i,j,k] - 1);
+s.t. lC2{i in 1..n, j in 1..m, k in 1..p}: dir[j] * (max[j]-min[j]+1) * lC[i,j,k] >= dir[j] * (A[i,j] - P[k,j]) + gamma;
+/* constraints on the weighted local concordance */
+s.t. wlC1{i in 1..n, j in 1..m, k in 1..p}: w[j] >= wlC[i,j,k];
+s.t. wlC2{i in 1..n, j in 1..m, k in 1..p}: wlC[i,j,k] >= 0;
+s.t. wlC3{i in 1..n, j in 1..m, k in 1..p}: lC[i,j,k] >= wlC[i,j,k];
+s.t. wlC4{i in 1..n, j in 1..m, k in 1..p}: wlC[i,j,k] >= lC[i,j,k] + w[j] - 1;
+/* preference w.r.t. a reference point */
+s.t. Pi{i in 1..q}: s[i,p+1] = 0; /* last one has to be 0 so that the weighted sums will not be forced to be equal if the first is not greater than the other */
+s.t. P1{i in 1..q, k in 1..p}: sum{j in 1..m}(wlC[BC[i,1],j,LO[k]]) - sum{j in 1..m}(wlC[BC[i,2],j,LO[k]]) >= gamma - s[i,k+1] * (1 + gamma) - (1 - s[i,k]);
+s.t. P2{i in 1..q, k in 1..p}: sum{j in 1..m}(wlC[BC[i,1],j,LO[k]]) - sum{j in 1..m}(wlC[BC[i,2],j,LO[k]]) >= s[i,k+1] - 1 - (1 - s[i,k]);
+s.t. P3{i in 1..q, k in 1..p}: sum{j in 1..m}(wlC[BC[i,1],j,LO[k]]) - sum{j in 1..m}(wlC[BC[i,2],j,LO[k]]) <= 1 - s[i,k+1] + (1 - s[i,k]);
+/*------------------------------------*/
+solve;

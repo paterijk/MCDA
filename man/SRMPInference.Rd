@@ -1,17 +1,14 @@
-\name{SRMPInferenceNoInconsist}
-\alias{SRMPInferenceNoInconsist}
+\name{SRMPInference}
+\alias{SRMPInference}
 
-\title{SRMPInferenceNoInconsist}
+\title{SRMPInference}
 
-\description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method only outputs a result when an SRMP model consistent with the provided pairwise comparisons exists. The method will search for a model with the minimum possible number of profiles up to a given maximum value.}
+\description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method outputs an SRMP model that is as consistent as possible with the provided pairwise comparisons (i.e. the model - the number of profiles and their lexicographic order - that maximizes the number of fulfilled pairwise comparisons). The method will search for a model with the minimum possible number of profiles up to a given maximum value.}
 
 \usage{
-SRMPInferenceNoInconsist(performanceTable, criteriaMinMax, maxProfilesNumber,
-                        preferencePairs, indifferencePairs = NULL,
-                        alternativesIDs = NULL, criteriaIDs = NULL,
-                        solver="glpk", timeLimit = NULL,
-                        cplexIntegralityTolerance = NULL,
-                        cplexThreads = NULL)
+SRMPInference(performanceTable, criteriaMinMax, maxProfilesNumber, preferencePairs, indifferencePairs = NULL,
+             alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", timeLimit = NULL,
+             cplexIntegralityTolerance = NULL, cplexThreads = NULL)
 }
 
 \arguments{
@@ -59,7 +56,7 @@ preferencePairs <- matrix(c("a16","a13","a3","a14","a17","a1","a18","a15","a2","
 indifferencePairs <- matrix(c("a3","a1","a2","a11","a11","a20","a10","a10","a19","a12","a12","a21",
                               "a9","a7","a8","a20","a22","a22","a19","a24","a24","a21","a23","a23"),12,2)
 
-result<-SRMPInferenceNoInconsist(performanceTable, criteriaMinMax, 3, preferencePairs, indifferencePairs, alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7","a8","a10","a11","a12","a14","a16","a17","a18","a19","a20","a21","a23","a24"))
+result<-SRMPInference(performanceTable, criteriaMinMax, 3, preferencePairs, indifferencePairs, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a15","a16","a17","a18"))
 }
 \keyword{methods}
 %\keyword{ ~~ other possible keyword(s)}

@@ -1,17 +1,17 @@
-\name{SRMPInferenceNoInconsist}
-\alias{SRMPInferenceNoInconsist}
+\name{SRMPInferenceFixedProfilesNumber}
+\alias{SRMPInferenceFixedProfilesNumber}
 
-\title{SRMPInferenceNoInconsist}
+\title{SRMPInferenceFixedProfilesNumber}
 
-\description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method only outputs a result when an SRMP model consistent with the provided pairwise comparisons exists. The method will search for a model with the minimum possible number of profiles up to a given maximum value.}
+\description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method outputs an SRMP model that is as consistent as possible with the provided pairwise comparisons (i.e. the model - and the lexicographic order of the reference profiles - that maximizes the number of fulfilled pairwise comparisons). The number of reference profiles is fixed and needs to be provided.}
 
 \usage{
-SRMPInferenceNoInconsist(performanceTable, criteriaMinMax, maxProfilesNumber,
-                        preferencePairs, indifferencePairs = NULL,
-                        alternativesIDs = NULL, criteriaIDs = NULL,
-                        solver="glpk", timeLimit = NULL,
-                        cplexIntegralityTolerance = NULL,
-                        cplexThreads = NULL)
+SRMPInferenceFixedProfilesNumber(performanceTable, criteriaMinMax, profilesNumber,
+                                 preferencePairs, indifferencePairs = NULL,
+                                 alternativesIDs = NULL, criteriaIDs = NULL,
+                                 solver="glpk", timeLimit = NULL,
+                                 cplexIntegralityTolerance = NULL,
+                                 cplexThreads = NULL)
 }
 
 \arguments{
@@ -21,7 +21,7 @@ SRMPInferenceNoInconsist(performanceTable, criteriaMinMax, maxProfilesNumber,
   \item{criteriaMinMax}{Vector containing the preference direction on each of the criteria.
   "min" (resp. "max") indicates that the criterion has to be minimized (maximized). 
   The elements are named according to the IDs of the criteria.}
-  \item{maxProfilesNumber}{A strictly pozitive numerical value which gives the highest number of reference profiles the sought SRMP model should have.}
+  \item{profilesNumber}{A strictly pozitive numerical value which gives the number of reference profiles in the sought SRMP model.}
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
   \item{solver}{String specifying if the glpk solver (glpk) should be used, or the cplex (cplex) solver. By default glpk. The cplex solver requires to install the cplex binary and the cplex C API, as well as the cplexAPI R package.}
@@ -31,7 +31,7 @@ SRMPInferenceNoInconsist(performanceTable, criteriaMinMax, maxProfilesNumber,
 }
 
 \value{
-  The function returns a list containing the criteria weights, the inferred reference profiles, the number of profiles, their lexicographic order, the status code of the mixed-integer linear solver as well as a human-readable message pertaining to it.
+  The function returns a list containing the criteria weights, the inferred reference profiles, their lexicographic order, the status code of the mixed-integer linear solver as well as a human-readable message pertaining to it.
 }
 
 \references{
@@ -59,7 +59,7 @@ preferencePairs <- matrix(c("a16","a13","a3","a14","a17","a1","a18","a15","a2","
 indifferencePairs <- matrix(c("a3","a1","a2","a11","a11","a20","a10","a10","a19","a12","a12","a21",
                               "a9","a7","a8","a20","a22","a22","a19","a24","a24","a21","a23","a23"),12,2)
 
-result<-SRMPInferenceNoInconsist(performanceTable, criteriaMinMax, 3, preferencePairs, indifferencePairs, alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7","a8","a10","a11","a12","a14","a16","a17","a18","a19","a20","a21","a23","a24"))
+result<-SRMPInferenceFixedProfilesNumber(performanceTable, criteriaMinMax, 3, preferencePairs, indifferencePairs, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a15","a16","a17","a18"))
 }
 \keyword{methods}
 %\keyword{ ~~ other possible keyword(s)}
