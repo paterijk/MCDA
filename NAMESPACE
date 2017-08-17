@@ -8,7 +8,7 @@ importFrom("methods", "new")
 importFrom("stats", "cor")
 import(glpkAPI)
 import(RColorBrewer)
-## import(combinat)
+import(combinat)
 
 ## Generics and functions defined in this package
 export(
