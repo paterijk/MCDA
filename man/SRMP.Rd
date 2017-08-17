@@ -49,7 +49,9 @@ weights <- c(0.2,0.44,0.36)
 
 criteriaMinMax <- c("max","max","max")
 
-rownames(performanceTable) <- c("a1","a2","a3","a4","a5","a6","a7","a8","a9","a10","a11","a12","a13","a14","a15","a16","a17","a18","a19","a20","a21","a22","a23","a24")
+rownames(performanceTable) <- c("a1","a2","a3","a4","a5","a6","a7","a8","a9","a10","a11","a12",
+                                "a13","a14","a15","a16","a17","a18","a19","a20","a21","a22",
+                                "a23","a24")
 
 colnames(performanceTable) <- c("c1","c2","c3")
 
@@ -59,7 +61,9 @@ names(weights) <- c("c1","c2","c3")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-expectedpreorder <- list('a16','a13',c('a3','a9'),'a14','a17',c('a1','a7'),'a18','a15',c('a2','a8'),c('a11','a20','a22'),'a5',c('a10','a19','a24'),'a4',c('a12','a21','a23'),'a6')
+expectedpreorder <- list('a16','a13',c('a3','a9'),'a14','a17',c('a1','a7'),'a18','a15',
+                         c('a2','a8'),c('a11','a20','a22'),'a5',c('a10','a19','a24'),
+                         'a4',c('a12','a21','a23'),'a6')
 
 preorder<-SRMP(performanceTable, referenceProfiles, lexicographicOrder, weights, criteriaMinMax)
 }

@@ -264,6 +264,18 @@ MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks,
     }
   }
   
+  humanReadableStatus <- "Unknown"
+  if(solverStatus %in% c(5,101,102))
+    humanReadableStatus <- "Solution is optimal"
+  else if(solverStatus %in% c(3,4,103,102))
+    humanReadableStatus <- "Solution is infeasible"
+  else if(solverStatus %in% c(111,112))
+    humanReadableStatus <- "Memory limit"
+  else if(solverStatus %in% c(107,108))
+    humanReadableStatus <- "Time limit"
+  else if(solverStatus %in% c(6,118))
+    humanReadableStatus <- "No unbounded solution"
+  
   if (!error){
     lambda <- solution[varnames=="lambda"]
     
@@ -324,7 +336,9 @@ MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks,
       colnames(vetoPerformances) <- colnames(performanceTable)
     }
     
-    return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances, solverStatus = solverStatus))  
+    return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances, solverStatus = solverStatus, humanReadableStatus = humanReadableStatus))  
   } else
-    return(list(solverStatus = solverStatus))
+  {
+    return(list(solverStatus = solverStatus, humanReadableStatus = humanReadableStatus))
+  }
 }

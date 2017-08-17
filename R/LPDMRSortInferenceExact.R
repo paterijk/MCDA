@@ -260,20 +260,19 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
     }
   }
   
-  if (!error){  
+  humanReadableStatus <- "Unknown"
+  if(solverStatus %in% c(5,101,102))
+    humanReadableStatus <- "Solution is optimal"
+  else if(solverStatus %in% c(3,4,103,102))
+    humanReadableStatus <- "Solution is infeasible"
+  else if(solverStatus %in% c(111,112))
+    humanReadableStatus <- "Memory limit"
+  else if(solverStatus %in% c(107,108))
+    humanReadableStatus <- "Time limit"
+  else if(solverStatus %in% c(6,118))
+    humanReadableStatus <- "No unbounded solution"
   
-  # solveMIPGLPK(lp)
-  # 
-  # if(mipStatusGLPK(lp)==5){
-  #   
-  #   mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
-  #   
-  #   solution <- mipColsValGLPK(lp)
-  #   
-  #   varnames <- c()
-  #   
-  #   for (i in 1:length(solution))
-  #     varnames <- c(varnames,getColNameGLPK(lp,i))
+  if (!error){
     
     lambda <- solution[varnames=="lambda"]
     
@@ -358,9 +357,11 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
       colnames(dictatorPerformances) <- colnames(performanceTable)
     }
     
-    return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances, dictatorPerformances = dictatorPerformances, solverStatus = solverStatus))
+    return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances, dictatorPerformances = dictatorPerformances, solverStatus = solverStatus, humanReadableStatus = humanReadableStatus))
     
   }
   else
-    return(list(solverStatus = solverStatus))
+  {
+    return(list(solverStatus = solverStatus, humanReadableStatus = humanReadableStatus))
+  }
 }
