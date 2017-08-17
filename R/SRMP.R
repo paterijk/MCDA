@@ -102,7 +102,7 @@ SRMP <- function(performanceTable, referenceProfiles, lexicographicOrder, criter
     return(0)
   }
   
-  preorder <- list(1)
+  preorder <- list(rownames(performanceTable)[1])
   
   for (i in 2:numAlt)
   {
@@ -115,15 +115,15 @@ SRMP <- function(performanceTable, referenceProfiles, lexicographicOrder, criter
       {
         # alternative i is better than alternative j -> we put it before j and go to the next alternative
         if(k == 1)
-          preorder <- c(i,preorder)
+          preorder <- c(rownames(performanceTable)[i],preorder)
         else
-          preorder <- c(preorder[1:(k-1)],i,preorder[k:length(preorder)])
+          preorder <- c(preorder[1:(k-1)],rownames(performanceTable)[i],preorder[k:length(preorder)])
         break
       }
       else if(comparison == 0)
       {
         # alternative i is indifferent to j -> we put it on the same spot and go to the next alternative
-        preorder[[k]] <- c(preorder[[k]],i)
+        preorder[[k]] <- c(preorder[[k]],rownames(performanceTable)[i])
         break
       }
       
@@ -132,7 +132,7 @@ SRMP <- function(performanceTable, referenceProfiles, lexicographicOrder, criter
       if(k > length(preorder))
       {
         # we've reached the end and could not find an alternative that is worse or indifferent to i
-        preorder <- c(preorder,i)
+        preorder <- c(preorder,rownames(performanceTable)[i])
         break
       }
     }

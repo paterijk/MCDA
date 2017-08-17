@@ -1,4 +1,4 @@
-SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", timeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
+SRMPInferenceFixedProfilesNumber <- function(performanceTable, criteriaMinMax, profilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", timeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
   
   ## check the input data
   if (!(is.matrix(performanceTable) || is.data.frame(performanceTable))) 
@@ -13,10 +13,10 @@ SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfil
   if (!(is.vector(criteriaMinMax)))
     stop("criteriaMinMax should be a vector")
   
-  if (!(is.numeric(maxProfilesNumber)))
-    stop("maxProfilesNumber should be numberic")
+  if (!(is.numeric(profilesNumber)))
+    stop("profilesNumber should be numberic")
   
-  maxProfilesNumber <- as.integer(maxProfilesNumber)
+  profilesNumber <- as.integer(profilesNumber)
   
   if (!(is.null(timeLimit)))
   {
@@ -65,31 +65,37 @@ SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfil
   if (is.null(dim(preferencePairs))) 
     stop("preferencePairs is empty or the provided alternativesIDs have filtered out everything from within")
   
-  if (!(maxProfilesNumber > 0))
-    stop("maxProfilesNumber should be strictly pozitive")
+  if (!(profilesNumber > 0))
+    stop("profilesNumber should be strictly pozitive")
+  
+  lexicographicOrders <- permn(1:profilesNumber)
   
   startTime <- Sys.time()
   
-  result <- (list(humanReadableStatus = "No solution found in the given time limit"))
+  bestResult <- (list(fitness = 0, humanReadableStatus = "No solution was found. Might be due to the time constraint, if one was provided."))
   
-  for(i in 1:maxProfilesNumber)
+  for(lexicographicOrder in lexicographicOrders)
   {
+    
     currentTime <- Sys.time()
     
     timeLeft <- NULL
     
     if(!is.null(timeLimit))
     {
-      timeLeft <- as.double(timeLimit - as.double(currentTime - startTime))
+      timeLeft <- timeLimit - as.double(currentTime - startTime)
       if(timeLeft < 1)
-        return(result)
+        return(bestResult)
     }
     
-    result <- SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMinMax, i, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, solver, timeLeft, cplexIntegralityTolerance, cplexThreads)
+    result <- SRMPInferenceFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, solver, timeLeft, cplexIntegralityTolerance, cplexThreads)
     
-    if(result$solverStatus == 5)
-      return(list(weights = result$weights, referenceProfilesNumber = i, referenceProfiles = result$referenceProfiles, lexicographicOrder = result$lexicographicOrder, solverStatus = result$solverStatus, humanReadableStatus = result$humanReadableStatus))
+    if(result$fitness > bestResult$fitness)
+      bestResult <- list(weights = result$weights, referenceProfiles = result$referenceProfiles, lexicographicOrder = lexicographicOrder, fitness = result$fitness, solverStatus = result$solverStatus, humanReadableStatus = result$humanReadableStatus)
+    
+    if(bestResult$fitness == 1)
+      return(bestResult)
   }
   
-  return(result)
+  return(bestResult)
 }

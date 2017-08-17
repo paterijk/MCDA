@@ -1,17 +1,17 @@
-\name{SRMPInferenceNoInconsistFixedLexicographicOrder}
-\alias{SRMPInferenceNoInconsistFixedLexicographicOrder}
+\name{SRMPInferenceFixedLexicographicOrder}
+\alias{SRMPInferenceFixedLexicographicOrder}
 
 \title{SRMPInferenceNoInconsistFixedLexicographicOrder}
 
-\description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method only outputs a result when an SRMP model consistent with the provided pairwise comparisons exists. The number of reference profiles and their lexicographic order is fixed.}
+\description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method only outputs an SRMP model that maximizes the number of fulfilled pairwise comparisons. The number of reference profiles and their lexicographic order is fixed.}
 
 \usage{
-SRMPInferenceNoInconsistFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder,
-                                                preferencePairs, indifferencePairs = NULL,
-                                                alternativesIDs = NULL, criteriaIDs = NULL,
-                                                solver="glpk", timeLimit = NULL,
-                                                cplexIntegralityTolerance = NULL,
-                                                cplexThreads = NULL)
+SRMPInferenceFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder,
+                                     preferencePairs, indifferencePairs = NULL,
+                                     alternativesIDs = NULL, criteriaIDs = NULL,
+                                     solver="glpk", timeLimit = NULL,
+                                     cplexIntegralityTolerance = NULL,
+                                     cplexThreads = NULL)
 }
 
 \arguments{
@@ -29,11 +29,11 @@ SRMPInferenceNoInconsistFixedLexicographicOrder(performanceTable, criteriaMinMax
   \item{solver}{String specifying if the glpk solver (glpk) should be used, or the cplex (cplex) solver. By default glpk. The cplex solver requires to install the cplex binary and the cplex C API, as well as the cplexAPI R package.}
   \item{timeLimit}{Allows to fix a time limit of the execution, in seconds. By default NULL (which corresponds to no time limit).}
   \item{cplexIntegralityTolerance}{If the cplex solver is used, allows to fix a tolerance for integrality. By default NULL (which corresponds to the default value of cplex).}
-  \item{cplexThreads}{If the cplex solver is used, allows to the number of threads for the calculation. By default NULL (which corresponds to the default value of cplex).}
+  \item{cplexThreads}{If the cplex solver is used, allows to set the number of threads for the calculation. By default NULL (which corresponds to the default value of cplex - 1).}
 }
 
 \value{
-  The function returns a list containing the criteria weights, the inferred reference profiles, the status code of the mixed-integer linear solver as well as a human-readable message pertaining to it.
+  The function returns a list containing the criteria weights, the inferred reference profiles, the ratio of fulfilled pairwise comparisons, the status code of the mixed-integer linear solver as well as a human-readable message pertaining to it.
 }
 
 \references{
@@ -65,7 +65,7 @@ preferencePairs <- matrix(c("a16","a13","a3","a14","a17","a1","a18","a15","a2","
 indifferencePairs <- matrix(c("a3","a1","a2","a11","a11","a20","a10","a10","a19","a12","a12","a21",
                               "a9","a7","a8","a20","a22","a22","a19","a24","a24","a21","a23","a23"),12,2)
 
-result<-SRMPInferenceNoInconsistFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs, alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7","a8","a10","a11","a12","a14","a16","a17","a18","a19","a20","a21","a23","a24"))
+result<-SRMPInferenceFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs)
 }
 \keyword{methods}
 %\keyword{ ~~ other possible keyword(s)}

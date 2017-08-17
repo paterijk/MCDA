@@ -5,7 +5,7 @@ Title: Functions to Support the Multicriteria Decision Aiding Process
 Author: Patrick Meyer, Sébastien Bigaret, Richard Hodgett, Alexandru-Liviu Olteanu
 Maintainer: Patrick Meyer <patrick.meyer@telecom-bretagne.eu>
 Description: Functions which can be useful to support the analyst in the Multicriteria Decision Aiding (MCDA) process involving multiple, conflicting criteria. 
-Imports: Rglpk, glpkAPI, methods, RColorBrewer
+Imports: Rglpk, glpkAPI, methods, RColorBrewer, combinat
 Suggests: Rgraphviz, cplexAPI
 License: EUPL (== 1.1)
 Encoding: UTF-8

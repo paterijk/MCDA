@@ -6,12 +6,12 @@
 \description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method only outputs a result when an SRMP model consistent with the provided pairwise comparisons exists. The method will search for a model with the minimum possible number of profiles up to a given maximum value.}
 
 \usage{
-SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMinMax, maxProfilesNumber,
-                                            preferencePairs, indifferencePairs = NULL,
-                                            alternativesIDs = NULL, criteriaIDs = NULL,
-                                            solver="glpk", timeLimit = NULL,
-                                            cplexIntegralityTolerance = NULL,
-                                            cplexThreads = NULL)
+SRMPInferenceNoInconsist(performanceTable, criteriaMinMax, maxProfilesNumber,
+                        preferencePairs, indifferencePairs = NULL,
+                        alternativesIDs = NULL, criteriaIDs = NULL,
+                        solver="glpk", timeLimit = NULL,
+                        cplexIntegralityTolerance = NULL,
+                        cplexThreads = NULL)
 }
 
 \arguments{
@@ -22,6 +22,8 @@ SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMinMax, ma
   "min" (resp. "max") indicates that the criterion has to be minimized (maximized). 
   The elements are named according to the IDs of the criteria.}
   \item{maxProfilesNumber}{A strictly pozitive numerical value which gives the highest number of reference profiles the sought SRMP model should have.}
+  \item{preferencePairs}{A two column matrix containing on each row a pair of alternative names where the first alternative is considered to be strictly preferred to the second.}
+    \item{indifferencePairs}{A two column matrix containing on each row a pair of alternative names the two alternatives are considered to indifferent with respect to each other.}
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
   \item{solver}{String specifying if the glpk solver (glpk) should be used, or the cplex (cplex) solver. By default glpk. The cplex solver requires to install the cplex binary and the cplex C API, as well as the cplexAPI R package.}

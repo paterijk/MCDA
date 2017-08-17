@@ -72,6 +72,8 @@ SRMPInferenceNoInconsistFixedProfilesNumber <- function(performanceTable, criter
   
   startTime <- Sys.time()
   
+  result <- (list(humanReadableStatus = "No solution found in the given time limit"))
+  
   for(lexicographicOrder in lexicographicOrders)
   {
     currentTime <- Sys.time()
@@ -79,7 +81,11 @@ SRMPInferenceNoInconsistFixedProfilesNumber <- function(performanceTable, criter
     timeLeft <- NULL
     
     if(!is.null(timeLimit))
+    {
       timeLeft <- as.double(timeLimit - as.double(currentTime - startTime))
+      if(timeLeft < 1)
+        return(result)
+    }
     
     result <- SRMPInferenceNoInconsistFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, solver, timeLeft, cplexIntegralityTolerance, cplexThreads)
     

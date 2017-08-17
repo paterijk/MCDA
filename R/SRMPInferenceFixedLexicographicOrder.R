@@ -1,4 +1,4 @@
-SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", timeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
+SRMPInferenceFixedLexicographicOrder <- function(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", timeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
   
   ## check the input data
   if (!(is.matrix(performanceTable) || is.data.frame(performanceTable))) 
@@ -74,9 +74,9 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
   
   # get model file depending on function options
 
-  modelfilename <- "SRMPNoInconsist.gmpl"
+  modelfilename <- "SRMPMinInconsist.gmpl"
   if(length(indifferencePairs) > 0)
-    modelfilename <- "SRMPNoInconsistIndif.gmpl"
+    modelfilename <- "SRMPMinInconsistIndif.gmpl"
 
   modelFile <- system.file("extdata", modelfilename, package="MCDA")
   
@@ -274,6 +274,8 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
     if ((cplexAPI::getStatCPLEX(env,prob) == 101) | (cplexAPI::getStatCPLEX(env,prob) == 102)){
       solution <- cplexAPI::solutionCPLEX(env,prob)$x
       
+      objective <- cplexAPI::getObjValCPLEX(env,prob)
+      
       varnames <- cplexAPI::getColNameCPLEX(env,prob, 0,length(solution)-1)
       
       paro <- "("
@@ -299,6 +301,8 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
       
       solution <- mipColsValGLPK(lp)
       
+      objective <- mipObjValGLPK(lp)
+      
       varnames <- c()
       
       for (i in 1:length(solution))
@@ -311,7 +315,13 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
     }
   }
   
-  if (!error){  
+  if (!error){
+    
+    ncomp <- dim(preferencePairs)[1]
+    if(!is.null(indifferencePairs))
+      ncomp <- ncomp + dim(indifferencePairs)[1]
+    
+    objective <- objective/ncomp
     
     weightsnames <- c()
     
@@ -346,7 +356,7 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
     colnames(referenceProfiles) <- colnames(performanceTable)
     
     
-    return(list(weights = weights, referenceProfiles = referenceProfiles, solverStatus = solverStatus, humanReadableStatus = "Solution is optimal."))
+    return(list(weights = weights, referenceProfiles = referenceProfiles, fitness = objective, solverStatus = solverStatus, humanReadableStatus = "Solution is optimal."))
     
   }
   else
@@ -362,6 +372,6 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
       humanReadableStatus <- "Time limit"
     else if(solverStatus %in% c(6,118))
       humanReadableStatus <- "No unbounded solution"
-    return(list(solverStatus = solverStatus, humanReadableStatus = humanReadableStatus))
+    return(list(fitness = 0, solverStatus = solverStatus, humanReadableStatus = humanReadableStatus))
   }
 }
