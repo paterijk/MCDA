@@ -27,7 +27,7 @@ names(weights) <- c("c1","c2","c3")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-expectedpreorder <- list(16,13,c(3,9),14,17,c(1,7),18,15,c(2,8),c(11,20,22),5,c(10,19,24),4,c(12,21,23),6)
+expectedpreorder <- list('a16','a13',c('a3','a9'),'a14','a17',c('a1','a7'),'a18','a15',c('a2','a8'),c('a11','a20','a22'),'a5',c('a10','a19','a24'),'a4',c('a12','a21','a23'),'a6')
 
 preorder<-SRMP(performanceTable, referenceProfiles, lexicographicOrder, weights, criteriaMinMax)
 
