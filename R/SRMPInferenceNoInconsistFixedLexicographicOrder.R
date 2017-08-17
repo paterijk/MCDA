@@ -249,7 +249,7 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
     # Create a problem object
     prob <- cplexAPI::initProbCPLEX(env)
     
-    if (!is.null(cplexTimeLimit))
+    if (!is.null(timeLimit))
       cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_TILIM,timeLimit*1000)
     
     if (!is.null(cplexIntegralityTolerance))
