@@ -74,6 +74,7 @@ LPDMRSortInferenceExact(performanceTable, assignments,
   The columns are named according to the criteria, whereas the rows are named according 
   to the categories. The veto profile of the lower category can be considered as a dummy profile.}
   \item{solverStatus}{The solver status as given by glpk or cplex.}
+  \item{humanReadableStatus}{A description of the solver status.}
 }
 
 \references{

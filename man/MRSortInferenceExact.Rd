@@ -56,6 +56,7 @@ MRSortInferenceExact(performanceTable, assignments,
   to the categories. The veto profile of the lower category can be considered as 
   a dummy profile.}
   \item{solverStatus}{The solver status as given by glpk or cplex.}
+  \item{humanReadableStatus}{A description of the solver status.}
 }
 
 \references{
