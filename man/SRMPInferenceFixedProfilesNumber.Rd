@@ -1,7 +1,7 @@
 \name{SRMPInferenceFixedProfilesNumber}
 \alias{SRMPInferenceFixedProfilesNumber}
 
-\title{SRMPInferenceFixedProfilesNumber}
+\title{Exact inference of an SRMP model given the number of reference profiles}
 
 \description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method outputs an SRMP model that is as consistent as possible with the provided pairwise comparisons (i.e. the model - and the lexicographic order of the reference profiles - that maximizes the number of fulfilled pairwise comparisons). The number of reference profiles is fixed and needs to be provided.}
 

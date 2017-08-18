@@ -1,9 +1,9 @@
 \name{SRMPInferenceNoInconsist}
 \alias{SRMPInferenceNoInconsist}
 
-\title{SRMPInferenceNoInconsist}
+\title{Exact inference of an SRMP model given a maximum number of reference profiles - no inconsistencies}
 
-\description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method only outputs a result when an SRMP model consistent with the provided pairwise comparisons exists. The method will search for a model with the minimum possible number of profiles up to a given maximum value.}
+\description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method only outputs a result when an SRMP model consistent with the provided pairwise comparisons exists. The method will search for a model with the minimum possible number of profiles up to a given maximum value. If such a model exists, this method is significantly faster than the one which handles inconsistencies.}
 
 \usage{
 SRMPInferenceNoInconsist(performanceTable, criteriaMinMax, maxProfilesNumber,
