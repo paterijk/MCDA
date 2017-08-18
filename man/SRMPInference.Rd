@@ -1,7 +1,7 @@
 \name{SRMPInference}
 \alias{SRMPInference}
 
-\title{SRMPInference}
+\title{Exact inference of an SRMP model given a maximum number of reference profiles}
 
 \description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method outputs an SRMP model that is as consistent as possible with the provided pairwise comparisons (i.e. the model - the number of profiles and their lexicographic order - that maximizes the number of fulfilled pairwise comparisons). The method will search for a model with the minimum possible number of profiles up to a given maximum value.}
 
