@@ -1,9 +1,9 @@
 \name{SRMPInferenceFixedLexicographicOrder}
 \alias{SRMPInferenceFixedLexicographicOrder}
 
-\title{SRMPInferenceNoInconsistFixedLexicographicOrder}
+\title{Exact inference of an SRMP model given the lexicographic order of the profiles}
 
-\description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method only outputs an SRMP model that maximizes the number of fulfilled pairwise comparisons. The number of reference profiles and their lexicographic order is fixed.}
+\description{Exact inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method outputs an SRMP model that maximizes the number of fulfilled pairwise comparisons. The number of reference profiles and their lexicographic order is fixed.}
 
 \usage{
 SRMPInferenceFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder,
