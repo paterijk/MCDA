@@ -70,7 +70,7 @@ SRMP <- function(performanceTable, referenceProfiles, lexicographicOrder, criter
   # -------------------------------------------------------
   
   outranking <- function(alternativePerformances1, alternativePerformances2, profilePerformances, criteriaWeights, criteriaMinMax){
-    for (k in 1:numRefProf)
+    for (k in lexicographicOrder)
     {
       weightedSum1 <- 0
       weightedSum2 <- 0
