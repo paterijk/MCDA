@@ -28,6 +28,8 @@ preferencePairs <- matrix(c("a16","a13","a3","a14","a17","a1","a18","a15","a2","
 indifferencePairs <- matrix(c("a3","a1","a2","a11","a11","a20","a10","a10","a19","a12","a12","a21",
                               "a9","a7","a8","a20","a22","a22","a19","a24","a24","a21","a23","a23"),12,2)
 
+set.seed(1)
+
 result<-SRMPInferenceApprox(performanceTable, criteriaMinMax, 3, preferencePairs, indifferencePairs, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a15","a16","a17","a18"))
 
 preorder<-SRMP(performanceTable, result$referenceProfiles, result$lexicographicOrder, result$weights, criteriaMinMax, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a15","a16","a17","a18"))

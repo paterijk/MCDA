@@ -67,6 +67,8 @@ indifferencePairs <- matrix(c("a3","a1","a2","a11","a11","a20","a10","a10","a19"
                               "a21","a9","a7","a8","a20","a22","a22","a19","a24","a24","a21",
                               "a23","a23"),12,2)
 
+set.seed(1) # remove this line in your code
+
 result<-SRMPInferenceApproxFixedLexicographicOrder(performanceTable, criteriaMinMax,
                                                    lexicographicOrder, preferencePairs,
                                                    indifferencePairs)
