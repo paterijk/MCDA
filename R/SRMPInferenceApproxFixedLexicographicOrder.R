@@ -142,7 +142,12 @@ SRMPInferenceApproxFixedLexicographicOrder <- function(performanceTable, criteri
       
       profiles <- NULL
       for(j in 1:numCrit)
-        profiles <- cbind(profiles,sort(runif(numProfiles,minEvaluations[j],maxEvaluations[j])))
+      {
+        if(criteriaMinMax[j] == 'max')
+          profiles <- cbind(profiles,sort(runif(profilesNumber,minEvaluations[j],maxEvaluations[j])))
+        else
+          profiles <- cbind(profiles,sort(runif(profilesNumber,minEvaluations[j],maxEvaluations[j]), decreasing = TRUE))
+      }
       colnames(profiles) <- colnames(performanceTable)
       
       population[[length(population)+1]] <- list(criteriaWeights = weights, referenceProfiles = profiles, lexicographicOrder = lexicographicOrder)
