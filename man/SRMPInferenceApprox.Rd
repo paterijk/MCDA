@@ -6,10 +6,9 @@
 \description{Approximative inference approach from pairwise comparisons of alternatives for the SRMP ranking model. This method outputs an SRMP model that fulfils as many pairwise comparisons as possible. Neither the number of reference profiles, nor the lexicographic order are fixed beforehand, however a maximum value for the number of reference profiles needs to be provided.}
 
 \usage{
-SRMPInferenceApprox(performanceTable, criteriaMinMax,
-                    maxProfilesNumber, preferencePairs, indifferencePairs = NULL,
-                    alternativesIDs = NULL, criteriaIDs = NULL,
-                    timeLimit = 60,populationSize = 100, mutationProb = 0.5)
+SRMPInferenceApprox(performanceTable, criteriaMinMax, maxProfilesNumber, preferencePairs, 
+                    indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL,
+                    timeLimit = 60, populationSize = 10, mutationProb = 0.5)
 }
 
 \arguments{
@@ -21,7 +20,7 @@ SRMPInferenceApprox(performanceTable, criteriaMinMax,
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
   \item{timeLimit}{Allows to fix a time limit of the execution, in seconds (default 60).}
-  \item{populationSize}{Allows to change the size of the population used by the genetic algorithm (default 100).}
+  \item{populationSize}{Allows to change the size of the population used by the genetic algorithm (default 10).}
   \item{mutationProb}{Allows to change the mutation probability used by the genetic algorithm (default 0.5).}
 }
 
