@@ -1,4 +1,4 @@
-SRMPInferenceApprox <- function(performanceTable, criteriaMinMax, maxProfilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = 60, populationSize = 100, mutationProb = 0.5){
+SRMPInferenceApprox <- function(performanceTable, criteriaMinMax, maxProfilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = 60, populationSize = 10, mutationProb = 0.5){
   
   ## check the input data
   
@@ -136,6 +136,7 @@ SRMPInferenceApprox <- function(performanceTable, criteriaMinMax, maxProfilesNum
   InitializePopulation <- function()
   {
     population <- list()
+    
     for(i in 1:populationSize)
     {
       values <- c(0,sort(runif(numCrit-1,0,1)),1)

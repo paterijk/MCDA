@@ -1,4 +1,4 @@
-SRMPInferenceApproxFixedLexicographicOrder <- function(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = 60, populationSize = 100, mutationProb = 0.5){
+SRMPInferenceApproxFixedLexicographicOrder <- function(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = 60, populationSize = 10, mutationProb = 0.5){
   
   ## check the input data
   
@@ -144,9 +144,9 @@ SRMPInferenceApproxFixedLexicographicOrder <- function(performanceTable, criteri
       for(j in 1:numCrit)
       {
         if(criteriaMinMax[j] == 'max')
-          profiles <- cbind(profiles,sort(runif(profilesNumber,minEvaluations[j],maxEvaluations[j])))
+          profiles <- cbind(profiles,sort(runif(length(lexicographicOrder),minEvaluations[j],maxEvaluations[j])))
         else
-          profiles <- cbind(profiles,sort(runif(profilesNumber,minEvaluations[j],maxEvaluations[j]), decreasing = TRUE))
+          profiles <- cbind(profiles,sort(runif(length(lexicographicOrder),minEvaluations[j],maxEvaluations[j]), decreasing = TRUE))
       }
       colnames(profiles) <- colnames(performanceTable)
       
