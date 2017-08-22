@@ -28,13 +28,13 @@ names(criteriaMinMax) <- colnames(performanceTable)
 set.seed(1)
 
 x<-MRSortInferenceApprox(performanceTable, assignments, categoriesRanks, 
-                         criteriaMinMax, 600, 3, 40, 30, 0.2, 0.02, 1.25, 0.8, veto = TRUE,
+                         criteriaMinMax, veto = TRUE,
                          alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7"))
 
 print(x)
 
 ElectreAssignments<-MRSort(performanceTable, x$profilesPerformances, 
-                        x$weights, criteriaMinMax, x$lambda, criteriaVetos=x$vetoPerformances, alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7"))
+                        x$criteriaWeights, criteriaMinMax, x$majorityThreshold, criteriaVetos=x$vetoPerformances, alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7"))
 
 print(all(ElectreAssignments == assignments[c("a1","a2","a3","a4","a5","a6","a7")]))
 
