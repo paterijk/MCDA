@@ -148,7 +148,7 @@ SRMPInferenceApproxFixedProfilesNumber <- function(performanceTable, criteriaMin
       
       lexicographicOrder <- sample(1:profilesNumber, profilesNumber)
       
-      population[[length(population)+1]] <- list(weights = weights, referenceProfiles = profiles, lexicographicOrder = lexicographicOrder)
+      population[[length(population)+1]] <- list(criteriaWeights = weights, referenceProfiles = profiles, lexicographicOrder = lexicographicOrder)
     }
     return(population)
   }
@@ -157,14 +157,14 @@ SRMPInferenceApproxFixedProfilesNumber <- function(performanceTable, criteriaMin
     total <- 0
     ok <- 0
     for (i in 1:dim(preferencePairs)[1]){
-      comparison <- outranking(performanceTable[preferencePairs[i,1],],performanceTable[preferencePairs[i,2],],individual$referenceProfiles, individual$weights, individual$lexicographicOrder, criteriaMinMax)
+      comparison <- outranking(performanceTable[preferencePairs[i,1],],performanceTable[preferencePairs[i,2],],individual$referenceProfiles, individual$criteriaWeights, individual$lexicographicOrder, criteriaMinMax)
       if(comparison == 1)
         ok <- ok + 1
       total <- total + 1
     }
     if(!is.null(indifferencePairs))
       for (i in 1:dim(indifferencePairs)[1]){
-        comparison <- outranking(performanceTable[indifferencePairs[i,1],],performanceTable[indifferencePairs[i,2],],individual$referenceProfiles, individual$weights, individual$lexicographicOrder, criteriaMinMax)
+        comparison <- outranking(performanceTable[indifferencePairs[i,1],],performanceTable[indifferencePairs[i,2],],individual$referenceProfiles, individual$criteriaWeights, individual$lexicographicOrder, criteriaMinMax)
         if(comparison == 0)
           ok <- ok + 1
         total <- total + 1
@@ -214,51 +214,51 @@ SRMPInferenceApproxFixedProfilesNumber <- function(performanceTable, criteriaMin
       
       # child identical to first parent - will get mutated in the second step
       
-      children[[length(children)+1]] <- list(weights = parent1$weights, referenceProfiles = parent1$referenceProfiles, lexicographicOrder = parent1$lexicographicOrder)
+      children[[length(children)+1]] <- list(criteriaWeights = parent1$criteriaWeights, referenceProfiles = parent1$referenceProfiles, lexicographicOrder = parent1$lexicographicOrder)
       
       # child identical to second parent
       
-      children[[length(children)+1]] <- list(weights = parent2$weights, referenceProfiles = parent2$referenceProfiles, lexicographicOrder = parent2$lexicographicOrder)
+      children[[length(children)+1]] <- list(criteriaWeights = parent2$criteriaWeights, referenceProfiles = parent2$referenceProfiles, lexicographicOrder = parent2$lexicographicOrder)
       
       # child takes weights from first parent and profiles from second
       
-      children[[length(children)+1]] <- list(weights = parent1$weights, referenceProfiles = parent2$referenceProfiles, lexicographicOrder = parent1$lexicographicOrder)
+      children[[length(children)+1]] <- list(criteriaWeights = parent1$criteriaWeights, referenceProfiles = parent2$referenceProfiles, lexicographicOrder = parent1$lexicographicOrder)
       
       # child takes weights from second parent and profiles from first
       
-      children[[length(children)+1]] <- list(weights = parent1$weights, referenceProfiles = parent2$referenceProfiles, lexicographicOrder = parent1$lexicographicOrder)
+      children[[length(children)+1]] <- list(criteriaWeights = parent1$criteriaWeights, referenceProfiles = parent2$referenceProfiles, lexicographicOrder = parent1$lexicographicOrder)
       
       # child takes weights from first parent and profiles from first crossover
       
-      children[[length(children)+1]] <- list(weights = parent1$weights, referenceProfiles = profiles1, lexicographicOrder = parent1$lexicographicOrder)
+      children[[length(children)+1]] <- list(criteriaWeights = parent1$criteriaWeights, referenceProfiles = profiles1, lexicographicOrder = parent1$lexicographicOrder)
       
       # child takes weights from first parent and profiles from second crossover
       
-      children[[length(children)+1]] <- list(weights = parent1$weights, referenceProfiles = profiles2, lexicographicOrder = parent1$lexicographicOrder)
+      children[[length(children)+1]] <- list(criteriaWeights = parent1$criteriaWeights, referenceProfiles = profiles2, lexicographicOrder = parent1$lexicographicOrder)
       
       # child takes weights from second parent and profiles from first crossover
       
-      children[[length(children)+1]] <- list(weights = parent2$weights, referenceProfiles = profiles1, lexicographicOrder = parent1$lexicographicOrder)
+      children[[length(children)+1]] <- list(criteriaWeights = parent2$criteriaWeights, referenceProfiles = profiles1, lexicographicOrder = parent1$lexicographicOrder)
       
       # child takes weights from second parent and profiles from second crossover
       
-      children[[length(children)+1]] <- list(weights = parent2$weights, referenceProfiles = profiles2, lexicographicOrder = parent1$lexicographicOrder)
+      children[[length(children)+1]] <- list(criteriaWeights = parent2$criteriaWeights, referenceProfiles = profiles2, lexicographicOrder = parent1$lexicographicOrder)
       
       # if the lexicographic orders are different then we add more children
       
       if(!all(parent1$lexicographicOrder == parent2$lexicographicOrder))
       {
-        children[[length(children)+1]] <- list(weights = parent1$weights, referenceProfiles = parent2$referenceProfiles, lexicographicOrder = parent2$lexicographicOrder)
+        children[[length(children)+1]] <- list(criteriaWeights = parent1$criteriaWeights, referenceProfiles = parent2$referenceProfiles, lexicographicOrder = parent2$lexicographicOrder)
         
-        children[[length(children)+1]] <- list(weights = parent1$weights, referenceProfiles = parent2$referenceProfiles, lexicographicOrder = parent2$lexicographicOrder)
+        children[[length(children)+1]] <- list(criteriaWeights = parent1$criteriaWeights, referenceProfiles = parent2$referenceProfiles, lexicographicOrder = parent2$lexicographicOrder)
         
-        children[[length(children)+1]] <- list(weights = parent1$weights, referenceProfiles = profiles1, lexicographicOrder = parent2$lexicographicOrder)
+        children[[length(children)+1]] <- list(criteriaWeights = parent1$criteriaWeights, referenceProfiles = profiles1, lexicographicOrder = parent2$lexicographicOrder)
         
-        children[[length(children)+1]] <- list(weights = parent1$weights, referenceProfiles = profiles2, lexicographicOrder = parent2$lexicographicOrder)
+        children[[length(children)+1]] <- list(criteriaWeights = parent1$criteriaWeights, referenceProfiles = profiles2, lexicographicOrder = parent2$lexicographicOrder)
         
-        children[[length(children)+1]] <- list(weights = parent2$weights, referenceProfiles = profiles1, lexicographicOrder = parent2$lexicographicOrder)
+        children[[length(children)+1]] <- list(criteriaWeights = parent2$criteriaWeights, referenceProfiles = profiles1, lexicographicOrder = parent2$lexicographicOrder)
         
-        children[[length(children)+1]] <- list(weights = parent2$weights, referenceProfiles = profiles2, lexicographicOrder = parent2$lexicographicOrder)
+        children[[length(children)+1]] <- list(criteriaWeights = parent2$criteriaWeights, referenceProfiles = profiles2, lexicographicOrder = parent2$lexicographicOrder)
       }
     }
     
@@ -305,15 +305,15 @@ SRMPInferenceApproxFixedProfilesNumber <- function(performanceTable, criteriaMin
         
         criteria <- sample(colnames(performanceTable),2)
         
-        minVal <- 0 - children[[i]]$weights[criteria[1]]
+        minVal <- 0 - children[[i]]$criteriaWeights[criteria[1]]
         
-        maxVal <- children[[i]]$weights[criteria[2]]
+        maxVal <- children[[i]]$criteriaWeights[criteria[2]]
         
         tradeoff <- runif(1,minVal,maxVal)
         
-        children[[i]]$weights[criteria[1]] <- children[[i]]$weights[criteria[1]] + tradeoff
+        children[[i]]$criteriaWeights[criteria[1]] <- children[[i]]$criteriaWeights[criteria[1]] + tradeoff
         
-        children[[i]]$weights[criteria[2]] <- children[[i]]$weights[criteria[2]] - tradeoff
+        children[[i]]$criteriaWeights[criteria[2]] <- children[[i]]$criteriaWeights[criteria[2]] - tradeoff
       }
       
       if(runif(1,0,1) < mutationProb)

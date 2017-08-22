@@ -35,7 +35,7 @@ SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMinMax,
 
 \value{
   The function returns a list containing:
-  \item{weights}{The inferred criteria weights.}
+  \item{criteriaWeights}{The inferred criteria weights.}
   \item{referenceProfiles}{The inferred reference profiles.}
   \item{lexicographicOrder}{The inferred lexicographic order of the profiles.}
   \item{solverStatus}{The solver status as given by glpk or cplex.}

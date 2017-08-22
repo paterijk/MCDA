@@ -30,7 +30,7 @@ preferencePairs <- matrix(c("a16","a13","a13","a9","a3","a14","a17","a17","a1","
 
 result<-SRMPInferenceNoInconsistFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, alternativesIDs = c("a4","a5","a6","a7","a8","a9","a13","a14","a15","a16","a17","a18","a19","a21","a22","a23","a24"))
 
-preorder<-SRMP(performanceTable, result$referenceProfiles, lexicographicOrder, result$weights, criteriaMinMax)
+preorder<-SRMP(performanceTable, result$referenceProfiles, lexicographicOrder, result$criteriaWeights, criteriaMinMax)
 
 stopifnot(length(preorder) == length(expectedpreorder))
 
@@ -49,7 +49,7 @@ indifferencePairs <- matrix(c("a3","a1","a2","a11","a11","a20","a10","a10","a19"
 
 result<-SRMPInferenceNoInconsistFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs, alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7","a8","a10","a11","a12","a14","a16","a17","a18","a19","a20","a21","a23","a24"))
 
-preorder<-SRMP(performanceTable, result$referenceProfiles, lexicographicOrder, result$weights, criteriaMinMax)
+preorder<-SRMP(performanceTable, result$referenceProfiles, lexicographicOrder, result$criteriaWeights, criteriaMinMax)
 
 stopifnot(length(preorder) == length(expectedpreorder))
 

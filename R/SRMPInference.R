@@ -88,7 +88,7 @@ SRMPInference <- function(performanceTable, criteriaMinMax, maxProfilesNumber, p
     result <- SRMPInferenceFixedProfilesNumber(performanceTable, criteriaMinMax, i, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, solver, timeLeft, cplexIntegralityTolerance, cplexThreads)
     
     if(result$fitness > bestResult$fitness)
-      bestResult <- list(weights = result$weights, referenceProfilesNumber = i, referenceProfiles = result$referenceProfiles, lexicographicOrder = result$lexicographicOrder, fitness = result$fitness, solverStatus = result$solverStatus, humanReadableStatus = result$humanReadableStatus)
+      bestResult <- list(criteriaWeights = result$criteriaWeights, referenceProfilesNumber = i, referenceProfiles = result$referenceProfiles, lexicographicOrder = result$lexicographicOrder, fitness = result$fitness, solverStatus = result$solverStatus, humanReadableStatus = result$humanReadableStatus)
     
     if(bestResult$fitness == 1)
       return(bestResult)

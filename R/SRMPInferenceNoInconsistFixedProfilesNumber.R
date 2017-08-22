@@ -90,7 +90,7 @@ SRMPInferenceNoInconsistFixedProfilesNumber <- function(performanceTable, criter
     result <- SRMPInferenceNoInconsistFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, solver, timeLeft, cplexIntegralityTolerance, cplexThreads)
     
     if(result$solverStatus == 5)
-      return(list(weights = result$weights, referenceProfiles = result$referenceProfiles, lexicographicOrder = lexicographicOrder, solverStatus = result$solverStatus, humanReadableStatus = result$humanReadableStatus))
+      return(list(criteriaWeights = result$criteriaWeights, referenceProfiles = result$referenceProfiles, lexicographicOrder = lexicographicOrder, solverStatus = result$solverStatus, humanReadableStatus = result$humanReadableStatus))
   }
   
   return(result)
