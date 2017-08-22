@@ -356,7 +356,7 @@ SRMPInferenceFixedLexicographicOrder <- function(performanceTable, criteriaMinMa
     colnames(referenceProfiles) <- colnames(performanceTable)
     
     
-    return(list(weights = weights, referenceProfiles = referenceProfiles, fitness = objective, solverStatus = solverStatus, humanReadableStatus = "Solution is optimal."))
+    return(list(criteriaWeights = weights, referenceProfiles = referenceProfiles, fitness = objective, solverStatus = solverStatus, humanReadableStatus = "Solution is optimal."))
     
   }
   else

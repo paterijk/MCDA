@@ -34,7 +34,7 @@ SRMPInferenceFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicogra
 
 \value{
   The function returns a list containing:
-  \item{weights}{The inferred criteria weights.}
+  \item{criteriaWeights}{The inferred criteria weights.}
   \item{referenceProfiles}{The inferred reference profiles.}
   \item{fitness}{The percentage (0 to 1) of fulfilled pair-wise relations.}
   \item{solverStatus}{The solver status as given by glpk or cplex.}

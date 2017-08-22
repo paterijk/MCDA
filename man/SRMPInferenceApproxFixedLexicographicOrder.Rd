@@ -29,7 +29,7 @@ SRMPInferenceApproxFixedLexicographicOrder(performanceTable, criteriaMinMax,
 
 \value{
   The function returns a list containing:
-  \item{weights}{The inferred criteria weights.}
+  \item{criteriaWeights}{The inferred criteria weights.}
   \item{referenceProfiles}{The inferred reference profiles.}
   \item{lexicographicOrder}{The lexicographic order of the reference profiles, in this case the one that was originally given as input.}
   \item{fitness}{The percentage of fulfilled pair-wise relations.}

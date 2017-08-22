@@ -32,7 +32,7 @@ set.seed(1)
 
 result<-SRMPInferenceApprox(performanceTable, criteriaMinMax, 3, preferencePairs, indifferencePairs, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a15","a16","a17","a18"))
 
-preorder<-SRMP(performanceTable, result$referenceProfiles, result$lexicographicOrder, result$weights, criteriaMinMax, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a15","a16","a17","a18"))
+preorder<-SRMP(performanceTable, result$referenceProfiles, result$lexicographicOrder, result$criteriaWeights, criteriaMinMax, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a15","a16","a17","a18"))
 
 stopifnot(length(preorder) == length(expectedpreorder))
 

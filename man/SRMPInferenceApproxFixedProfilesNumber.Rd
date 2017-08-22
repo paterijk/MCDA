@@ -29,7 +29,7 @@ SRMPInferenceApproxFixedProfilesNumber(performanceTable, criteriaMinMax,
 
 \value{
   The function returns a list containing:
-  \item{weights}{The inferred criteria weights.}
+  \item{criteriaWeights}{The inferred criteria weights.}
   \item{referenceProfiles}{The inferred reference profiles.}
   \item{lexicographicOrder}{The inferred lexicographic order of the reference profiles.}
   \item{fitness}{The percentage of fulfilled pair-wise relations.}

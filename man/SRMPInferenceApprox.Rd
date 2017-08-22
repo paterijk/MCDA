@@ -27,7 +27,7 @@ SRMPInferenceApprox(performanceTable, criteriaMinMax,
 
 \value{
   The function returns a list containing:
-  \item{weights}{The inferred criteria weights.}
+  \item{criteriaWeights}{The inferred criteria weights.}
   \item{referenceProfilesNumber}{The number of inferred reference profiles.}
   \item{referenceProfiles}{The inferred reference profiles.}
   \item{lexicographicOrder}{The inferred lexicographic order of the reference profiles.}
