@@ -23,7 +23,7 @@ MRSortInferenceApprox(performanceTable, assignments, categoriesRanks, criteriaMi
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the data should be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
   \item{timeLimit}{Allows to fix a time limit of the execution, in seconds (default 60).}
-  \item{populationSize}{Allows to change the size of the population used by the genetic algorithm (default 100).}
+  \item{populationSize}{Allows to change the size of the population used by the genetic algorithm (default 10).}
   \item{mutationProb}{Allows to change the mutation probability used by the genetic algorithm (default 0.5).}
 }
 
