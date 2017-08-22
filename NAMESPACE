@@ -17,6 +17,7 @@ export(
   "MARE",
   "LPDMRSort",
   "LPDMRSortInferenceExact",
+  "LPDMRSortInferenceApprox",
   "LPDMRSortIdentifyIncompatibleAssignments",
   "MRSort",
   "MRSortInferenceExact",
