@@ -1,4 +1,4 @@
-LPDMRSort <- function(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, majorityThreshold, criteriaVetos = NULL, criteriaDictators = NULL, majorityRule = "", alternativesIDs = NULL, criteriaIDs = NULL, categoriesIDs = NULL){
+LPDMRSort <- function(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, majorityThreshold, criteriaVetos = NULL, criteriaDictators = NULL, majorityRule = "M", alternativesIDs = NULL, criteriaIDs = NULL, categoriesIDs = NULL){
   
   ## check the input data
   
@@ -31,8 +31,8 @@ LPDMRSort <- function(performanceTable, categoriesLowerProfiles, criteriaWeights
   
   if (!is.character(majorityRule))
     stop("majorityRule should be a string")
-  else if (!(majorityRule %in% c("","V","D","v","d","dV","Dv","dv")))
-    stop("majorityRule needs to take values in {'','V','D','v','d','dV','Dv','dv'}")
+  else if (!(majorityRule %in% c("M","V","D","v","d","dV","Dv","dv")))
+    stop("majorityRule needs to take values in {'M','V','D','v','d','dV','Dv','dv'}")
   
   if (majorityRule %in% c("V","v","dV","Dv","dv") && is.null(criteriaVetos))
     stop("majorityRule requires non-NULL criteriaVetos")
@@ -90,7 +90,7 @@ LPDMRSort <- function(performanceTable, categoriesLowerProfiles, criteriaWeights
   
   # -------------------------------------------------------
   
-  outranking <- function(alternativePerformances, profilePerformances, criteriaWeights, criteriaMinMax, majorityThreshold, profileCriteriaVetos=NULL, profileCriteriaDictators=NULL, majorityRule = ""){
+  outranking <- function(alternativePerformances, profilePerformances, criteriaWeights, criteriaMinMax, majorityThreshold, profileCriteriaVetos=NULL, profileCriteriaDictators=NULL, majorityRule = "M"){
     localConcordance <- rep(0,numCrit)
     veto <- 0
     dictator <- 0
@@ -142,7 +142,7 @@ LPDMRSort <- function(performanceTable, categoriesLowerProfiles, criteriaWeights
     
     concordance = sum(localConcordance*criteriaWeights)
     
-    if(majorityRule == "")
+    if(majorityRule == "M")
     {
       if(!(concordance %>=% majorityThreshold))
         return(FALSE)
