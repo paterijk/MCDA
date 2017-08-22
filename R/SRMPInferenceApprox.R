@@ -146,7 +146,12 @@ SRMPInferenceApprox <- function(performanceTable, criteriaMinMax, maxProfilesNum
       
       profiles <- NULL
       for(j in 1:numCrit)
-        profiles <- cbind(profiles,sort(runif(profilesNumber,minEvaluations[j],maxEvaluations[j])))
+      {
+        if(criteriaMinMax[j] == 'max')
+          profiles <- cbind(profiles,sort(runif(profilesNumber,minEvaluations[j],maxEvaluations[j])))
+        else
+          profiles <- cbind(profiles,sort(runif(profilesNumber,minEvaluations[j],maxEvaluations[j]), decreasing = TRUE))
+      }
       colnames(profiles) <- colnames(performanceTable)
       
       lexicographicOrder <- sample(1:profilesNumber, profilesNumber)
