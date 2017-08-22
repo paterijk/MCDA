@@ -10,7 +10,7 @@ binary discordance and a binary concordance conditions including several interac
 \usage{
 LPDMRSort(performanceTable, categoriesLowerProfiles, criteriaWeights, 
           criteriaMinMax, majorityThreshold, criteriaVetos = NULL, 
-          criteriaDictators = NULL, majorityRule = "",
+          criteriaDictators = NULL, majorityRule = "M",
           alternativesIDs = NULL, criteriaIDs = NULL, 
           categoriesIDs = NULL)
 }
@@ -43,8 +43,8 @@ LPDMRSort(performanceTable, categoriesLowerProfiles, criteriaWeights,
   are named according to the criteria.}
   \item{majorityRule}{String denoting how the vetoes and dictators are combined in order to form 
   the assignment rule. 
-  The values to choose from are "", "V", "D", "v", "d", "dV", "Dv", "dv". 
-  "" corresponds to using only the majority rule without vetoes or dictators, 
+  The values to choose from are "M", "V", "D", "v", "d", "dV", "Dv", "dv". 
+  "M" corresponds to using only the majority rule without vetoes or dictators, 
   "V" considers only the vetoes, "D" only the dictators, 
   "v" is like "V" only that a dictator may invalidate a veto, 
   "d" is like "D" only that a veto may invalidate a dictator, 

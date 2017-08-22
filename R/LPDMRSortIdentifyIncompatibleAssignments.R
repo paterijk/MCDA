@@ -1,4 +1,4 @@
-LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, majorityRule = "", incompatibleSetsLimit = 100, largerIncompatibleSetsMargin = 0, alternativesIDs = NULL, criteriaIDs = NULL, solver = "glpk", cplexIntegralityTolerance = NULL, cplexThreads = NULL){
+LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, majorityRule = "M", incompatibleSetsLimit = 100, largerIncompatibleSetsMargin = 0, alternativesIDs = NULL, criteriaIDs = NULL, solver = "glpk", cplexIntegralityTolerance = NULL, cplexThreads = NULL){
   
   ## check the input data
   if (!((is.matrix(performanceTable) || (is.data.frame(performanceTable))))) 
@@ -15,8 +15,8 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
   
   if (!is.character(majorityRule))
     stop("majorityRule should be a string")
-  else if (!(majorityRule %in% c("","V","D","v","d","dV","Dv","dv")))
-    stop("majorityRule needs to take values in {'','V','D','v','d','dV','Dv','dv'}")
+  else if (!(majorityRule %in% c("M","V","D","v","d","dV","Dv","dv")))
+    stop("majorityRule needs to take values in {'M','V','D','v','d','dV','Dv','dv'}")
   
   if (!is.numeric(incompatibleSetsLimit))
     stop("incompatibleSetsLimit should be numeric")
@@ -142,7 +142,7 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
   
   # get first model file
   
-  modelfilename <- paste("MRSort", c("","V","D","DV1","DV2","DV3","DV4","DV5")[match(majorityRule,c("","V","D","v","d","dV","Dv","dv"))], "IdentifyMinimalInvalidAssignmentsSet.gmpl", sep = "")
+  modelfilename <- paste("MRSort", c("","V","D","DV1","DV2","DV3","DV4","DV5")[match(majorityRule,c("M","V","D","v","d","dV","Dv","dv"))], "IdentifyMinimalInvalidAssignmentsSet.gmpl", sep = "")
   
   modelFile <- system.file("extdata",modelfilename, package="MCDA")
   
@@ -280,7 +280,7 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
     
     # get second model file
     
-    modelfilename <- paste("MRSort", c("","V","D","DV1","DV2","DV3","DV4","DV5")[match(majorityRule,c("","V","D","v","d","dV","Dv","dv"))], "IdentifyInvalidAssignmentsSet.gmpl", sep = "")
+    modelfilename <- paste("MRSort", c("","V","D","DV1","DV2","DV3","DV4","DV5")[match(majorityRule,c("M","V","D","v","d","dV","Dv","dv"))], "IdentifyInvalidAssignmentsSet.gmpl", sep = "")
     
     modelFile <- system.file("extdata",modelfilename, package="MCDA")
     

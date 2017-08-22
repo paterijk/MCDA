@@ -14,7 +14,7 @@ are done by taking into account assignment examples.}
 \usage{
 LPDMRSortInferenceExact(performanceTable, assignments, 
             categoriesRanks, criteriaMinMax, 
-            majorityRule = "", readableWeights = FALSE,
+            majorityRule = "M", readableWeights = FALSE,
             readableProfiles = FALSE, minmaxLPD = FALSE,
             alternativesIDs = NULL, criteriaIDs = NULL,
             solver="glpk",cplexTimeLimit = NULL,
@@ -35,8 +35,8 @@ LPDMRSortInferenceExact(performanceTable, assignments,
   The elements are named according to the IDs of the criteria.}
   \item{majorityRule}{String denoting how the vetoes and dictators are combined in order to form 
   the assignment rule. 
-  The values to choose from are "", "V", "D", "v", "d", "dV", "Dv", "dv". 
-  "" corresponds to using only the majority rule without vetoes or dictators, 
+  The values to choose from are "M", "V", "D", "v", "d", "dV", "Dv", "dv". 
+  "M" corresponds to using only the majority rule without vetoes or dictators, 
   "V" considers only the vetoes, "D" only the dictators, 
   "v" is like "V" only that a dictator may invalidate a veto, 
   "d" is like "D" only that a veto may invalidate a dictator, 

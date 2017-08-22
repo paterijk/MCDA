@@ -11,7 +11,7 @@ LPDMRSortIdentifyIncompatibleAssignments(performanceTable,
                                          assignments, 
                                          categoriesRanks,
                                          criteriaMinMax, 
-                                         majorityRule = "", 
+                                         majorityRule = "M", 
                                          incompatibleSetsLimit = 100, 
                                          largerIncompatibleSetsMargin = 0, 
                                          alternativesIDs = NULL, 
@@ -33,8 +33,8 @@ LPDMRSortIdentifyIncompatibleAssignments(performanceTable,
   "min" (resp. "max") indicates that the criterion has to be minimized (maximized). 
   The elements are named according to the IDs of the criteria.}
   \item{majorityRule}{String denoting how the vetoes and dictators are combined in order to form the assignment rule. 
-  The values to choose from are "", "V", "D", "v", "d", "dV", "Dv", "dv". 
-  "" corresponds to using only the majority rule without vetoes or dictators, 
+  The values to choose from are "M", "V", "D", "v", "d", "dV", "Dv", "dv". 
+  "M" corresponds to using only the majority rule without vetoes or dictators, 
   "V" considers only the vetoes, "D" only the dictators, 
   "v" is like "V" only that a dictator may invalidate a veto, 
   "d" is like "D" only that a veto may invalidate a dictator, 
