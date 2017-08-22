@@ -492,7 +492,7 @@ SRMPInferenceApprox <- function(performanceTable, criteriaMinMax, maxProfilesNum
   
   ct <- 0
   
-  while(as.double(Sys.time() - startTime) < timeLimit)
+  while(as.double(difftime(Sys.time(), startTime, units = 'secs')) < timeLimit)
   {
     # Evaluate population
     
@@ -511,7 +511,7 @@ SRMPInferenceApprox <- function(performanceTable, criteriaMinMax, maxProfilesNum
     
     # report
     
-    if(as.double(Sys.time() - startTime) / 5 > ct)
+    if(as.double(difftime(Sys.time(), startTime, units = 'secs')) / 5 > ct)
     {
       ct <- ct + 1
       
