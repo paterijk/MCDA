@@ -1,4 +1,4 @@
-MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, alg_total_time = 90, alg_repeats = 3, alg_repeat_time = 30, 
+deprecatedMRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, alg_total_time = 90, alg_repeats = 3, alg_repeat_time = 30, 
                                          alg_repeat_iterations = 30,mh_max_temp_step = 0.2, mh_min_temp_step = 0.02, mh_temp_step_increase = 1.25,
                                          mh_temp_step_decrease = 0.8, veto = FALSE, alternativesIDs = NULL, criteriaIDs = NULL){
   

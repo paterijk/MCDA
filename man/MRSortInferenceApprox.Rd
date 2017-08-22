@@ -45,19 +45,19 @@ no reference yet for the algorithmic approach; one should become available in 20
 }
 
 \examples{
-performanceTable <- rbind(c(10,10,9), c(10,9,10), c(9,10,10), c(9,9,10), c(9,10,9), c(10,9,9), c(10,10,7),
-                          c(10,7,10), c(7,10,10), c(9,9,17), c(9,17,9), c(17,9,9), c(7,10,17), c(10,17,7),
-                          c(17,7,10), c(7,17,10), c(17,10,7), c(10,7,17), c(7,9,17), c(9,17,7), c(17,7,9),
-                          c(7,17,9), c(17,9,7), c(9,7,17))
+performanceTable <- rbind(c(10,10,9), c(10,9,10), c(9,10,10), c(9,9,10), c(9,10,9), c(10,9,9),
+                          c(10,10,7), c(10,7,10), c(7,10,10), c(9,9,17), c(9,17,9), c(17,9,9),
+                          c(7,10,17), c(10,17,7), c(17,7,10), c(7,17,10), c(17,10,7), c(10,7,17),
+                          c(7,9,17), c(9,17,7), c(17,7,9), c(7,17,9), c(17,9,7), c(9,7,17))
 
-rownames(performanceTable) <- c("a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "a10", "a11", "a12",
-                                "a13", "a14", "a15", "a16", "a17", "a18", "a19", "a20", "a21", "a22", 
-                                "a23", "a24")
+rownames(performanceTable) <- c("a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8", "a9", "a10", "a11",
+                                "a12", "a13", "a14", "a15", "a16", "a17", "a18", "a19", "a20",
+                                "a21", "a22", "a23", "a24")
 
 colnames(performanceTable) <- c("c1","c2","c3")
 
-assignments <-c("P", "P", "P", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F",
-                "F", "F", "F", "F", "F", "F")
+assignments <-c("P", "P", "P", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F", "F",
+                "F", "F", "F", "F", "F", "F", "F")
 
 names(assignments) <- rownames(performanceTable)
 
@@ -71,14 +71,9 @@ names(criteriaMinMax) <- colnames(performanceTable)
 
 set.seed(1)
 
-x<-MRSortInferenceApprox(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto = TRUE,
+x<-MRSortInferenceApprox(performanceTable, assignments, categoriesRanks, 
+                         criteriaMinMax, veto = TRUE,
                          alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7"))
-
-print(x)
-
-ElectreAssignments<-MRSort(performanceTable, x$profilesPerformances, x$criteriaWeights, criteriaMinMax,
-                           x$majorityThreshold, criteriaVetos=x$vetoPerformances, 
-                           alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7"))
 }
 
 \keyword{methods}
