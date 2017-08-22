@@ -1,1191 +1,508 @@
-MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, alg_total_time = 90, alg_repeats = 3, alg_repeat_time = 30, 
-                                         alg_repeat_iterations = 30,mh_max_temp_step = 0.2, mh_min_temp_step = 0.02, mh_temp_step_increase = 1.25,
-                                         mh_temp_step_decrease = 0.8, veto = FALSE, alternativesIDs = NULL, criteriaIDs = NULL){
+MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto = FALSE, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = 60, populationSize = 100, mutationProb = 0.5){
   
   ## check the input data
-  if (!((is.matrix(performanceTable) || (is.data.frame(performanceTable))))) 
-    stop("wrong performanceTable, should be a matrix or a data frame")
+  
+  if (!(is.matrix(performanceTable) || is.data.frame(performanceTable))) 
+    stop("performanceTable should be a matrix or a data frame")
+  
+  if(is.null(colnames(performanceTable)))
+    stop("performanceTable columns should be named")
   
   if (!(is.vector(assignments)))
     stop("assignments should be a vector")
   
-  if (!(is.vector(categoriesRanks)))
-    stop("categoriesRanks should be a vector")
+  if(is.null(names(assignments)))
+    stop("assignments should be named")
   
   if (!(is.vector(criteriaMinMax)))
     stop("criteriaMinMax should be a vector")
   
+  if(!all(sort(colnames(performanceTable)) == sort(names(criteriaMinMax))))
+    stop("criteriaMinMax should be named as the columns of performanceTable")
+  
+  if (!(is.vector(categoriesRanks)))
+    stop("categoriesRanks should be a vector")
+  
+  if(is.null(names(categoriesRanks)))
+    stop("categoriesRanks should be named")
+  
+  if(!all(assignments %in% names(categoriesRanks)))
+    stop("some of the assignments reference a category which does not exist in categoriesRanks")
+  
   if (!is.logical(veto))
     stop("veto should be a boolean")
   
+  if (!(is.null(timeLimit)))
+  {
+    if(!is.numeric(timeLimit))
+      stop("timeLimit should be numeric")
+    if(timeLimit <= 0)
+      stop("timeLimit should be strictly positive")
+  }
+  
+  if (!(is.null(populationSize)))
+  {
+    if(!is.numeric(populationSize))
+      stop("populationSize should be numeric")
+    if(populationSize < 10)
+      stop("populationSize should be at least 10")
+  }
+  
+  if (!(is.null(mutationProb)))
+  {
+    if(!is.numeric(mutationProb))
+      stop("mutationProb should be numeric")
+    if(mutationProb < 0 || mutationProb > 1)
+      stop("mutationProb should be between 0 and 1")
+  }
+
   if (!(is.null(alternativesIDs) || is.vector(alternativesIDs)))
     stop("alternativesIDs should be a vector")
   
   if (!(is.null(criteriaIDs) || is.vector(criteriaIDs)))
     stop("criteriaIDs should be a vector")
   
-  if (!is.numeric(alg_total_time))
-    stop("alg_total_time should be numeric")
-  else if (alg_total_time%%1!=0)
-    stop("alg_total_time should be an integer")
-  else if (alg_total_time<=0)
-    stop("alg_total_time should be strictly pozitive")
-  
-  if (!is.numeric(alg_repeats))
-    stop("alg_repeats should be numeric")
-  else if (alg_repeats%%1!=0)
-    stop("alg_repeats should be an integer")
-  else if (alg_repeats<=0)
-    stop("alg_repeats should be strictly pozitive")
-  
-  if (!is.numeric(alg_repeat_time))
-    stop("alg_repeat_time should be numeric")
-  else if (alg_repeat_time%%1!=0)
-    stop("alg_repeat_time should be an integer")
-  else if (alg_repeat_time<=0)
-    stop("alg_repeat_time should be strictly pozitive")
-
-  if (!is.numeric(alg_repeat_iterations))
-    stop("alg_repeat_iterations should be numeric")
-  else if (alg_repeat_iterations%%1!=0)
-    stop("alg_repeat_iterations should be an integer")
-  else if (alg_repeat_iterations<=0)
-    stop("alg_repeat_iterations should be strictly pozitive")
-    
-  if (!is.numeric(mh_max_temp_step))
-    stop("mh_max_temp_step should be numeric")
-  else if (mh_max_temp_step<=0)
-    stop("mh_max_temp_step should be strictly pozitive")
-  
-  if (!is.numeric(mh_min_temp_step))
-    stop("mh_min_temp_step should be numeric")
-  else if (mh_min_temp_step<=0)
-    stop("mh_min_temp_step should be strictly pozitive")
-  
-  if (!is.numeric(mh_temp_step_increase))
-    stop("mh_temp_step_increase should be numeric")
-  else if (mh_temp_step_increase<=1)
-    stop("mh_temp_step_increase should be strictly above 1")
-  
-  if (!is.numeric(mh_temp_step_decrease))
-    stop("mh_temp_step_decrease should be numeric")
-  else if (mh_temp_step_decrease<=0 || mh_temp_step_decrease>=1)
-    stop("mh_temp_step_decrease should be betweem 0 and 1")
-  
   ## filter the data according to the given alternatives and criteria
   
   if (!is.null(alternativesIDs)){
     performanceTable <- performanceTable[alternativesIDs,]
-    assignments <- assignments[alternativesIDs]
-  } 
+    assignments <- assignments[names(assignments) %in% alternativesIDs]
+  }
   
   if (!is.null(criteriaIDs)){
     performanceTable <- performanceTable[,criteriaIDs]
     criteriaMinMax <- criteriaMinMax[criteriaIDs]
   }
   
-  # data is filtered, check for some data consistency
-  
-  # if there are less than 2 criteria or 2 alternatives, there is no MCDA problem
-  
   if (is.null(dim(performanceTable))) 
     stop("less than 2 criteria or 2 alternatives")
   
+  if (length(assignments) == 0) 
+    stop("assignments is empty or the provided alternativesIDs have filtered out everything from within")
+  
   # -------------------------------------------------------
   
-  # init total starting time
-  
-  start.time.total <- Sys.time()
-  
-  # get number of alternatives, criteria and categories
-  
   numAlt <- dim(performanceTable)[1]
-  
   numCrit <- dim(performanceTable)[2]
-  
   numCat <- length(categoriesRanks)
+  minEvaluations <- apply(performanceTable, 2, min)
+  maxEvaluations <- apply(performanceTable, 2, max)
   
-  # initialize model parameters
+  # -------------------------------------------------------
   
-  model.params <- InitModel(performanceTable, assignments, categoriesRanks, criteriaMinMax)
-  
-  # initialize best parameters
-  
-  best.params <- list(gamma = model.params$gamma, lambda = model.params$lambda, weights = model.params$weights, profilesPerformances = model.params$profilesPerformances, vetoPerformances = model.params$vetoPerformances)
-  
-  best.fitness <- Fitness(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto, best.params)
-  
-  maxed.fitness <- FALSE
-  
-  # check if we've spent all the allocated time
-  
-  time.taken <- Sys.time() - start.time.total
-  
-  if (time.taken >= alg_total_time)
-    return(best.params)
-  
-  # repeat the algorithm several times
-  
-  for (i in 1:alg_repeats)
-  {
-    # init local starting time
-    
-    start.time.local <- Sys.time()
-    
-    # start with best parameters
-    
-    model.params <- list(gamma = best.params$gamma, lambda = best.params$lambda, weights = best.params$weights, profilesPerformances = best.params$profilesPerformances, vetoPerformances = best.params$vetoPerformances)
-    
-    # initialize temperature
-    
-    temp.step <- mh_max_temp_step
-    
-    # go through the algorithm iterations
-    
-    for (j in 1:alg_repeat_iterations)
+  getCategory <- function(alternativePerformances, criteriaWeights, majorityThreshold, profilesPerformances, vetoPerformances, criteriaMinMax){
+    for (k in (numCat-1):1)
     {
-      # get lambda and weights
+      weightedSum <- 0
       
-      temp.params <- InferLW(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto, model.params)
-      
-      if(!is.null(temp.params))
+      for (i in 1:numCrit)
       {
-        model.params$lambda <- temp.params$lambda
-        
-        model.params$weights <- temp.params$weights
-      }
-      
-      # get profiles
-      
-      temp.params <- InferP(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto, model.params, temp.step)
-      
-      if(!is.null(temp.params))
-      {
-        model.params$profilesPerformances <- temp.params$profilesPerformances
-        
-        model.params$vetoPerformances <- temp.params$vetoPerformances
-      }
-      
-      # evaluate parameters
-      
-      fitness <- Fitness(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto, model.params)
-      
-      print(c(fitness,best.fitness))
-      
-      # check for overall improvement
-      
-      if (fitness >= best.fitness)
-      {
-        # increase temperature step so that the MH will do less iterations
-        
-        temp.step <- temp.step * mh_temp_step_increase
-        
-        # stay within limits
-        
-        if (temp.step > mh_max_temp_step)
-          temp.step <- mh_max_temp_step
-        
-        # update model parameters only if fitness has improved or randomly if it remained stagnant
-        
-        if (fitness > best.fitness || sample(c(TRUE,FALSE),1))
-        {          
-          best.params <- list(gamma = model.params$gamma, lambda = model.params$lambda, weights = model.params$weights, profilesPerformances = model.params$profilesPerformances, vetoPerformances = model.params$vetoPerformances)
-          
-          # record best fitness
-          
-          best.fitness <- fitness
-        }
-        
-        # check if we've maxed out the fitness -> algorithm stops
-        
-        if (best.fitness == 1.0)
-          maxed.fitness <- TRUE
-      }
-      else
-      {
-        # decrease temperature step so that the MH will do more iterations
-        
-        temp.step <- temp.step * mh_temp_step_decrease
-        
-        # stay within limits
-        
-        if (temp.step < mh_min_temp_step)
-          temp.step <- mh_min_temp_step
-      }
-      
-      # check if we've spent all the allocated time for this repeat
-      
-      time.taken <- Sys.time() - start.time.local
-      
-      if (time.taken >= alg_repeat_time)
-        break
-      
-      # check if we've maxed out the fitness -> algorithm stops
-      
-      if (maxed.fitness)
-        break
-    }
-    
-    # check if we've spent all the allocated time
-    
-    time.taken <- Sys.time() - start.time.total
-    
-    if (time.taken >= alg_total_time)
-      break
-    
-    # check if we've maxed out the fitness -> algorithm stops
-    
-    if (maxed.fitness)
-      break
-  }
-  
-  # add bottom profile
-  
-  bottomprofile = rep(-Inf,numCrit)
-  
-  for (i in 1:numCrit)
-    if(criteriaMinMax[i] == "min")
-      bottomprofile[i] <- Inf
-  
-  best.params$profilesPerformances <- rbind(model.params$profilesPerformances,bottomprofile)
-  
-  best.params$vetoPerformances <- rbind(model.params$vetoPerformances,bottomprofile)
-  
-  rownames(best.params$profilesPerformances) <- names(categoriesRanks)
-  
-  rownames(best.params$vetoPerformances) <- names(categoriesRanks)
-  
-  # return result
-  
-  return(best.params)
-}
-
-InitModel <-function(performanceTable, assignments, categoriesRanks, criteriaMinMax){
-  
-  # get number of alternatives, criteria and categories
-  
-  numCrit <- dim(performanceTable)[2]
-  
-  numAlt <- dim(performanceTable)[1]
-  
-  numCat <- length(categoriesRanks)
-  
-  # init parameters
-  
-  model.params <- list(gamma = 0.001, lambda = 0.5, weights = rep(1/numCrit, times = numCrit), profilesPerformances = matrix(0,numCat-1,numCrit), vetoPerformances = matrix(0,numCat-1,numCrit))
-  
-  colnames(model.params$profilesPerformances) <- colnames(performanceTable)
-  
-  colnames(model.params$vetoPerformances) <- colnames(performanceTable)
-  
-  # init vetoes
-  
-  for (j in 1:numCrit)
-  {
-    # get criterion preference direction
-    if(criteriaMinMax[j] == "max")
-      model.params$vetoPerformances[,j] <- rep(apply(performanceTable, 2, min)[j] - model.params$gamma, times = numCat-1)
-    else
-      model.params$vetoPerformances[,j] <- rep(apply(performanceTable, 2, max)[j] + model.params$gamma, times = numCat-1)
-  }
-  
-  # go thorough each criterion
-  
-  for (j in 1:numCrit)
-  {
-    # get criterion preference direction
-    
-    critdir <- 1
-    
-    if(criteriaMinMax[j] == "min")
-      critdir <- -1
-    
-    # get all values and a list of the categories in which the alternatives containing that value are assigned
-    
-    values <- c()
-    
-    valuecategories <- list()
-    
-    for (i in 1:numAlt)
-    {
-      if(!(performanceTable[i,j] %in% values))
-      {
-        values <- c(values,performanceTable[i,j])
-        
-        valueindex <- match(performanceTable[i,j],values)
-        
-        valuecategories[[valueindex]] <- c(categoriesRanks[assignments[i]])
-      }
-      else
-      {
-        valueindex <- match(performanceTable[i,j],values)
-        
-        valuecategories[[valueindex]] <- c(valuecategories[[valueindex]],categoriesRanks[assignments[i]])
-      }
-    }
-    
-    # order the values from worst to best
-    
-    valuecategories <- valuecategories[order(critdir * values)]
-    
-    values <- values[order(critdir *values)]
-    
-    # get profiles values
-    
-    startvalindex <- 1
-    
-    # go from the worst profile to the best
-    
-    for (i in (numCat-1):1)
-    {
-      # are there still values to explore?
-      
-      if(startvalindex <= length(values))
-      {
-        # get current value
-        
-        value <- values[startvalindex]
-        
-        # find its initial fitness for the current profile
-        
-        f <- 0
-        
-        # go through values below the one at startvalindex
-        
-        if(startvalindex > 1)
-          for(k in 1:(startvalindex-1))
-            for(l in valuecategories[[k]])
-            {
-              # all values belonging to alternatives that are classified in a category below the profile (index is higher than that of the profile) affect pozitively the fitness; all others negatively
-              
-              if(l > i)
-                f <- f + 1
-              else
-                f <- f - 1
-            }
-        
-        if(startvalindex <= length(values))
-          for(k in startvalindex:length(values))
-            for(l in valuecategories[[k]])
-            {
-              # all values belonging to alternatives that are classified in a category above the profile (index is lower or equal to that of the profile) affect pozitively the fitness; all others negatively
-              
-              if(l <= i)
-                f <- f + 1
-              else
-                f <- f - 1
-            }
-        
-        # go through following values and update f
-        
-        newf <- f
-        
-        currentvalindex <- startvalindex
-        
-        if(startvalindex < length(values))
-          for(k in (startvalindex+1):length(values))
-          {
-            # update f
-            
-            for(l in valuecategories[[k]])
-            {
-              if(l > i)
-                newf <- newf + 1
-              else
-                newf <- newf - 1
-            }
-            
-            # if f is improved we store it and the value that the profile should take
-            
-            if(newf > f)
-            {
-              f <- newf
-              
-              value <-values[k]
-              
-              currentvalindex <- k
-            }
-          }
-        
-        # same as above but for when we have reached the last value for this criterion and we consider a value above
-        
-        for(l in valuecategories[[length(values)]])
+        if (criteriaMinMax[i] == "min")
         {
-          if(l > i)
-            newf <- newf + 1
-          else
-            newf <- newf - 1
-        }
-        
-        # if f is improved we store it and the value that the profile should take
-        
-        if(newf > f)
-        {
-          f <- newf
-          
-          value <- values[length(values)] + critdir * model.params$gamma
-          
-          currentvalindex <- length(values)
-        }
-        
-        # set profile value
-        
-        model.params$profilesPerformances[i,j] <- value
-        
-        # set the starting value index for the next profile
-        
-        startvalindex <- currentvalindex# + 1
-      }
-      else
-      {
-        # we have are at the top of the scale
-        
-        model.params$profilesPerformances[i,j] <- values[length(values)] + critdir * model.params$gamma
-      }
-    }
-  }
-  return(model.params)
-}
-
-InferLW <-function(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto, model.params){
-
-  # get number of alternatives, criteria and categories
-  
-  numCrit <- dim(performanceTable)[2]
-  
-  numAlt <- dim(performanceTable)[1]
-  
-  numCat <- length(categoriesRanks)
-  
-  # take out alternatives with vetoes
-  
-  model.discordance <- GetDiscordance(performanceTable, categoriesRanks, criteriaMinMax, model.params)
-  
-  alternatives <- c(1:numAlt)[model.discordance %==% 0]
-  
-  numAlt <- length(alternatives)
-  
-  if(numAlt == 0)
-    return(NULL)
-  
-  # get temp directory
-  
-  tempPath <- tempdir()
-  
-  # get model file
-  
-  modelFile <- system.file("extdata","MRSortInferenceLW.gmpl", package="MCDA")
-  
-  # create temporary data file
-  
-  dataFile <- tempfile()
-  
-  # copy file to temp directory
-  
-  file.copy(modelFile, dataFile)
-  
-  # open writing channel
-  
-  sink(dataFile, append=TRUE)
-  
-  # write data
-  
-  cat("data;\n")
-  cat("param X := ")
-  cat(numAlt)
-  cat(";\n\n")
-  
-  cat("param F := ")
-  cat(numCrit)
-  cat(";\n\n")
-  
-  cat("param lClow : ")
-  cat(1:numCrit)
-  cat(" := \n")
-  for (i in 1:numAlt){
-    cat(i)
-    cat("\t")
-    for (j in 1:numCrit)
-    {
-      critdir <- 1
-      if(criteriaMinMax[j] == "min")
-        critdir <- -1
-      categ <- categoriesRanks[assignments[alternatives[i]]]
-      if(categ %==% numCat)
-        cat("1")
-      else
-      {
-        print(alternatives[i])
-        if((critdir * performanceTable[alternatives[i],j]) %>=% (critdir * model.params$profilesPerformances[categ,j]))
-          cat("1")
-        else
-          cat("0")
-      }
-      if(j != numCrit)
-        cat("\t")
-      else
-      {
-        if(i != numAlt)
-          cat("\n")
-        else
-          cat(";\n\n")
-      }
-    }
-  }
-  
-  cat("param lCupp : ")
-  cat(1:numCrit)
-  cat(" := \n")
-  for (i in 1:numAlt){
-    cat(i)
-    cat("\t")
-    for (j in 1:numCrit)
-    {
-      critdir <- 1
-      if(criteriaMinMax[j] == "min")
-        critdir <- -1
-      categ <- categoriesRanks[assignments[alternatives[i]]]
-      if(categ %==% 1)
-        cat("0")
-      else
-      {
-        if((critdir * performanceTable[alternatives[i],j]) %>=% (critdir * model.params$profilesPerformances[categ-1,j]))
-          cat("1")
-        else
-          cat("0")
-      }
-      if(j != numCrit)
-        cat("\t")
-      else
-      {
-        if(i != numAlt)
-          cat("\n")
-        else
-          cat(";\n\n")
-      }
-    }
-  }
-  
-  cat("param gamma:=")
-  cat(model.params$gamma)
-  cat(";\n")
-  
-  cat("end;\n")
-  
-  sink()
-  
-  lp<-initProbGLPK()
-  
-  tran<-mplAllocWkspGLPK()
-  
-  setMIPParmGLPK(PRESOLVE, GLP_ON)
-  
-  termOutGLPK(GLP_OFF)
-  
-  out<-mplReadModelGLPK(tran, dataFile, skip=0)
-  
-  if (is.null(out))
-    out <- mplGenerateGLPK(tran)
-  else 
-    stop(return_codeGLPK(out))
-  
-  if (is.null(out))
-    mplBuildProbGLPK(tran,lp)
-  else 
-    stop(return_codeGLPK(out))
-  
-  # solve the problem
-  
-  solveMIPGLPK(lp)
-  
-  if(mipStatusGLPK(lp)==5){
-    mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
-    
-    solution <- mipColsValGLPK(lp)
-    
-    # get results
-    
-    varnames <- c()
-    
-    for (i in 1:length(solution))
-      varnames <- c(varnames,getColNameGLPK(lp,i))
-    
-    lambda <- solution[varnames=="lambda"]
-    
-    weightsnames <- c()
-    
-    for (i in 1:numCrit)
-    {
-      weightsnames <- c(weightsnames,paste("w[",i,"]",sep=""))
-    }
-    
-    weights <- c()
-    
-    for (i in 1:numCrit)
-      weights <- c(weights,solution[varnames==weightsnames[i]])
-    
-    return(list(lambda = lambda, weights = weights))
-    
-  }
-  else
-    return(NULL)
-}
-
-InferP <-function(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto, model.params, temp.step){
-  
-  # get number of alternatives, criteria and categories
-  
-  numCrit <- dim(performanceTable)[2]
-  
-  numAlt <- dim(performanceTable)[1]
-  
-  numCat <- length(categoriesRanks)
-  
-  # init assignments and concordance
-  
-  model.concordance <- GetConcordance(performanceTable, categoriesRanks, criteriaMinMax, model.params)
-  
-  model.discordance <- GetDiscordance(performanceTable, categoriesRanks, criteriaMinMax, model.params)
-  
-  model.assignments <- GetAssignments(model.concordance, model.discordance, model.params)
-  
-  # init temperature
-  
-  t <- 1.0
-  
-  while(t > 0)
-  {
-    # go through each profile at random
-    
-    for(k in sample(1:(numCat-1)))
-    {
-      # go through each criterion at random
-      
-      for(j in sample(1:numCrit))
-      {
-        # get range within which the profile can move
-        
-        valmin <- apply(performanceTable, 2, min)[j] - model.params$gamma
-        
-        valmax <- apply(performanceTable, 2, max)[j] + model.params$gamma
-        
-        if(criteriaMinMax[j] == "max")
-        {
-          if(k > 1)
-            valmax <- model.params$profilesPerformances[k-1,j]
-          
-          if(k < numCat - 1)
-            valmin <- model.params$profilesPerformances[k+1,j]
-          
-          if(valmin %<=% model.params$vetoPerformances[k,j])
-            valmin <- model.params$vetoPerformances[k,j] + model.params$gamma
+          if (alternativePerformances[i] %<=% profilesPerformances[k,i])
+            weightedSum <- weightedSum + criteriaWeights[i]
         }
         else
         {
-          if(k > 1)
-            valmin <- model.params$profilesPerformances[k-1,j]
-          
-          if(k < numCat - 1)
-            valmax <- model.params$profilesPerformances[k+1,j]
-          
-          if(valmax %>=% model.params$vetoPerformances[k,j])
-            valmax <- model.params$vetoPerformances[k,j] - model.params$gamma
-        }
-        
-        # get new value
-        
-        val <- model.params$profilesPerformances[k,j]
-        
-        h <- c(-Inf,-Inf)
-        
-        # try several random values and select the one with maximum heuristic value
-        
-        for(i in 1:10)
-        {
-          newval <- runif(1, valmin, valmax)
-          
-          newh <- Heuristic(k, j, newval, performanceTable, assignments, categoriesRanks, criteriaMinMax, model.assignments, model.concordance, model.discordance, model.params)
-          
-          if(newh[1] > h[1] || (newh[1] %==% h[1] && newh[2] > h[2]) || (newh %==% h && sample(c(TRUE,FALSE),1)))
-          {
-            h <- newh
-            
-            val <- newval
-          }
-        }
-        
-        # simulated annealing condition for accepting the change
-        
-        if(h[1] > 0 || (h[1] %==% 0 && h[2] > 0) || runif(1,0,1) < exp(-1/t))
-        {
-          # update profile value
-          
-          model.params$profilesPerformances[k,j] <- val
-          
-          # update assignments and concordance (could be done more smartly as only a column in the concordance matrix changes)
-          
-          model.concordance <- GetConcordance(performanceTable, categoriesRanks, criteriaMinMax, model.params)
-          
-          model.assignments <- GetAssignments(model.concordance, model.discordance, model.params)
+          if (alternativePerformances[i] %>=% profilesPerformances[k,i])
+            weightedSum <- weightedSum + criteriaWeights[i]
         }
       }
-    }
-
-    if(veto)
-    {
-      for(k in sample(1:(numCat-1)))
-      {
-        # go through each criterion at random
-        
-        for(j in sample(1:numCrit))
-        {
-          # get range within which the profile can move
-          
-          valmin <- apply(performanceTable, 2, min)[j] - model.params$gamma
-          
-          valmax <- apply(performanceTable, 2, max)[j] + model.params$gamma
-          
-          if(criteriaMinMax[j] == "max")
-          {
-            if(k > 1)
-              valmax <- model.params$vetoPerformances[k-1,j]
-            
-            if(k < numCat - 1)
-              valmin <- model.params$vetoPerformances[k+1,j]
-            
-            if(valmax %>=% model.params$profilesPerformances[k,j])
-              valmax <- model.params$profilesPerformances[k,j] - model.params$gamma
-          }
-          else
-          {
-            if(k > 1)
-              valmin <- model.params$vetoPerformances[k-1,j]
-            
-            if(k < numCat - 1)
-              valmax <- model.params$vetoPerformances[k+1,j]
-            
-            if(valmin %<=% model.params$profilesPerformances[k,j])
-              valmin <- model.params$profilesPerformances[k,j] + model.params$gamma
-          }
-
-          # get new value
-          
-          val <- model.params$vetoPerformances[k,j]
-          
-          h <- c(-Inf,-Inf)
-          
-          # try several random values and select the one with maximum heuristic value
-          
-          for(i in 1:10)
-          {
-            newval <- runif(1, valmin, valmax)
-            
-            newh <- HeuristicV(k, j, newval, performanceTable, assignments, categoriesRanks, criteriaMinMax, model.assignments, model.concordance, model.discordance, model.params)
-            
-            if(newh[1] > h[1] || (newh[1] %==% h[1] && newh[2] > h[2]) || (newh %==% h && sample(c(TRUE,FALSE),1)))
-            {
-              h <- newh
-              
-              val <- newval
-            }
-          }
-          
-          # simulated annealing condition for accepting the change
-          
-          if(h[1] > 0 || (h[1] %==% 0 && h[2] > 0) || runif(1,0,1) < exp(-1/t))
-          {
-            # update profile value
-            
-            model.params$vetoPerformances[k,j] <- val
-            
-            # update assignments and concordance (could be done more smartly as only a column in the concordance matrix changes)
-            
-            model.concordance <- GetConcordance(performanceTable, categoriesRanks, criteriaMinMax, model.params)
-            
-            model.disncordance <- GetDiscordance(performanceTable, categoriesRanks, criteriaMinMax, model.params)
-            
-            model.assignments <- GetAssignments(model.concordance, model.discordance, model.params)
-          }
-        }
-      }
-    }
-    
-    # reduce temperature
-    
-    t <- t - temp.step
-  }
-  
-  return(list(profilesPerformances = model.params$profilesPerformances, vetoPerformances = model.params$vetoPerformances))
-}
-
-GetAssignments <-function(model.concordance, model.discordance, model.params){
-  
-  # get a list of alternatives assignments to categories using the given model parameters
-  
-  numAlt <- dim(model.concordance)[1]
-  
-  numCat <- dim(model.concordance)[2] + 1
-  
-  model.assignments = c(rep(1,times=numAlt))
-  
-  for(i in 1:numAlt)
-  {
-    for(k in (numCat-1):1)
-    {
-      # compare support to majority threshold
-      if(!(model.concordance[i,k] %>=% model.params$lambda) || model.discordance[i,k] > 0)
-      {
-        # insufficient support -> k is the upper profile of the category we're in
-        
-        model.assignments[i] <- k + 1
-        
-        break
-      }
-    }
-  }
-  
-  return(model.assignments)
-}
-
-GetConcordance <-function(performanceTable, categoriesRanks, criteriaMinMax, model.params){
-  
-  # get the overall concordance indices for each alternative and each profile
-  
-  numAlt <- dim(performanceTable)[1]
-  
-  numCrit <- dim(performanceTable)[2]
-  
-  numCat <- length(categoriesRanks)
-  
-  model.concordance = matrix(0,numAlt,numCat-1)
-  
-  for(i in 1:numAlt)
-  {
-    for(k in 1:(numCat-1))
-    {
-      for(j in 1:numCrit)
-      {
-        critdir <- 1
-        
-        if(criteriaMinMax[j] == "min")
-          critdir <- -1
-        
-        if((critdir * performanceTable[i,j][[1]]) %>=% (critdir * model.params$profilesPerformances[k,j][[1]]))
-          model.concordance[i,k] <- model.concordance[i,k] + model.params$weights[j]
-      }
-    }
-  }
-  return(model.concordance)
-}
-
-GetDiscordance <-function(performanceTable, categoriesRanks, criteriaMinMax, model.params){
-  
-  # get the overall concordance indices for each alternative and each profile
-  
-  numAlt <- dim(performanceTable)[1]
-  
-  numCrit <- dim(performanceTable)[2]
-  
-  numCat <- length(categoriesRanks)
-  
-  model.discordance = matrix(0,numAlt,numCat-1)
-  
-  for(i in 1:numAlt)
-  {
-    for(k in 1:(numCat-1))
-    {
-      for(j in 1:numCrit)
-      {
-        critdir <- 1
-        
-        if(criteriaMinMax[j] == "min")
-          critdir <- -1
-        if((critdir * performanceTable[i,j][[1]]) %<=% (critdir * model.params$vetoPerformances[k,j][[1]]))
-          model.discordance[i,k] <- model.discordance[i,k] + 1
-      }
-    }
-  }
-  return(model.discordance)
-}
-
-Heuristic <-function(k, j, value ,performanceTable, assignments, categoriesRanks, criteriaMinMax, model.assignments, model.concordance, model.discordance, model.params){
-  
-  # get number of alternatives, criteria and categories
-  
-  numCrit <- dim(performanceTable)[2]
-  
-  numAlt <- dim(performanceTable)[1]
-  
-  numCat <- length(categoriesRanks)
-  
-  # get criterion preference direction
-  
-  critdir <- 1
-  
-  if(criteriaMinMax[j] == "min")
-    critdir <- -1
-  
-  # init heuristic
-  
-  h = c(0,0)
-  
-  # go thourough each alternative
-  
-  for(i in 1:numAlt)
-  {
-    # get categories  to which it is assigned by the DM and by the model
-    
-    given.k <- categoriesRanks[assignments[i]][[1]]
-    
-    found.k <- model.assignments[i]
-    
-    # get object, old profile and new profile values multiplying by critdir in order to use one set of conditions for both cases
-    
-    old.val <- critdir * model.params$profilesPerformances[k,j]
-    
-    new.val <- critdir * value
-    
-    obj.val <- critdir * performanceTable[i,j]
-    
-    # object misclassified in k or above instead of k + 1 -> model.concordance >= l and no veto
-    
-    if(given.k %==% (k + 1) && found.k %<=% k)
-    {
-      # moving profile above object corrects classification
       
-      if(new.val > obj.val && obj.val %>=% old.val && !((model.concordance[i,k] - model.params$weights[j]) %>=% model.params$l))
-        h[1] <- h[1] + 1
-      
-      # moving profile above object does not improve classification but reduces concordance
-      
-      if(new.val > obj.val && obj.val %>=% old.val && (model.concordance[i,k] - model.params$weights[j]) %>=% model.params$l)
-        h[2] <- h[2] + 1
-      
-      # moving profile below object does not improve classification and increases concordance -> maybe add a third component to the fitness
-    }
-    
-    # object misclassified in k + 1 or below instead of k -> model.concordance < l or veto
-    
-    if(given.k %==% k && found.k %>=% (k + 1))
-    {
-      # if object misclassified due to veto then nothing can be done here
-      if(model.discordance[i,k] %==% 0)
-      {      
-        # moving profile below object corrects classification
-        
-        if(old.val > obj.val && obj.val %>=% new.val && (model.concordance[i,k] + model.params$weights[j]) %>=% model.params$l)
-          h[1] <- h[1] + 1
-        
-        # moving profile below object does not improve classification but increases concordance
-        if(old.val > obj.val && obj.val %>=% new.val && !((model.concordance[i,k] + model.params$weights[j]) %>=% model.params$l))
-          h[2] <- h[2] + 1
-        
-        # moving profile above object does not improve classification and decreases concordance -> maybe add a third component to the fitness
-      }
-    }
-    
-    # object correctly classified in k + 1 -> model.concordance < l or veto
-    
-    if(given.k %==% (k + 1) && found.k %==% (k + 1))
-    {
-      if(model.discordance[i,k] %==% 0)
-      {      
-        # moving profile below object results in misclassification
-        if(old.val > obj.val && obj.val %>=% new.val && (model.concordance[i,k] + model.params$weights[j]) %>=% model.params$l)
-          h[1] <- h[1] - 1
-        
-        # moving profile below object keeps correct classification but increases concordance
-        if(old.val > obj.val && obj.val %>=% new.val && !((model.concordance[i,k] + model.params$weights[j]) %>=% model.params$l))
-          h[2] <- h[2] - 1
-        
-        # moving profile above object keeps correct classification and decreases concordance
-      }
-    }
-    
-    # object correctly classified in k -> model.concordance >= l and no veto
-    
-    if(given.k %==% k && found.k %==% k)
-    {
-      # moving profile above object results in misclassification
-      
-      if(new.val > obj.val && obj.val %>=% old.val && (model.concordance[i,k] - model.params$weights[j]) %>=% model.params$l)
-        h[1] <- h[1] - 1
-      
-      # moving profile above object keeps correct classification but decreases concordance
-      
-      if(new.val > obj.val && obj.val %>=% old.val && !((model.concordance[i,k] - model.params$weights[j]) %>=% model.params$l))
-        h[2] <- h[2] - 1
-      
-      # moving profile below object keeps correct classification and increases concordance
-    }
-  }
-  return(h)
-}
-
-HeuristicV <-function(k, j, value ,performanceTable, assignments, categoriesRanks, criteriaMinMax, model.assignments, model.concordance, model.discordance, model.params){
-  
-  # get number of alternatives, criteria and categories
-  
-  numCrit <- dim(performanceTable)[2]
-  
-  numAlt <- dim(performanceTable)[1]
-  
-  numCat <- length(categoriesRanks)
-  
-  # get criterion preference direction
-  
-  critdir <- 1
-  
-  if(criteriaMinMax[j] == "min")
-    critdir <- -1
-  
-  # init heuristic
-  
-  h = c(0,0)
-  
-  # go thourough each alternative
-  
-  for(i in 1:numAlt)
-  {
-    # get categories  to which it is assigned by the DM and by the model
-    
-    given.k <- categoriesRanks[assignments[i]][[1]]
-    
-    found.k <- model.assignments[i]
-    
-    # get object, old profile and new profile values multiplying by critdir in order to use one set of conditions for both cases
-    
-    old.val <- critdir * model.params$vetoPerformances[k,j]
-    
-    new.val <- critdir * value
-    
-    obj.val <- critdir * performanceTable[i,j]
-    
-    # object misclassified in k or above instead of k + 1 -> model.concordance >= l and no veto
-    
-    if(given.k %==% (k + 1) && found.k %<=% k)
-    {
-      # moving profile above object corrects classification
-      
-      if(new.val %>=% obj.val && obj.val > old.val)
-        h[1] <- h[1] + 1
-      
-      # moving profile below object does not improve classification
-    }
-    
-    # object misclassified in k + 1 or below instead of k -> model.concordance < l or veto
-    
-    if(given.k %==% k && found.k %>=% (k + 1))
-    {   
-      # moving profile below object corrects classification
-      
-      if(old.val %>=% obj.val && obj.val > new.val && model.concordance[i,k] %>=% model.params$l && model.discordance[i,k] %==% 1)
-        h[1] <- h[1] + 1
-      
-      # moving profile below object does not improve classification but decreases vetoes
-      if(old.val %>=% obj.val && obj.val > new.val && (model.discordance[i,k] > 1 || (!(model.concordance[i,k] %>=% model.params$l) && model.discordance[i,k] %==% 1)))
-        h[2] <- h[2] + 1
-      
-      # moving profile above object does not improve classification and increases discordance
-      if(new.val %>=% obj.val && obj.val > old.val)
-        h[2] <- h[2] - 1
-    }
-    
-    # object correctly classified in k + 1 -> model.concordance < l or veto
-    
-    if(given.k %==% (k + 1) && found.k %==% (k + 1))
-    {
-      # moving profile below object results in misclassification
-      if(old.val %>=% obj.val && obj.val > new.val && model.concordance[i,k] %>=% model.params$l && model.discordance[i,k] %==% 1)
-        h[1] <- h[1] - 1
-      
-      # moving profile below object keeps correct classification and reduces discordance
-      if(old.val %>=% obj.val && obj.val > new.val && (!(model.concordance[i,k] %>=% model.params$l) || model.discordance[i,k] > 1))
-        h[2] <- h[2] + 1
-      
-      # moving profile above object keeps correct classification but increases concordance
-      if(new.val %>=% obj.val && obj.val > old.val)
-        h[2] <- h[2] - 1
-    }
-    
-    # object correctly classified in k -> model.concordance >= l and no veto
-    
-    if(given.k %==% k && found.k %==% k)
-    {
-      # moving profile above object results in misclassification
-      
-      if(new.val %>=% obj.val && obj.val > old.val)
-        h[1] <- h[1] - 1
-    }
-  }
-  return(h)
-}
-
-GetCategory <- function(performance, criteriaMinMax, veto, model.params){
-  
-  numCrit <- length(performance)
-  
-  numCat <- dim(model.params$profilesPerformances)[1] + 1
-  
-  # go through profiles from the worst (highest index) to the best (lowest index)
-  
-  for(k in (numCat-1):1)
-  {
-    # compute relation
-    
-    C <- 0
-    
-    V <- FALSE
-    
-    for(j in 1:numCrit)
-    {
-      critdir <- 1
-      
-      if(criteriaMinMax[j] == "min")
-        critdir <- -1
-      
-      if((critdir * performance[j]) %>=% (critdir * model.params$profilesPerformances[k,j]))
-        C <- C + model.params$weights[j]
+      vetoActive <- FALSE
       
       if(veto)
-        if((critdir * performance[j]) %<=% (critdir * model.params$vetoPerformances[k,j]))
+      {
+        for (i in 1:numCrit)
         {
-          V <- TRUE
-          break
+          if (criteriaMinMax[i] == "min")
+          {
+            if (alternativePerformances[i] %>=% vetoPerformances[k,i])
+            {
+              vetoActive <- TRUE
+              break
+            }
+          }
+          else
+          {
+            if (alternativePerformances[i] %<=% vetoPerformances[k,i])
+            {
+              vetoActive <- TRUE
+              break
+            }
+          }
         }
-    }
-    # compare support to majority threshold
-    if(!(C %>=% model.params$lambda) || V)
-    {
-      # insufficient support -> k is the upper profile of the category we're in
+      }
       
-      return(k + 1)
+      # stopping condition
+      if(weightedSum < majorityThreshold || vetoActive)
+        return(k + 1)
     }
+    # better than all profiles -> top categ
+    return(1)
   }
-  return(1)
-}
-
-Fitness <-function(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto, model.params){
   
-  numCrit <- dim(performanceTable)[2]
-  
-  numAlt <- dim(performanceTable)[1]
-  
-  numCat <- length(categoriesRanks)
-  
-  ca <- 0
-  
-  # go through each alternative
-  
-  for(i in 1:numAlt)
+  InitializePopulation <- function()
   {
-    catfound <- GetCategory(performanceTable[i,], criteriaMinMax, veto, model.params)
-    
-    if(categoriesRanks[assignments[i]] == catfound)
-      ca <- ca + 1
+    population <- list()
+    for(i in 1:populationSize)
+    {
+      values <- c(0,sort(runif(numCrit-1,0,1)),1)
+      weights <- sapply(1:numCrit, function(i) return(values[i+1]-values[i]))
+      names(weights) <- colnames(performanceTable)
+      
+      majority <- runif(1,0.5,1)
+      
+      profiles <- NULL
+      for(j in 1:numCrit)
+      {
+        if(criteriaMinMax[j] == 'max')
+          profiles <- cbind(profiles,sort(runif(numCat - 1,minEvaluations[j],maxEvaluations[j]), decreasing = TRUE))
+        else
+          profiles <- cbind(profiles,sort(runif(numCat - 1,minEvaluations[j],maxEvaluations[j])))
+      }
+      colnames(profiles) <- colnames(performanceTable)
+      
+      vetoes <- NULL
+      if(veto)
+      {
+        for(j in 1:numCrit)
+        {
+          if(criteriaMinMax[j] == 'max')
+            vetoes <- cbind(vetoes,rep(minEvaluations[j] - 1, numCat - 1))
+          else
+            vetoes <- cbind(vetoes,rep(maxEvaluations[j] + 1, numCat - 1))
+        }
+        rownames(vetoes) <- c()
+        colnames(vetoes) <- colnames(performanceTable)
+      }
+      
+      population[[length(population)+1]] <- list(majorityThreshold = majority, criteriaWeights = weights, profilesPerformances = profiles, vetoPerformances = vetoes)
+    }
+    return(population)
   }
   
-  ca <- ca / numAlt
+  Fitness <- function(individual)
+  {
+    ok <- 0
+    for (alternative in names(assignments))
+    {
+      category <- getCategory(performanceTable[alternative,],individual$criteriaWeights, individual$majorityThreshold, individual$profilesPerformances, individual$vetoPerformances, criteriaMinMax)
+      if(category == categoriesRanks[assignments[alternative]])
+        ok <- ok + 1
+    }
+    return(ok/length(assignments))
+  }
   
-  return(ca)
+  Reproduce <- function(parents){
+    children <- list()
+    
+    numPairs <- as.integer(length(parents)/2)
+    
+    pairings <- matrix(sample(1:length(parents),numPairs*2),numPairs,2)
+    
+    for(i in 1:numPairs)
+    {
+      parent1 <- parents[[pairings[i,1]]]
+      
+      parent2 <- parents[[pairings[i,2]]]
+      
+      # crossover bewtween profiles
+      
+      criteria <- sample(colnames(performanceTable), numCrit)
+      
+      pivot <- runif(1,1,numCrit - 1)
+      
+      profiles1 <- matrix(rep(0,numCrit*(numCat - 1)),numCat - 1,numCrit)
+      profiles2 <- matrix(rep(0,numCrit*(numCat - 1)),numCat - 1,numCrit)
+      
+      colnames(profiles1) <- colnames(performanceTable)
+      colnames(profiles2) <- colnames(performanceTable)
+      
+      for(k in 1:(numCat - 1))
+        for(j in 1:numCrit)
+        {
+          if(j <= pivot)
+          {
+            profiles1[k,criteria[j]] <- parent1$profilesPerformances[k,criteria[j]]
+            profiles2[k,criteria[j]] <- parent2$profilesPerformances[k,criteria[j]]
+          }
+          else
+          {
+            profiles1[k,criteria[j]] <- parent2$profilesPerformances[k,criteria[j]]
+            profiles2[k,criteria[j]] <- parent1$profilesPerformances[k,criteria[j]]
+          }
+        }
+      
+      vetoes1 <- NULL
+      vetoes2 <- NULL
+      
+      if(veto)
+      {
+        vetoes1 <- matrix(rep(0,numCrit*(numCat - 1)),numCat - 1,numCrit)
+        vetoes2 <- matrix(rep(0,numCrit*(numCat - 1)),numCat - 1,numCrit)
+        
+        colnames(vetoes1) <- colnames(performanceTable)
+        colnames(vetoes2) <- colnames(performanceTable)
+        
+        for(k in 1:(numCat - 1))
+          for(j in 1:numCrit)
+          {
+            if(j <= pivot)
+            {
+              vetoes1[k,criteria[j]] <- parent1$vetoPerformances[k,criteria[j]]
+              vetoes2[k,criteria[j]] <- parent2$vetoPerformances[k,criteria[j]]
+            }
+            else
+            {
+              vetoes1[k,criteria[j]] <- parent2$vetoPerformances[k,criteria[j]]
+              vetoes2[k,criteria[j]] <- parent1$vetoPerformances[k,criteria[j]]
+            }
+          }
+      }
+      
+      # child identical to first parent - will get mutated in the second step
+      
+      children[[length(children)+1]] <- list(majorityThreshold = parent1$majorityThreshold, criteriaWeights = parent1$criteriaWeights, profilesPerformances = parent1$profilesPerformances, vetoPerformances = parent1$vetoPerformances)
+      
+      # child identical to second parent
+      
+      children[[length(children)+1]] <- list(majorityThreshold = parent2$majorityThreshold, criteriaWeights = parent2$criteriaWeights, profilesPerformances = parent2$profilesPerformances, vetoPerformances = parent2$vetoPerformances)
+      
+      # child takes weights and threshold from first parent and profiles from second
+      
+      children[[length(children)+1]] <- list(majorityThreshold = parent1$majorityThreshold, criteriaWeights = parent1$criteriaWeights, profilesPerformances = parent2$profilesPerformances, vetoPerformances = parent2$vetoPerformances)
+      
+      # child takes weights and threshold from second parent and profiles from first
+      
+      children[[length(children)+1]] <- list(majorityThreshold = parent2$majorityThreshold, criteriaWeights = parent2$criteriaWeights, profilesPerformances = parent1$profilesPerformances, vetoPerformances = parent1$vetoPerformances)
+      
+      # child takes weights and threshold from first parent and profiles from first crossover
+      
+      children[[length(children)+1]] <- list(majorityThreshold = parent1$majorityThreshold, criteriaWeights = parent1$criteriaWeights, profilesPerformances = profiles1, vetoPerformances = vetoes1)
+      
+      # child takes weights and threshold from first parent and profiles from second crossover
+      
+      children[[length(children)+1]] <- list(majorityThreshold = parent1$majorityThreshold, criteriaWeights = parent1$criteriaWeights, profilesPerformances = profiles2, vetoPerformances = vetoes2)
+      
+      # child takes weights and threshold from second parent and profiles from first crossover
+      
+      children[[length(children)+1]] <- list(majorityThreshold = parent2$majorityThreshold, criteriaWeights = parent2$criteriaWeights, profilesPerformances = profiles1, vetoPerformances = vetoes1)
+      
+      # child takes weights from second parent and profiles from second crossover
+      
+      children[[length(children)+1]] <- list(majorityThreshold = parent2$majorityThreshold, criteriaWeights = parent2$criteriaWeights, profilesPerformances = profiles2, vetoPerformances = vetoes2)
+    }
+    
+    # mutate children
+    
+    numChildren <- length(children)
+    
+    for(i in 1:numChildren)
+    {
+      if(runif(1,0,1) < mutationProb)
+      {
+        # mutate majority threshold
+        
+        children[[i]]$majorityThreshold <- runif(1,0.5,1)
+      }
+      
+      if(runif(1,0,1) < mutationProb)
+      {
+        # mutate two criteria weights
+        
+        criteria <- sample(colnames(performanceTable),2)
+        
+        minVal <- 0 - children[[i]]$criteriaWeights[criteria[1]]
+        
+        maxVal <- children[[i]]$criteriaWeights[criteria[2]]
+        
+        tradeoff <- runif(1,minVal,maxVal)
+        
+        children[[i]]$criteriaWeights[criteria[1]] <- children[[i]]$criteriaWeights[criteria[1]] + tradeoff
+        
+        children[[i]]$criteriaWeights[criteria[2]] <- children[[i]]$criteriaWeights[criteria[2]] - tradeoff
+      }
+      
+      if(runif(1,0,1) < mutationProb)
+      {
+        # mutate one profile evaluation <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        
+        criterion <- sample(colnames(performanceTable),1)
+        
+        k <- sample(1:(numCat - 1),1)
+        
+        maxVal <- maxEvaluations[criterion]
+        
+        minVal <- minEvaluations[criterion]
+        
+        if(k < (numCat - 1))
+        {
+          if(criteriaMinMax[criterion] == 'max')
+            minVal <- children[[i]]$profilesPerformances[k+1,criterion]
+          else
+            maxVal <- children[[i]]$profilesPerformances[k+1,criterion]
+        }
+        
+        if(k > 1)
+        {
+          if(criteriaMinMax[criterion] == 'max')
+            maxVal <- children[[i]]$profilesPerformances[k-1,criterion]
+          else
+            minVal <- children[[i]]$profilesPerformances[k-1,criterion]
+        }
+        
+        if(veto)
+        {
+          if(criteriaMinMax[criterion] == 'max')
+          {
+            if(children[[i]]$vetoPerformances[k,criterion] > minVal)
+              minVal <- children[[i]]$vetoPerformances[k,criterion] + 0.0000000001
+          }
+          else
+          {
+            if(children[[i]]$vetoPerformances[k,criterion] < maxVal)
+              maxVal <- children[[i]]$vetoPerformances[k,criterion] - 0.0000000001
+          }
+        }
+        
+        children[[i]]$profilesPerformances[k,criterion] <- runif(1,minVal,maxVal)
+      }
+      
+      if(veto)
+      {
+        if(runif(1,0,1) < mutationProb)
+        {
+          # mutate one veto evaluation
+          
+          criterion <- sample(colnames(performanceTable),1)
+          
+          k <- sample(1:(numCat - 1),1)
+          
+          maxVal <- maxEvaluations[criterion]
+          
+          if(criteriaMinMax[criterion] == 'min')
+            maxVal <- maxEvaluations[criterion] + 1
+          
+          minVal <- minEvaluations[criterion]
+          
+          if(criteriaMinMax[criterion] == 'max')
+            minVal <- minEvaluations[criterion] - 1
+          
+          if(k < (numCat - 1))
+          {
+            if(criteriaMinMax[criterion] == 'max')
+              minVal <- children[[i]]$vetoPerformances[k+1,criterion]
+            else
+              maxVal <- children[[i]]$vetoPerformances[k+1,criterion]
+          }
+          
+          if(k > 1)
+          {
+            if(criteriaMinMax[criterion] == 'max')
+              maxVal <- children[[i]]$vetoPerformances[k-1,criterion]
+            else
+              minVal <- children[[i]]$vetoPerformances[k-1,criterion]
+          }
+          
+          if(criteriaMinMax[criterion] == 'max')
+          {
+            if(children[[i]]$profilesPerformances[k,criterion] %<=% maxVal)
+              maxVal <- children[[i]]$profilesPerformances[k,criterion] - 0.0000000001
+          }
+          else
+          {
+            if(children[[i]]$profilesPerformances[k,criterion] %>=% minVal)
+              minVal <- children[[i]]$profilesPerformances[k,criterion] + 0.0000000001
+          }
+          
+          children[[i]]$vetoPerformances[k,criterion] <- runif(1,minVal,maxVal)
+        }
+      }
+    }
+    return(children)
+  }
+  
+  # -------------------------------------------------------
+  
+  startTime <- Sys.time()
+  
+  # Initialize population
+  
+  population <- InitializePopulation()
+  
+  bestIndividual <- list(fitness = 0)
+  
+  # Main loop
+  
+  ct <- 0
+  
+  while(as.double(difftime(Sys.time(), startTime, units = 'secs')) < timeLimit)
+  {
+    # Evaluate population
+    
+    evaluations <- unlist(lapply(population, Fitness))
+    
+    # Store best individual if better than the overall best
+    
+    maxFitness <- max(evaluations)
+    
+    if(maxFitness > bestIndividual$fitness)
+    {
+      bestIndividual <- population[[match(maxFitness,evaluations)]]
+      
+      bestIndividual$fitness <- maxFitness
+    }
+    
+    # report
+    
+    if(as.double(difftime(Sys.time(), startTime, units = 'secs')) / 5 > ct)
+    {
+      ct <- ct + 1
+      
+      print(sprintf("Best fitness so far: %6.2f%%", bestIndividual$fitness * 100))
+    }
+    
+    # check if we are done
+    
+    if(bestIndividual$fitness == 1)
+      break
+    
+    # Selection - not the first iteration
+    
+    if(length(population) > populationSize)
+    {
+      evaluations <- evaluations^2
+      
+      newPopulation <- list()
+      
+      i <- 1
+      
+      while(length(newPopulation) < populationSize)
+      {
+        if(runif(1,0,1) <= evaluations[i])
+        {
+          evaluations[i] <- -1
+          
+          newPopulation[[length(newPopulation)+1]] <- population[[i]]
+        }
+        
+        i <- i + 1
+        
+        if(i > length(population))
+          i <- 1
+        
+      }
+      
+      population <- newPopulation
+    }
+    
+    # Reproduction
+    
+    population <- Reproduce(population)
+  }
+  
+  print(sprintf("Final model fitness: %6.2f%%", bestIndividual$fitness * 100))
+  
+  return(bestIndividual)
 }
