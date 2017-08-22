@@ -314,7 +314,7 @@ SRMPInferenceApproxFixedLexicographicOrder <- function(performanceTable, criteri
   
   ct <- 0
   
-  while(as.double(Sys.time() - startTime) < timeLimit)
+  while(as.double(difftime(Sys.time(), startTime, units = 'secs')) < timeLimit)
   {
     # Evaluate population
     
@@ -333,7 +333,7 @@ SRMPInferenceApproxFixedLexicographicOrder <- function(performanceTable, criteri
     
     # report
     
-    if(as.double(Sys.time() - startTime) / 5 > ct)
+    if(as.double(difftime(Sys.time(), startTime, units = 'secs')) / 5 > ct)
     {
       ct <- ct + 1
       
