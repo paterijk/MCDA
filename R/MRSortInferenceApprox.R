@@ -234,17 +234,14 @@ MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks
           }
         }
       
-      vetoes1 <- NULL
-      vetoes2 <- NULL
+      vetoes1 <- matrix(rep(NA,numCrit*(numCat - 1)),numCat - 1,numCrit)
+      vetoes2 <- matrix(rep(NA,numCrit*(numCat - 1)),numCat - 1,numCrit)
+      
+      colnames(vetoes1) <- colnames(performanceTable)
+      colnames(vetoes2) <- colnames(performanceTable)
       
       if(veto)
       {
-        vetoes1 <- matrix(rep(0,numCrit*(numCat - 1)),numCat - 1,numCrit)
-        vetoes2 <- matrix(rep(0,numCrit*(numCat - 1)),numCat - 1,numCrit)
-        
-        colnames(vetoes1) <- colnames(performanceTable)
-        colnames(vetoes2) <- colnames(performanceTable)
-        
         for(k in 1:(numCat - 1))
           for(j in 1:numCrit)
           {
@@ -326,7 +323,7 @@ MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks
       
       if(runif(1,0,1) < mutationProb)
       {
-        # mutate one profile evaluation <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        # mutate one profile evaluation
         
         criterion <- sample(colnames(performanceTable),1)
         
@@ -356,12 +353,12 @@ MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks
         {
           if(criteriaMinMax[criterion] == 'max')
           {
-            if(children[[i]]$vetoPerformances[k,criterion] > minVal)
+            if(children[[i]]$vetoPerformances[k,criterion] %>=% minVal)
               minVal <- children[[i]]$vetoPerformances[k,criterion] + 0.0000000001
           }
           else
           {
-            if(children[[i]]$vetoPerformances[k,criterion] < maxVal)
+            if(children[[i]]$vetoPerformances[k,criterion] %<=% maxVal)
               maxVal <- children[[i]]$vetoPerformances[k,criterion] - 0.0000000001
           }
         }
@@ -447,7 +444,7 @@ MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks
     
     maxFitness <- max(evaluations)
     
-    if(maxFitness > bestIndividual$fitness)
+    if(maxFitness >= bestIndividual$fitness)
     {
       bestIndividual <- population[[match(maxFitness,evaluations)]]
       
@@ -476,6 +473,8 @@ MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks
       
       newPopulation <- list()
       
+      newPopulation[[length(newPopulation)+1]] <- bestIndividual
+      
       i <- 1
       
       while(length(newPopulation) < populationSize)
@@ -503,6 +502,16 @@ MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks
   }
   
   print(sprintf("Final model fitness: %6.2f%%", bestIndividual$fitness * 100))
+  
+  # add dummy profiles
+  
+  bestIndividual$profilesPerformances <- rbind(bestIndividual$profilesPerformances,rep(NA,numCrit))
+  
+  bestIndividual$vetoPerformances <- rbind(bestIndividual$vetoPerformances,rep(NA,numCrit))
+  
+  rownames(bestIndividual$profilesPerformances) <- names(sort(categoriesRanks))
+  
+  rownames(bestIndividual$vetoPerformances) <- rownames(bestIndividual$profilesPerformances)
   
   return(bestIndividual)
 }
