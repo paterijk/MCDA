@@ -75,7 +75,8 @@ indifferencePairs <- matrix(c("a3","a1","a2","a11","a11","a20","a10","a10","a19"
 
 result<-SRMPInferenceFixedLexicographicOrder(performanceTable, criteriaMinMax,
                                              lexicographicOrder, preferencePairs,
-                                             indifferencePairs)
+                                             indifferencePairs, alternativesIDs = 
+                                             c("a1","a3","a7","a9","a13","a14","a16","a17"))
 }
 \keyword{methods}
 %\keyword{ ~~ other possible keyword(s)}
