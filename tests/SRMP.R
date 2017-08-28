@@ -27,16 +27,12 @@ names(weights) <- c("c1","c2","c3")
 
 names(criteriaMinMax) <- colnames(performanceTable)
 
-expectedpreorder <- list('a16','a13',c('a3','a9'),'a14','a17',c('a1','a7'),'a18','a15',c('a2','a8'),c('a11','a20','a22'),'a5',c('a10','a19','a24'),'a4',c('a12','a21','a23'),'a6')
+expectedValues <- c(10,7,13,3,5,1,10,7,13,4,6,2,14,12,8,15,11,9,4,6,2,6,2,4)
 
-preorder<-SRMP(performanceTable, referenceProfiles, lexicographicOrder, weights, criteriaMinMax)
+names(expectedValues) <- rownames(performanceTable)
 
-print(preorder)
+alternativesValues <- SRMP(performanceTable, referenceProfiles, lexicographicOrder, weights, criteriaMinMax)
 
-stopifnot(length(preorder) == length(expectedpreorder))
+print(alternativesValues)
 
-for(i in 1:length(preorder))
-{
-  stopifnot(length(preorder[[i]]) == length(expectedpreorder[[i]]))
-  stopifnot(all(preorder[[i]]== expectedpreorder[[i]]))
-}
+stopifnot(all(alternativesValues == expectedValues))

@@ -102,41 +102,57 @@ SRMP <- function(performanceTable, referenceProfiles, lexicographicOrder, criter
     return(0)
   }
   
-  preorder <- list(rownames(performanceTable)[1])
+  alternativesValues <- rep(1, numAlt)
+  
+  names(alternativesValues) <- rownames(performanceTable)
   
   for (i in 2:numAlt)
   {
-    k <- 1
-    while(k <= length(preorder))
+    minVal <- 0
+    
+    maxVal <- i
+    
+    for(j in 1:(i-1))
     {
-      j <- preorder[[k]][1]
-      comparison <- outranking(performanceTable[i,],performanceTable[j,],referenceProfiles, criteriaWeights, criteriaMinMax)
-      if(comparison == 1)
+      #print(c('j',j))
+      #print(alternativesValues)
+      if(alternativesValues[j] >= minVal && alternativesValues[j] <= maxVal)
       {
-        # alternative i is better than alternative j -> we put it before j and go to the next alternative
-        if(k == 1)
-          preorder <- c(rownames(performanceTable)[i],preorder)
+        comparison <- outranking(performanceTable[i,],performanceTable[j,],referenceProfiles, criteriaWeights, criteriaMinMax)
+        
+        if(comparison == 1)
+        {
+          # i is better than j
+          minVal <- alternativesValues[j] + 1
+        }
+        else if(comparison == 0)
+        {
+          # i is the same as j
+          alternativesValues[i] <- alternativesValues[j]
+          
+          minVal <- -1
+          
+          break
+        }
         else
-          preorder <- c(preorder[1:(k-1)],rownames(performanceTable)[i],preorder[k:length(preorder)])
-        break
+        {
+          # i is worse than j
+          maxVal <- alternativesValues[j] - 1
+        }
       }
-      else if(comparison == 0)
-      {
-        # alternative i is indifferent to j -> we put it on the same spot and go to the next alternative
-        preorder[[k]] <- c(preorder[[k]],rownames(performanceTable)[i])
-        break
-      }
+    }
+    
+    if(minVal == i)
+      alternativesValues[i] <- i
+    else if(minVal == 0)
+      alternativesValues <- sapply(1:numAlt, function(index){if(index<i) (alternativesValues[index] + 1) else alternativesValues[index]})
+    else if(minVal >= 0)
+    {
+      alternativesValues <- sapply(1:numAlt, function(index){if(index<i && alternativesValues[index] >= minVal) (alternativesValues[index] + 1) else alternativesValues[index]})
       
-      k <- k + 1
-      
-      if(k > length(preorder))
-      {
-        # we've reached the end and could not find an alternative that is worse or indifferent to i
-        preorder <- c(preorder,rownames(performanceTable)[i])
-        break
-      }
+      alternativesValues[i] <- minVal
     }
   }
   
-  return(preorder)
+  return(alternativesValues)
 }

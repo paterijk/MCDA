@@ -25,7 +25,7 @@ SRMP(performanceTable, referenceProfiles, lexicographicOrder, criteriaWeights,
 }
 
 \value{
-  The function returns a list containing the alternatives placed in a descending order of preference (the first ones are the most preferred). Indifferent alternatives will be placed in vectors within this list.
+  The function returns a vector containing the ranks of the alternatives (the higher the better).
 }
 
 \references{
