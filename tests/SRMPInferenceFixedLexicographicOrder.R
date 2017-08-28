@@ -21,7 +21,13 @@ names(criteriaMinMax) <- colnames(performanceTable)
 
 # expected result for the tests below
 
-expectedpreorder <- list("a16","a13",c("a3","a9"),"a14","a17",c("a1","a7"))
+expectedValues <- c(10,7,13,3,5,1,10,7,13,4,6,2,14,12,8,15,11,9,4,6,2,6,2,4)
+
+names(expectedValues) <- rownames(performanceTable)
+
+expectedValues <- expectedValues[c("a1","a3","a7","a9","a13","a14","a16","a17")]
+
+expectedValues <- expectedValues - min(expectedValues) + 1
 
 # first test - only preferences
 
@@ -30,15 +36,9 @@ preferencePairs <- matrix(c("a16","a13","a13","a9","a3","a14","a17","a17","a1","
 
 result<-SRMPInferenceFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a16","a17"))
 
-preorder<-SRMP(performanceTable, result$referenceProfiles, lexicographicOrder, result$criteriaWeights, criteriaMinMax, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a16","a17"))
+alternativesValues<-SRMP(performanceTable, result$referenceProfiles, lexicographicOrder, result$criteriaWeights, criteriaMinMax, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a16","a17"))
 
-stopifnot(length(preorder) == length(expectedpreorder))
-
-for(i in 1:length(preorder))
-{
-  stopifnot(length(preorder[[i]]) == length(expectedpreorder[[i]]))
-  stopifnot(all(preorder[[i]]== expectedpreorder[[i]]))
-}
+stopifnot(all(alternativesValues == expectedValues))
 
 # second test - preferences and indifferences
 
@@ -49,12 +49,6 @@ indifferencePairs <- matrix(c("a3","a1","a2","a11","a11","a20","a10","a10","a19"
 
 result<-SRMPInferenceFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a16","a17"))
 
-preorder<-SRMP(performanceTable, result$referenceProfiles, lexicographicOrder, result$criteriaWeights, criteriaMinMax, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a16","a17"))
+alternativesValues<-SRMP(performanceTable, result$referenceProfiles, lexicographicOrder, result$criteriaWeights, criteriaMinMax, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a16","a17"))
 
-stopifnot(length(preorder) == length(expectedpreorder))
-
-for(i in 1:length(preorder))
-{
-  stopifnot(length(preorder[[i]]) == length(expectedpreorder[[i]]))
-  stopifnot(all(preorder[[i]]== expectedpreorder[[i]]))
-}
+stopifnot(all(alternativesValues == expectedValues))

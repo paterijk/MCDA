@@ -19,7 +19,13 @@ names(criteriaMinMax) <- colnames(performanceTable)
 
 # expected result for the tests below
 
-expectedpreorder <- list("a16","a13",c("a3","a9"),"a14","a17",c("a1","a7"),"a18","a15")
+expectedValues <- c(10,7,13,3,5,1,10,7,13,4,6,2,14,12,8,15,11,9,4,6,2,6,2,4)
+
+names(expectedValues) <- rownames(performanceTable)
+
+expectedValues <- expectedValues[c("a1","a3","a7","a9","a13","a14","a15","a16","a17","a18")]
+
+expectedValues <- expectedValues - min(expectedValues) + 1
 
 # test - preferences and indifferences
 
@@ -32,12 +38,6 @@ set.seed(1)
 
 result<-SRMPInferenceApproxFixedProfilesNumber(performanceTable, criteriaMinMax, 3, preferencePairs, indifferencePairs, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a15","a16","a17","a18"))
 
-preorder<-SRMP(performanceTable, result$referenceProfiles, result$lexicographicOrder, result$criteriaWeights, criteriaMinMax, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a15","a16","a17","a18"))
+alternativesValues<-SRMP(performanceTable, result$referenceProfiles, result$lexicographicOrder, result$criteriaWeights, criteriaMinMax, alternativesIDs = c("a1","a3","a7","a9","a13","a14","a15","a16","a17","a18"))
 
-stopifnot(length(preorder) == length(expectedpreorder))
-
-for(i in 1:length(preorder))
-{
-  stopifnot(length(preorder[[i]]) == length(expectedpreorder[[i]]))
-  stopifnot(all(preorder[[i]]== expectedpreorder[[i]]))
-}
+stopifnot(all(alternativesValues == expectedValues))

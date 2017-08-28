@@ -19,7 +19,9 @@ names(criteriaMinMax) <- colnames(performanceTable)
 
 # expected result for the tests below
 
-expectedpreorder <- list("a16","a13",c("a3","a9"),"a14","a17",c("a1","a7"),"a18","a15",c("a2","a8"),c("a11","a20","a22"),"a5",c("a10","a19","a24"),"a4",c("a12","a21","a23"),"a6")
+expectedValues <- c(10,7,13,3,5,1,10,7,13,4,6,2,14,12,8,15,11,9,4,6,2,6,2,4)
+
+names(expectedValues) <- rownames(performanceTable)
 
 # first test - only preferences
 
@@ -28,15 +30,9 @@ preferencePairs <- matrix(c("a16","a13","a13","a9","a3","a14","a17","a17","a1","
 
 result<-SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMinMax, 3, preferencePairs, alternativesIDs = c("a4","a5","a6","a7","a8","a9","a13","a14","a15","a16","a17","a18","a19","a21","a22","a23","a24"))
 
-preorder<-SRMP(performanceTable, result$referenceProfiles, result$lexicographicOrder, result$criteriaWeights, criteriaMinMax)
+alternativesValues<-SRMP(performanceTable, result$referenceProfiles, result$lexicographicOrder, result$criteriaWeights, criteriaMinMax)
 
-stopifnot(length(preorder) == length(expectedpreorder))
-
-for(i in 1:length(preorder))
-{
-  stopifnot(length(preorder[[i]]) == length(expectedpreorder[[i]]))
-  stopifnot(all(preorder[[i]]== expectedpreorder[[i]]))
-}
+stopifnot(all(alternativesValues == expectedValues))
 
 # second test - preferences and indifferences
 
@@ -47,12 +43,6 @@ indifferencePairs <- matrix(c("a3","a1","a2","a11","a11","a20","a10","a10","a19"
 
 result<-SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMinMax, 3, preferencePairs, indifferencePairs, alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7","a8","a10","a11","a12","a14","a16","a17","a18","a19","a20","a21","a23","a24"))
 
-preorder<-SRMP(performanceTable, result$referenceProfiles, result$lexicographicOrder, result$criteriaWeights, criteriaMinMax)
+alternativesValues<-SRMP(performanceTable, result$referenceProfiles, result$lexicographicOrder, result$criteriaWeights, criteriaMinMax)
 
-stopifnot(length(preorder) == length(expectedpreorder))
-
-for(i in 1:length(preorder))
-{
-  stopifnot(length(preorder[[i]]) == length(expectedpreorder[[i]]))
-  stopifnot(all(preorder[[i]]== expectedpreorder[[i]]))
-}
+stopifnot(all(alternativesValues == expectedValues))
