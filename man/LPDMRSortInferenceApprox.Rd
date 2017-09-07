@@ -85,8 +85,8 @@ names(criteriaMinMax) <- colnames(performanceTable)
 set.seed(1)
 
 x<-LPDMRSortInferenceApprox(performanceTable, criteriaMinMax, categoriesRanks, assignments,
-                            majorityRules = c("M","V","D","v","d","dV","Dv","dv"),
-                            populationSize = 30)
+                            majorityRules = c("dV","Dv","dv"),
+                            timeLimit = 120, populationSize = 30)
 }
 
 \keyword{methods}
