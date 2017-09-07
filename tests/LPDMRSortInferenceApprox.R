@@ -29,7 +29,7 @@ set.seed(1)
 
 x<-LPDMRSortInferenceApprox(performanceTable, criteriaMinMax, categoriesRanks, assignments,
                             majorityRules = c("M","V","D","v","d","dV","Dv","dv"),
-                            populationSize = 25)
+                            timeLimit = 120, populationSize = 30)
 
 print(x)
 

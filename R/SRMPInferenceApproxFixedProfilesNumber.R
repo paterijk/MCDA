@@ -1,4 +1,4 @@
-SRMPInferenceApproxFixedProfilesNumber <- function(performanceTable, criteriaMinMax, profilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = 60, populationSize = 10, mutationProb = 0.5){
+SRMPInferenceApproxFixedProfilesNumber <- function(performanceTable, criteriaMinMax, profilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = 60, populationSize = 20, mutationProb = 0.1){
   
   ## check the input data
   
@@ -273,55 +273,63 @@ SRMPInferenceApproxFixedProfilesNumber <- function(performanceTable, criteriaMin
     
     for(i in 1:numChildren)
     {
-      if(runif(1,0,1) < mutationProb)
+      for(k in 1:profilesNumber)
       {
-        # mutate one profile evaluation
-        
-        criterion <- sample(colnames(performanceTable),1)
-        
-        k <- sample(1:profilesNumber,1)
-        
-        maxVal <- maxEvaluations[criterion]
-
-        minVal <- minEvaluations[criterion]
-        
-        if(k < profilesNumber)
+        for(criterion in colnames(performanceTable))
         {
-          if(criteriaMinMax[criterion] == 'max')
-            maxVal <- children[[i]]$referenceProfiles[k+1,criterion]
-          else
-            minVal <- children[[i]]$referenceProfiles[k+1,criterion]
+          if(runif(1,0,1) < mutationProb)
+          {
+            # mutate profile evaluation
+            
+            maxVal <- maxEvaluations[criterion]
+            
+            minVal <- minEvaluations[criterion]
+            
+            if(k < profilesNumber)
+            {
+              if(criteriaMinMax[criterion] == 'max')
+                maxVal <- children[[i]]$referenceProfiles[k+1,criterion]
+              else
+                minVal <- children[[i]]$referenceProfiles[k+1,criterion]
+            }
+            
+            if(k > 1)
+            {
+              if(criteriaMinMax[criterion] == 'max')
+                minVal <- children[[i]]$referenceProfiles[k-1,criterion]
+              else
+                maxVal <- children[[i]]$referenceProfiles[k-1,criterion]
+            }
+            
+            children[[i]]$referenceProfiles[k,criterion] <- runif(1,minVal,maxVal)
+          }
         }
-        
-        if(k > 1)
-        {
-          if(criteriaMinMax[criterion] == 'max')
-            minVal <- children[[i]]$referenceProfiles[k-1,criterion]
-          else
-            maxVal <- children[[i]]$referenceProfiles[k-1,criterion]
-        }
-        
-        children[[i]]$referenceProfiles[k,criterion] <- runif(1,minVal,maxVal)
       }
       
-      if(runif(1,0,1) < mutationProb)
+      for(j1 in 1:(numCrit-1))
       {
-        # mutate two criteria weights
-        
-        criteria <- sample(colnames(performanceTable),2)
-        
-        minVal <- 0 - children[[i]]$criteriaWeights[criteria[1]]
-        
-        maxVal <- children[[i]]$criteriaWeights[criteria[2]]
-        
-        tradeoff <- runif(1,minVal,maxVal)
-        
-        children[[i]]$criteriaWeights[criteria[1]] <- children[[i]]$criteriaWeights[criteria[1]] + tradeoff
-        
-        children[[i]]$criteriaWeights[criteria[2]] <- children[[i]]$criteriaWeights[criteria[2]] - tradeoff
+        for(j2 in (j1+1):numCrit)
+        {
+          if(runif(1,0,1) < mutationProb)
+          {
+            # mutate two criteria weights
+            
+            criteria <- c(colnames(performanceTable)[j1],colnames(performanceTable)[j2])
+            
+            minVal <- 0 - children[[i]]$criteriaWeights[criteria[1]]
+            
+            maxVal <- children[[i]]$criteriaWeights[criteria[2]]
+            
+            tradeoff <- runif(1,minVal,maxVal)
+            
+            children[[i]]$criteriaWeights[criteria[1]] <- children[[i]]$criteriaWeights[criteria[1]] + tradeoff
+            
+            children[[i]]$criteriaWeights[criteria[2]] <- children[[i]]$criteriaWeights[criteria[2]] - tradeoff
+          }
+        }
       }
       
-      if(runif(1,0,1) < mutationProb)
+      if(runif(1,0,1) < mutationProb && profilesNumber > 1)
       {
         # mutate the lexicographic order
         
@@ -336,7 +344,7 @@ SRMPInferenceApproxFixedProfilesNumber <- function(performanceTable, criteriaMin
           adjacent <- c(adjacent, i1 + 1)
         
         i2 <- sample(adjacent, 1)
-                     
+        
         temp <- children[[i]]$lexicographicOrder[i1]
         
         children[[i]]$lexicographicOrder[i1] <- children[[i]]$lexicographicOrder[i2]

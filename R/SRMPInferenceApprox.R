@@ -1,4 +1,4 @@
-SRMPInferenceApprox <- function(performanceTable, criteriaMinMax, maxProfilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = 60, populationSize = 10, mutationProb = 0.5){
+SRMPInferenceApprox <- function(performanceTable, criteriaMinMax, maxProfilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = 60, populationSize = 20, mutationProb = 0.1){
   
   ## check the input data
   
@@ -406,78 +406,84 @@ SRMPInferenceApprox <- function(performanceTable, criteriaMinMax, maxProfilesNum
           children[[i]]$lexicographicOrder <- sapply(children[[i]]$lexicographicOrder, function(val){if(val > k) return(val - 1) else return(val)})
         }
       }
-      else
+      
+      for(k in 1:children[[i]]$referenceProfilesNumber)
       {
-        if(runif(1,0,1) < mutationProb)
+        for(criterion in colnames(performanceTable))
         {
-          # mutate one profile evaluation
-          
-          criterion <- sample(colnames(performanceTable),1)
-          
-          k <- sample(1:children[[i]]$referenceProfilesNumber,1)
-          
-          maxVal <- maxEvaluations[criterion]
-  
-          minVal <- minEvaluations[criterion]
-          
-          if(k < children[[i]]$referenceProfilesNumber)
+          if(runif(1,0,1) < mutationProb)
           {
-            if(criteriaMinMax[criterion] == 'max')
-              maxVal <- children[[i]]$referenceProfiles[k+1,criterion]
-            else
-              minVal <- children[[i]]$referenceProfiles[k+1,criterion]
+            # mutate profile evaluation
+            
+            maxVal <- maxEvaluations[criterion]
+            
+            minVal <- minEvaluations[criterion]
+            
+            if(k < children[[i]]$referenceProfilesNumber)
+            {
+              if(criteriaMinMax[criterion] == 'max')
+                maxVal <- children[[i]]$referenceProfiles[k+1,criterion]
+              else
+                minVal <- children[[i]]$referenceProfiles[k+1,criterion]
+            }
+            
+            if(k > 1)
+            {
+              if(criteriaMinMax[criterion] == 'max')
+                minVal <- children[[i]]$referenceProfiles[k-1,criterion]
+              else
+                maxVal <- children[[i]]$referenceProfiles[k-1,criterion]
+            }
+            
+            children[[i]]$referenceProfiles[k,criterion] <- runif(1,minVal,maxVal)
           }
-          
-          if(k > 1)
+        }
+      }
+      
+      for(j1 in 1:(numCrit-1))
+      {
+        for(j2 in (j1+1):numCrit)
+        {
+          if(runif(1,0,1) < mutationProb)
           {
-            if(criteriaMinMax[criterion] == 'max')
-              minVal <- children[[i]]$referenceProfiles[k-1,criterion]
-            else
-              maxVal <- children[[i]]$referenceProfiles[k-1,criterion]
+            # mutate two criteria weights
+            
+            criteria <- c(colnames(performanceTable)[j1],colnames(performanceTable)[j2])
+            
+            minVal <- 0 - children[[i]]$criteriaWeights[criteria[1]]
+            
+            maxVal <- children[[i]]$criteriaWeights[criteria[2]]
+            
+            tradeoff <- runif(1,minVal,maxVal)
+            
+            children[[i]]$criteriaWeights[criteria[1]] <- children[[i]]$criteriaWeights[criteria[1]] + tradeoff
+            
+            children[[i]]$criteriaWeights[criteria[2]] <- children[[i]]$criteriaWeights[criteria[2]] - tradeoff
           }
-          
-          children[[i]]$referenceProfiles[k,criterion] <- runif(1,minVal,maxVal)
         }
+      }
+      
+      if(runif(1,0,1) < mutationProb && children[[i]]$referenceProfilesNumber > 1)
+      {
+        # mutate the lexicographic order
         
-        if(runif(1,0,1) < mutationProb)
-        {
-          # mutate two criteria weights
-          
-          criteria <- sample(colnames(performanceTable),2)
-          
-          minVal <- 0 - children[[i]]$criteriaWeights[criteria[1]]
-          
-          maxVal <- children[[i]]$criteriaWeights[criteria[2]]
-          
-          tradeoff <- runif(1,minVal,maxVal)
-          
-          children[[i]]$criteriaWeights[criteria[1]] <- children[[i]]$criteriaWeights[criteria[1]] + tradeoff
-          
-          children[[i]]$criteriaWeights[criteria[2]] <- children[[i]]$criteriaWeights[criteria[2]] - tradeoff
-        }
+        i1 <- sample(1:children[[i]]$referenceProfilesNumber, 1)
         
-        if(runif(1,0,1) < mutationProb && children[[i]]$referenceProfilesNumber > 1)
-        {
-          # mutate the lexicographic order
-          
-          i1 <- sample(1:children[[i]]$referenceProfilesNumber, 1)
-          
-          adjacent <- NULL
-          
-          if(i1 > 1)
-            adjacent <- c(adjacent, i1 - 1)
-          
-          if(i1 < children[[i]]$referenceProfilesNumber)
-            adjacent <- c(adjacent, i1 + 1)
-          
-          i2 <- sample(adjacent, 1)
-                       
-          temp <- children[[i]]$lexicographicOrder[i1]
-          
-          children[[i]]$lexicographicOrder[i1] <- children[[i]]$lexicographicOrder[i2]
-          
-          children[[i]]$lexicographicOrder[i2] <- temp
-        }
+        adjacent <- NULL
+        
+        if(i1 > 1)
+          adjacent <- c(adjacent, i1 - 1)
+        
+        if(i1 < children[[i]]$referenceProfilesNumber)
+          adjacent <- c(adjacent, i1 + 1)
+        
+        i2 <- sample(adjacent, 1)
+                     
+        temp <- children[[i]]$lexicographicOrder[i1]
+        
+        children[[i]]$lexicographicOrder[i1] <- children[[i]]$lexicographicOrder[i2]
+        
+        children[[i]]$lexicographicOrder[i2] <- temp
       }
     }
     
