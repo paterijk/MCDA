@@ -12,7 +12,7 @@ binary discordance and a binary concordance conditions including several interac
 LPDMRSortInferenceApprox(performanceTable, criteriaMinMax, categoriesRanks, assignments,
                          majorityRules = c("M","V","D","v","d","dV","Dv","dv"),
                          alternativesIDs = NULL, criteriaIDs = NULL,
-                         timeLimit = 60, populationSize = 10, mutationProb = 0.5)
+                         timeLimit = 60, populationSize = 20, mutationProb = 0.1)
 }
 
 \arguments{
@@ -34,8 +34,8 @@ LPDMRSortInferenceApprox(performanceTable, criteriaMinMax, categoriesRanks, assi
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the data should be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
   \item{timeLimit}{Allows to fix a time limit of the execution, in seconds (default 60).}
-  \item{populationSize}{Allows to change the size of the population used by the genetic algorithm (default 10).}
-  \item{mutationProb}{Allows to change the mutation probability used by the genetic algorithm (default 0.5).}
+  \item{populationSize}{Allows to change the size of the population used by the genetic algorithm (default 20).}
+  \item{mutationProb}{Allows to change the mutation probability used by the genetic algorithm (default 0.1).}
 }
 
 \value{
@@ -86,7 +86,7 @@ set.seed(1)
 
 x<-LPDMRSortInferenceApprox(performanceTable, criteriaMinMax, categoriesRanks, assignments,
                             majorityRules = c("M","V","D","v","d","dV","Dv","dv"),
-                            populationSize = 25)
+                            populationSize = 30)
 }
 
 \keyword{methods}

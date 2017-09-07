@@ -1,4 +1,4 @@
-MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto = FALSE, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = 60, populationSize = 10, mutationProb = 0.5){
+MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto = FALSE, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = 60, populationSize = 20, mutationProb = 0.1){
   
   ## check the input data
   
@@ -304,116 +304,126 @@ MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks
         children[[i]]$majorityThreshold <- runif(1,0.5,1)
       }
       
-      if(runif(1,0,1) < mutationProb)
+      for(j1 in 1:(numCrit-1))
       {
-        # mutate two criteria weights
-        
-        criteria <- sample(colnames(performanceTable),2)
-        
-        minVal <- 0 - children[[i]]$criteriaWeights[criteria[1]]
-        
-        maxVal <- children[[i]]$criteriaWeights[criteria[2]]
-        
-        tradeoff <- runif(1,minVal,maxVal)
-        
-        children[[i]]$criteriaWeights[criteria[1]] <- children[[i]]$criteriaWeights[criteria[1]] + tradeoff
-        
-        children[[i]]$criteriaWeights[criteria[2]] <- children[[i]]$criteriaWeights[criteria[2]] - tradeoff
+        for(j2 in (j1+1):numCrit)
+        {
+          if(runif(1,0,1) < mutationProb)
+          {
+            # mutate two criteria weights
+            
+            criteria <- c(colnames(performanceTable)[j1],colnames(performanceTable)[j2])
+            
+            minVal <- 0 - children[[i]]$criteriaWeights[criteria[1]]
+            
+            maxVal <- children[[i]]$criteriaWeights[criteria[2]]
+            
+            tradeoff <- runif(1,minVal,maxVal)
+            
+            children[[i]]$criteriaWeights[criteria[1]] <- children[[i]]$criteriaWeights[criteria[1]] + tradeoff
+            
+            children[[i]]$criteriaWeights[criteria[2]] <- children[[i]]$criteriaWeights[criteria[2]] - tradeoff
+          }
+        }
       }
       
-      if(runif(1,0,1) < mutationProb)
+      for(k in 1:(numCat - 1))
       {
-        # mutate one profile evaluation
-        
-        criterion <- sample(colnames(performanceTable),1)
-        
-        k <- sample(1:(numCat - 1),1)
-        
-        maxVal <- maxEvaluations[criterion]
-        
-        minVal <- minEvaluations[criterion]
-        
-        if(k < (numCat - 1))
+        for(criterion in colnames(performanceTable))
         {
-          if(criteriaMinMax[criterion] == 'max')
-            minVal <- children[[i]]$profilesPerformances[k+1,criterion]
-          else
-            maxVal <- children[[i]]$profilesPerformances[k+1,criterion]
-        }
-        
-        if(k > 1)
-        {
-          if(criteriaMinMax[criterion] == 'max')
-            maxVal <- children[[i]]$profilesPerformances[k-1,criterion]
-          else
-            minVal <- children[[i]]$profilesPerformances[k-1,criterion]
-        }
-        
-        if(veto)
-        {
-          if(criteriaMinMax[criterion] == 'max')
+          if(runif(1,0,1) < mutationProb)
           {
-            if(children[[i]]$vetoPerformances[k,criterion] %>=% minVal)
-              minVal <- children[[i]]$vetoPerformances[k,criterion] + 0.0000000001
-          }
-          else
-          {
-            if(children[[i]]$vetoPerformances[k,criterion] %<=% maxVal)
-              maxVal <- children[[i]]$vetoPerformances[k,criterion] - 0.0000000001
+            # mutate profile evaluation
+            
+            maxVal <- maxEvaluations[criterion]
+            
+            minVal <- minEvaluations[criterion]
+            
+            if(k < (numCat - 1))
+            {
+              if(criteriaMinMax[criterion] == 'max')
+                minVal <- children[[i]]$profilesPerformances[k+1,criterion]
+              else
+                maxVal <- children[[i]]$profilesPerformances[k+1,criterion]
+            }
+            
+            if(k > 1)
+            {
+              if(criteriaMinMax[criterion] == 'max')
+                maxVal <- children[[i]]$profilesPerformances[k-1,criterion]
+              else
+                minVal <- children[[i]]$profilesPerformances[k-1,criterion]
+            }
+            
+            if(veto)
+            {
+              if(criteriaMinMax[criterion] == 'max')
+              {
+                if(children[[i]]$vetoPerformances[k,criterion] %>=% minVal)
+                  minVal <- children[[i]]$vetoPerformances[k,criterion] + 0.0000000001
+              }
+              else
+              {
+                if(children[[i]]$vetoPerformances[k,criterion] %<=% maxVal)
+                  maxVal <- children[[i]]$vetoPerformances[k,criterion] - 0.0000000001
+              }
+            }
+            
+            children[[i]]$profilesPerformances[k,criterion] <- runif(1,minVal,maxVal)
           }
         }
-        
-        children[[i]]$profilesPerformances[k,criterion] <- runif(1,minVal,maxVal)
       }
       
       if(veto)
       {
-        if(runif(1,0,1) < mutationProb)
+        for(k in 1:(numCat - 1))
         {
-          # mutate one veto evaluation
-          
-          criterion <- sample(colnames(performanceTable),1)
-          
-          k <- sample(1:(numCat - 1),1)
-          
-          maxVal <- maxEvaluations[criterion]
-          
-          if(criteriaMinMax[criterion] == 'min')
-            maxVal <- maxEvaluations[criterion] + 1
-          
-          minVal <- minEvaluations[criterion]
-          
-          if(criteriaMinMax[criterion] == 'max')
-            minVal <- minEvaluations[criterion] - 1
-          
-          if(k < (numCat - 1))
+          for(criterion in colnames(performanceTable))
           {
-            if(criteriaMinMax[criterion] == 'max')
-              minVal <- children[[i]]$vetoPerformances[k+1,criterion]
-            else
-              maxVal <- children[[i]]$vetoPerformances[k+1,criterion]
+            if(runif(1,0,1) < mutationProb)
+            {
+              # mutate one veto evaluation
+              
+              maxVal <- maxEvaluations[criterion]
+              
+              if(criteriaMinMax[criterion] == 'min')
+                maxVal <- maxEvaluations[criterion] + 1
+              
+              minVal <- minEvaluations[criterion]
+              
+              if(criteriaMinMax[criterion] == 'max')
+                minVal <- minEvaluations[criterion] - 1
+              
+              if(k < (numCat - 1))
+              {
+                if(criteriaMinMax[criterion] == 'max')
+                  minVal <- children[[i]]$vetoPerformances[k+1,criterion]
+                else
+                  maxVal <- children[[i]]$vetoPerformances[k+1,criterion]
+              }
+              
+              if(k > 1)
+              {
+                if(criteriaMinMax[criterion] == 'max')
+                  maxVal <- children[[i]]$vetoPerformances[k-1,criterion]
+                else
+                  minVal <- children[[i]]$vetoPerformances[k-1,criterion]
+              }
+              
+              if(criteriaMinMax[criterion] == 'max')
+              {
+                if(children[[i]]$profilesPerformances[k,criterion] %<=% maxVal)
+                  maxVal <- children[[i]]$profilesPerformances[k,criterion] - 0.0000000001
+              }
+              else
+              {
+                if(children[[i]]$profilesPerformances[k,criterion] %>=% minVal)
+                  minVal <- children[[i]]$profilesPerformances[k,criterion] + 0.0000000001
+              }
+              
+              children[[i]]$vetoPerformances[k,criterion] <- runif(1,minVal,maxVal)
+            }
           }
-          
-          if(k > 1)
-          {
-            if(criteriaMinMax[criterion] == 'max')
-              maxVal <- children[[i]]$vetoPerformances[k-1,criterion]
-            else
-              minVal <- children[[i]]$vetoPerformances[k-1,criterion]
-          }
-          
-          if(criteriaMinMax[criterion] == 'max')
-          {
-            if(children[[i]]$profilesPerformances[k,criterion] %<=% maxVal)
-              maxVal <- children[[i]]$profilesPerformances[k,criterion] - 0.0000000001
-          }
-          else
-          {
-            if(children[[i]]$profilesPerformances[k,criterion] %>=% minVal)
-              minVal <- children[[i]]$profilesPerformances[k,criterion] + 0.0000000001
-          }
-          
-          children[[i]]$vetoPerformances[k,criterion] <- runif(1,minVal,maxVal)
         }
       }
     }
