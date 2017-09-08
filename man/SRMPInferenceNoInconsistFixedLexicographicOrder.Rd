@@ -48,6 +48,7 @@ Ranking Method based on Multiple Reference Profiles, forthcoming 2018.
 }
 
 \examples{
+\dontrun{
 # the performance table
 
 performanceTable <- rbind(c(10,10,9),c(10,9,10),c(9,10,10),c(9,9,10),c(9,10,9),c(10,9,9),
@@ -81,6 +82,6 @@ result<-SRMPInferenceNoInconsistFixedLexicographicOrder(performanceTable, criter
                                                         "a8","a10","a11","a12","a14","a16",
                                                         "a17","a18","a19","a20","a21","a23",
                                                         "a24"))
-}
+}}
 \keyword{methods}
 %\keyword{ ~~ other possible keyword(s)}

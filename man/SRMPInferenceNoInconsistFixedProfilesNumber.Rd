@@ -48,6 +48,7 @@ Ranking Method based on Multiple Reference Profiles, forthcoming 2018.
 }
 
 \examples{
+\dontrun{
 performanceTable <- rbind(c(10,10,9),c(10,9,10),c(9,10,10),c(9,9,10),c(9,10,9),c(10,9,9),
                           c(10,10,7),c(10,7,10),c(7,10,10),c(9,9,17),c(9,17,9),c(17,9,9),
                           c(7,10,17),c(10,17,7),c(17,7,10),c(7,17,10),c(17,10,7),c(10,7,17),
@@ -76,6 +77,6 @@ result<-SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMi
                                                     "a5","a6","a7","a8","a10","a11","a12",
                                                     "a14","a16","a17","a18","a19","a20","a21",
                                                     "a23","a24"))
-}
+}}
 \keyword{methods}
 %\keyword{ ~~ other possible keyword(s)}
