@@ -27,18 +27,7 @@ expectedValues <- c(9,7,12,3,5,1,9,7,4,6,2,11,13,10,8,4,6,2,2,4)
 
 names(expectedValues) <- altIDs
 
-# first test - only preferences
-
-preferencePairs <- matrix(c("a16","a13","a13","a9","a3","a14","a17","a17","a1","a7","a18","a15","a15","a2","a2","a2","a8","a8","a8","a11","a20","a22","a5","a5","a5","a10","a19","a24","a4","a4","a4","a12","a21","a23",
-                            "a13","a3","a9","a14","a14","a17","a1","a7","a18","a18","a15","a2","a8","a11","a20","a22","a11","a20","a22","a5","a5","a5","a10","a19","a24","a4","a4","a4","a12","a21","a23","a6","a6","a6"),34,2)
-
-result<-SRMPInferenceNoInconsistFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, alternativesIDs = altIDs)
-
-alternativesValues<-SRMP(performanceTable, result$referenceProfiles, lexicographicOrder, result$criteriaWeights, criteriaMinMax, alternativesIDs = altIDs)
-
-stopifnot(all(alternativesValues == expectedValues))
-
-# second test - preferences and indifferences
+# test - preferences and indifferences
 
 preferencePairs <- matrix(c("a16","a13","a3","a14","a17","a1","a18","a15","a2","a11","a5","a10","a4","a12",
                             "a13","a3","a14","a17","a1","a18","a15","a2","a11","a5","a10","a4","a12","a6"),14,2)
