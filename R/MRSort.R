@@ -1,4 +1,4 @@
-MRSort <- function(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, majorityThreshold, criteriaVetos = NULL, alternativesIDs = NULL, criteriaIDs = NULL, categoriesIDs = NULL){
+MRSort <- function(performanceTable, categoriesLowerProfiles, categoriesRanks, criteriaWeights, criteriaMinMax, majorityThreshold, criteriaVetos = NULL, alternativesIDs = NULL, criteriaIDs = NULL, categoriesIDs = NULL){
   
   ## check the input data
   
@@ -7,6 +7,15 @@ MRSort <- function(performanceTable, categoriesLowerProfiles, criteriaWeights, c
   
   if (!(is.matrix(categoriesLowerProfiles)))
     stop("categoriesLowerProfiles should be a matrix")
+  
+  if (!(is.vector(categoriesRanks)))
+    stop("categoriesRanks should be a vector")
+  
+  if(is.null(names(categoriesRanks)))
+    stop("categoriesRanks should be named")
+  
+  if(!all(sort(categoriesRanks) == 1:length(categoriesRanks)))
+    stop("categoriesRanks should contain a permutation of the category indices (from 1 to the number of categories)")
   
   if (!(is.vector(criteriaMinMax)))
     stop("criteriaMinMax should be a vector")
@@ -51,9 +60,22 @@ MRSort <- function(performanceTable, categoriesLowerProfiles, criteriaWeights, c
     categoriesLowerProfiles <- categoriesLowerProfiles[categoriesIDs,]
   }
   
-  
-  
-  
+  if (!is.null(categoriesIDs)){
+    # filter out categories
+    categoriesRanks <- categoriesRanks[names(categoriesRanks) %in% categoriesIDs]
+    # check if we took out all categories
+    if(length(categoriesRanks) == 0)
+      stop('categoriesIDs have filtered out all categories')
+    # order the remaining ones
+    categoriesRanks <- sort(categoriesRanks)
+    # store their order
+    catOrder <- names(categoriesRanks)
+    # adjust their indices to a range from 1 to the number of remaining categories
+    categoriesRanks <- 1:length(categoriesRanks)
+    # rename them
+    names(categoriesRanks) <- catOrder
+  }
+
   # data is filtered, check for some data consistency
   
   # if there are less than 2 criteria or 2 alternatives, there is no MCDA problem
@@ -67,71 +89,69 @@ MRSort <- function(performanceTable, categoriesLowerProfiles, criteriaWeights, c
   
   numAlt <- dim(performanceTable)[1]
   
-  numCat <- dim(categoriesLowerProfiles)[1]
-  
-  
+  numCat <- length(categoriesRanks)
   
   # -------------------------------------------------------
   
-  outranking <- function(alternativePerformances, profilePerformances, criteriaWeights, criteriaMinMax, majorityThreshold, profileCriteriaVetos=NULL){
-    localConcordance <- rep(0,numCrit)
-    veto <- 0
-    for (i in 1:numCrit){
-      if (criteriaMinMax[i] == "min"){
-        if (alternativePerformances[i] %<=% profilePerformances[i])
-          localConcordance[i] = 1
-        if (!is.null(profileCriteriaVetos)){
-          if (!is.na(profileCriteriaVetos[i])){
-            if (alternativePerformances[i] %>=% profileCriteriaVetos[i])
-              veto = 1 
+  getCategory <- function(i)
+  {
+    for (k in (numCat-1):1)
+    {
+      cat <- names(categoriesRanks)[categoriesRanks == k]
+      
+      weightedSum <- 0
+      
+      for (crit in names(criteriaMinMax))
+      {
+        if (criteriaMinMax[crit] == "min")
+        {
+          if (performanceTable[i,crit] %<=% categoriesLowerProfiles[cat,crit])
+            weightedSum <- weightedSum + criteriaWeights[crit]
+        }
+        else
+        {
+          if (performanceTable[i,crit] %>=% categoriesLowerProfiles[cat,crit])
+            weightedSum <- weightedSum + criteriaWeights[crit]
+        }
+      }
+      
+      vetoActive <- FALSE
+      
+      if(!is.null(criteriaVetos))
+      {
+        for (crit in names(criteriaMinMax))
+        {
+          if(!is.na(criteriaVetos[cat,crit]) & !is.null(criteriaVetos[cat,crit]))
+          {
+            if (criteriaMinMax[crit] == "min")
+            {
+              if (performanceTable[i,crit] %>=% criteriaVetos[cat,crit])
+              {
+                vetoActive <- TRUE
+                break
+              }
+            }
+            else
+            {
+              if (performanceTable[i,crit] %<=% criteriaVetos[cat,crit])
+              {
+                vetoActive <- TRUE
+                break
+              }
+            }
           }
         }
       }
-      else{
-        if (alternativePerformances[i] %>=% profilePerformances[i])
-          localConcordance[i] = 1
-        if (!is.null(profileCriteriaVetos)){
-          if (!is.na(profileCriteriaVetos[i])){
-            if (alternativePerformances[i] %<=% profileCriteriaVetos[i])
-              veto = 1 
-          }
-        }
-      }
+      
+      # stopping condition
+      if(weightedSum < majorityThreshold || vetoActive)
+        return(names(categoriesRanks)[categoriesRanks == (k + 1)])
     }
-    
-    concordance = sum(localConcordance*criteriaWeights)
-    
-    if ((veto == 1) || (concordance < majorityThreshold))
-      return(FALSE)
-    else 
-      return(TRUE)
+    # better than all profiles -> top categ
+    return(names(categoriesRanks)[categoriesRanks == 1])
   }
   
-  
-  assignments <- c()
-  
-  for (i in 1:numAlt){
-    categoryNotFound <- TRUE
-    k <- 1
-    while ((categoryNotFound) && k<=numCat-1){
-      if (is.null(criteriaVetos)){
-        if(outranking(performanceTable[i,],categoriesLowerProfiles[k,], criteriaWeights, criteriaMinMax, majorityThreshold, profileCriteriaVetos = NULL)){
-          category <- k
-          categoryNotFound <- FALSE
-        }
-        else
-          k<-k+1
-      } else {
-        if(outranking(performanceTable[i,],categoriesLowerProfiles[k,], criteriaWeights, criteriaMinMax, majorityThreshold, profileCriteriaVetos = criteriaVetos[k,])){
-          category <- k
-          categoryNotFound <- FALSE
-        }
-        else
-          k<-k+1
-      }
-    }
-    assignments <- c(assignments, rownames(categoriesLowerProfiles)[k]) 
-  }
+  assignments <- sapply(1:numAlt, getCategory)
   
   names(assignments) <- rownames(performanceTable)
   

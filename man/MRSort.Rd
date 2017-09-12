@@ -10,9 +10,10 @@ in any possible concordance situation, or not.}
 
 \usage{
 MRSort(performanceTable, categoriesLowerProfiles, 
-            criteriaWeights, criteriaMinMax, majorityThreshold, 
-            criteriaVetos = NULL, alternativesIDs = NULL, 
-            criteriaIDs = NULL, categoriesIDs = NULL)
+       categoriesRanks, criteriaWeights, criteriaMinMax,
+       majorityThreshold, criteriaVetos = NULL,
+       alternativesIDs = NULL, criteriaIDs = NULL,
+       categoriesIDs = NULL)
 }
 
 \arguments{
@@ -22,6 +23,10 @@ MRSort(performanceTable, categoriesLowerProfiles,
   \item{categoriesLowerProfiles}{Matrix containing, in each row, the lower profiles of the categories. 
   The columns are named according to the criteria, and the rows are named according to the categories. 
   The index of the row in the matrix corresponds to the rank of the category.}
+  \item{categoriesRanks}{A vector containing the ranks of the categories (1 for the best,
+  with higher values for increasingly less preferred categories). The vector needs to be 
+  named with the categories names, whereas the ranks need to be a range of values from 1
+  to the number of categories.}
   \item{criteriaWeights}{Vector containing the weights of the criteria. 
   The elements are named according to the IDs of the criteria.}
   \item{criteriaMinMax}{Vector containing the preference direction on each of the criteria. 
@@ -74,6 +79,12 @@ colnames(categoriesLowerProfiles) <- colnames(performanceTable)
 
 rownames(categoriesLowerProfiles)<-c("Good","Medium","Bad")
 
+# the order of the categories, 1 being the best
+
+categoriesRanks <-c(1,2,3)
+
+names(categoriesRanks) <- c("Good","Medium","Bad")
+
 # criteria to minimize or maximize
 
 criteriaMinMax <- c("min","min","max")
@@ -96,19 +107,21 @@ names(criteriaWeights) <- colnames(performanceTable)
 
 # MRSort
 
-assignments<-MRSort(performanceTable, categoriesLowerProfiles, 
-                          criteriaWeights, criteriaMinMax, 3, 
-                          criteriaVetos = criteriaVetos)
+assignments<-MRSort(performanceTable, categoriesLowerProfiles,
+                    categoriesRanks,criteriaWeights,
+                    criteriaMinMax, 3, 
+                    criteriaVetos = criteriaVetos)
  
 print(assignments)
 
 # un peu de filtrage
 
 assignments<-MRSort(performanceTable, categoriesLowerProfiles, 
-                          criteriaWeights, criteriaMinMax, 2, 
-                          categoriesIDs = c("Medium","Bad"), 
-                          criteriaIDs = c("Price","Time"), 
-                          alternativesIDs = c("RER", "BUS"))
+                    categoriesRanks, criteriaWeights,
+                    criteriaMinMax, 2,
+                    categoriesIDs = c("Medium","Bad"), 
+                    criteriaIDs = c("Price","Time"), 
+                    alternativesIDs = c("RER", "BUS"))
 
 print(assignments)
 

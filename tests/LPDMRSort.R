@@ -59,7 +59,7 @@ majorityRules <- c("V","D","v","d","dV","Dv","dv")
 
 for(i in 1:7)
 {
-  ElectreAssignments<-LPDMRSort(performanceTable, profilesPerformances, 
+  ElectreAssignments<-LPDMRSort(performanceTable, profilesPerformances, categoriesRanks,
                                 weights, criteriaMinMax, lambda, criteriaVetos=vetoPerformances, criteriaDictators=dictatorPerformances, majorityRule = majorityRules[i])
 
   print(ElectreAssignments)

@@ -54,6 +54,10 @@ colnames(categoriesLowerProfiles) <- colnames(performanceTable)
 
 rownames(categoriesLowerProfiles)<-c("Good","Medium","Bad")
 
+categoriesRanks <-c(1,2,3)
+
+names(categoriesRanks) <- c("Good","Medium","Bad")
+
 # criteria to minimize or maximize
 
 criteriaMinMax <- c("min","min","max")
@@ -79,15 +83,16 @@ criteriaWeights <- c(1,3,2)
 names(criteriaWeights) <- colnames(performanceTable)
 
 assignments <- assignments<-MRSort(performanceTable, 
-                                          categoriesLowerProfiles, 
-                                          criteriaWeights, 
-                                          criteriaMinMax, 3)
+                                   categoriesLowerProfiles, 
+                                   categoriesRanks,
+                                   criteriaWeights, 
+                                   criteriaMinMax, 3)
 
 names(assignments) <- rownames(performanceTable)
 
 plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles, 
-                              assignments, criteriaMinMax, 
-                              criteriaUBs, criteriaLBs)
+                         assignments, criteriaMinMax, 
+                         criteriaUBs, criteriaLBs)
 }
 
 \keyword{methods}

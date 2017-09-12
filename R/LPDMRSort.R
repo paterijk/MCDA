@@ -1,4 +1,4 @@
-LPDMRSort <- function(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, majorityThreshold, criteriaVetos = NULL, criteriaDictators = NULL, majorityRule = "M", alternativesIDs = NULL, criteriaIDs = NULL, categoriesIDs = NULL){
+LPDMRSort <- function(performanceTable, categoriesLowerProfiles, categoriesRanks, criteriaWeights, criteriaMinMax, majorityThreshold, criteriaVetos = NULL, criteriaDictators = NULL, majorityRule = "M", alternativesIDs = NULL, criteriaIDs = NULL, categoriesIDs = NULL){
   
   ## check the input data
   
@@ -7,6 +7,15 @@ LPDMRSort <- function(performanceTable, categoriesLowerProfiles, criteriaWeights
   
   if (!(is.matrix(categoriesLowerProfiles)))
     stop("categoriesLowerProfiles should be a matrix")
+  
+  if (!(is.vector(categoriesRanks)))
+    stop("categoriesRanks should be a vector")
+  
+  if(is.null(names(categoriesRanks)))
+    stop("categoriesRanks should be named")
+  
+  if(!all(sort(categoriesRanks) == 1:length(categoriesRanks)))
+    stop("categoriesRanks should contain a permutation of the category indices (from 1 to the number of categories)")
   
   if (!(is.vector(criteriaMinMax)))
     stop("criteriaMinMax should be a vector")
@@ -80,152 +89,157 @@ LPDMRSort <- function(performanceTable, categoriesLowerProfiles, criteriaWeights
   if (is.null(dim(performanceTable))) 
     stop("less than 2 criteria or 2 alternatives")
   
+  if (!is.null(categoriesIDs)){
+    # filter out categories
+    categoriesRanks <- categoriesRanks[names(categoriesRanks) %in% categoriesIDs]
+    # check if we took out all categories
+    if(length(categoriesRanks) == 0)
+      stop('categoriesIDs have filtered out all categories')
+    # order the remaining ones
+    categoriesRanks <- sort(categoriesRanks)
+    # store their order
+    catOrder <- names(categoriesRanks)
+    # adjust their indices to a range from 1 to the number of remaining categories
+    categoriesRanks <- 1:length(categoriesRanks)
+    # rename them
+    names(categoriesRanks) <- catOrder
+  }
+  
   # -------------------------------------------------------
   
   numCrit <- dim(performanceTable)[2]
   
   numAlt <- dim(performanceTable)[1]
   
-  numCat <- dim(categoriesLowerProfiles)[1]
+  numCat <- length(categoriesRanks)
   
   # -------------------------------------------------------
   
-  outranking <- function(alternativePerformances, profilePerformances, criteriaWeights, criteriaMinMax, majorityThreshold, profileCriteriaVetos=NULL, profileCriteriaDictators=NULL, majorityRule = "M"){
-    localConcordance <- rep(0,numCrit)
-    veto <- 0
-    dictator <- 0
-    for (i in 1:numCrit)
-    {
-      if (criteriaMinMax[i] == "min")
-      {
-        if (alternativePerformances[i] %<=% profilePerformances[i])
-          localConcordance[i] = 1
-        if (!is.null(profileCriteriaVetos))
-        {
-          if (!is.na(profileCriteriaVetos[i]))
-          {
-            if (alternativePerformances[i] %>=% profileCriteriaVetos[i])
-              veto = 1 
-          }
-        }
-        if (!is.null(profileCriteriaDictators))
-        {
-          if (!is.na(profileCriteriaDictators[i]))
-          {
-            if (alternativePerformances[i] %<=% profileCriteriaDictators[i])
-              dictator = 1 
-          }
-        }
-      }
-      else
-      {
-        if (alternativePerformances[i] %>=% profilePerformances[i])
-          localConcordance[i] = 1
-        if (!is.null(profileCriteriaVetos))
-        {
-          if (!is.na(profileCriteriaVetos[i]))
-          {
-            if (alternativePerformances[i] %<=% profileCriteriaVetos[i])
-              veto = 1 
-          }
-        }
-        if (!is.null(profileCriteriaDictators))
-        {
-          if (!is.na(profileCriteriaDictators[i]))
-          {
-            if (alternativePerformances[i] %>=% profileCriteriaDictators[i])
-              dictator = 1 
-          }
-        }
-      }
-    }
-    
-    concordance = sum(localConcordance*criteriaWeights)
-    
-    if(majorityRule == "M")
-    {
-      if(!(concordance %>=% majorityThreshold))
-        return(FALSE)
-      else
-        return(TRUE)
-    }
-    else if(majorityRule == "V")
-    {
-      if ((veto == 1) || !(concordance %>=% majorityThreshold))
-        return(FALSE)
-      else 
-        return(TRUE)
-    }
-    else if(majorityRule == "D")
-    {
-      if ((dictator == 1) || (concordance %>=% majorityThreshold))
-        return(TRUE)
-      else 
-        return(FALSE)
-    }
-    else if(majorityRule == "v")
-    {
-      if ((veto == 1 && dictator == 0) || !(concordance %>=% majorityThreshold))
-        return(FALSE)
-      else
-        return(TRUE)
-    }
-    else if(majorityRule == "d")
-    {
-      if ((dictator == 1 && veto == 0) || (concordance %>=% majorityThreshold))
-        return(TRUE)
-      else 
-        return(FALSE)
-    }
-    else if(majorityRule == "Dv")
-    {
-      if ((dictator == 1) || (concordance %>=% majorityThreshold && veto == 0))
-        return(TRUE)
-      else 
-        return(FALSE)
-    }
-    else if(majorityRule == "dV")
-    {
-      if ((veto == 1) || (!(concordance %>=% majorityThreshold) && dictator == 0))
-        return(FALSE)
-      else 
-        return(TRUE)
-    }
-    else if(majorityRule == "dv")
-    {
-      if ((dictator == 1 && veto == 0) || (concordance %>=% majorityThreshold && veto == 0) || (concordance %>=% majorityThreshold && veto == 1 && dictator == 1))
-        return(TRUE)
-      else 
-        return(FALSE)
-    }
-  }
-  
-  assignments <- c()
-  
-  for (i in 1:numAlt)
+  getCategory <- function(i)
   {
-    categoryNotFound <- TRUE
-    k <- 1
-    while ((categoryNotFound) && k<=numCat-1)
+    for (k in (numCat-1):1)
     {
-      profileCriteriaVetos <- NULL
-      if (!is.null(criteriaVetos))
-        profileCriteriaVetos <- criteriaVetos[k,]
+      cat <- names(categoriesRanks)[categoriesRanks == k]
       
-      profileCriteriaDictators <- NULL
-      if (!is.null(criteriaDictators))
-        profileCriteriaDictators <- criteriaDictators[k,]
-
-      if(outranking(performanceTable[i,],categoriesLowerProfiles[k,], criteriaWeights, criteriaMinMax, majorityThreshold, profileCriteriaVetos = profileCriteriaVetos, profileCriteriaDictators = profileCriteriaDictators, majorityRule = majorityRule))
+      weightedSum <- 0
+      
+      for (crit in names(criteriaMinMax))
       {
-        category <- k
-        categoryNotFound <- FALSE
+        if (criteriaMinMax[crit] == "min")
+        {
+          if (performanceTable[i,crit] %<=% categoriesLowerProfiles[cat,crit])
+            weightedSum <- weightedSum + criteriaWeights[crit]
+        }
+        else
+        {
+          if (performanceTable[i,crit] %>=% categoriesLowerProfiles[cat,crit])
+            weightedSum <- weightedSum + criteriaWeights[crit]
+        }
       }
-      else
-        k<-k+1
+      
+      vetoActive <- FALSE
+      
+      if(majorityRule %in% c("V","v","d","dV","Dv","dv"))
+      {
+        for (crit in names(criteriaMinMax))
+        {
+          if(!is.na(criteriaVetos[cat,crit]) & !is.null(criteriaVetos[cat,crit]))
+          {
+            if (criteriaMinMax[crit] == "min")
+            {
+              if (performanceTable[i,crit] %>=% criteriaVetos[cat,crit])
+              {
+                vetoActive <- TRUE
+                break
+              }
+            }
+            else
+            {
+              if (performanceTable[i,crit] %<=% criteriaVetos[cat,crit])
+              {
+                vetoActive <- TRUE
+                break
+              }
+            }
+          }
+        }
+      }
+      
+      dictatorActive <- FALSE
+      
+      
+      if(majorityRule %in% c("D","v","d","dV","Dv","dv"))
+      {
+        for (crit in names(criteriaMinMax))
+        {
+          if(!is.na(criteriaDictators[cat,crit]) & !is.null(criteriaDictators[cat,crit]))
+          {
+            if (criteriaMinMax[crit] == "min")
+            {
+              if (performanceTable[i,crit] %<=% criteriaDictators[cat,crit])
+              {
+                dictatorActive <- TRUE
+                break
+              }
+            }
+            else
+            {
+              if (performanceTable[i,crit] %>=% criteriaDictators[cat,crit])
+              {
+                dictatorActive <- TRUE
+                break
+              }
+            }
+          }
+        }
+      }
+      # stopping condition
+      if(majorityRule == 'M')
+      {
+        if(weightedSum < majorityThreshold)
+          return(names(categoriesRanks)[categoriesRanks == (k + 1)])
+      }
+      else if(majorityRule == 'V')
+      {
+        if(weightedSum < majorityThreshold || vetoActive)
+          return(names(categoriesRanks)[categoriesRanks == (k + 1)])
+      }
+      else if(majorityRule == 'D')
+      {
+        if(weightedSum < majorityThreshold && !dictatorActive)
+          return(names(categoriesRanks)[categoriesRanks == (k + 1)])
+      }
+      else if(majorityRule == 'v')
+      {
+        if(weightedSum < majorityThreshold || (vetoActive && !dictatorActive))
+          return(names(categoriesRanks)[categoriesRanks == (k + 1)])
+      }
+      else if(majorityRule == 'd')
+      {
+        if(weightedSum < majorityThreshold && (!dictatorActive || vetoActive))
+          return(names(categoriesRanks)[categoriesRanks == (k + 1)])
+      }
+      if(majorityRule == 'dV')
+      {
+        if((weightedSum < majorityThreshold && !dictatorActive) || vetoActive)
+          return(names(categoriesRanks)[categoriesRanks == (k + 1)])
+      }
+      if(majorityRule == 'Dv')
+      {
+        if(!dictatorActive && (vetoActive || weightedSum < majorityThreshold))
+          return(names(categoriesRanks)[categoriesRanks == (k + 1)])
+      }
+      if(majorityRule == 'dv')
+      {
+        if((vetoActive && !dictatorActive) || (weightedSum < majorityThreshold && ((vetoActive && dictatorActive) || (!vetoActive && !dictatorActive))))
+          return(names(categoriesRanks)[categoriesRanks == (k + 1)])
+      }
     }
-    assignments <- c(assignments, rownames(categoriesLowerProfiles)[k])
+    # better than all profiles -> top categ
+    return(names(categoriesRanks)[categoriesRanks == 1])
   }
+  
+  assignments <- sapply(1:numAlt, getCategory)
   
   names(assignments) <- rownames(performanceTable)
   

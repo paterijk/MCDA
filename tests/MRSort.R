@@ -21,6 +21,12 @@ colnames(categoriesLowerProfiles) <- colnames(performanceTable)
 
 rownames(categoriesLowerProfiles)<-c("Good","Medium","Bad")
 
+# the order of the categories, 1 being the best
+
+categoriesRanks <-c(1,2,3)
+
+names(categoriesRanks) <- c("Good","Medium","Bad")
+
 # criteria to minimize or maximize
 
 criteriaMinMax <- c("min","min","max")
@@ -29,7 +35,7 @@ names(criteriaMinMax) <- colnames(performanceTable)
 
 # vetos
 
-criteriaVetos <- rbind(c(10, NA, NA),c(NA, NA, 1),c(NA,NA,NA))
+criteriaVetos <- rbind(c(9, NA, NA),c(NA, NA, 0),c(NA,NA,NA))
 
 colnames(criteriaVetos) <- colnames(performanceTable)
 rownames(criteriaVetos) <- c("Good","Medium","Bad")
@@ -43,18 +49,18 @@ names(criteriaWeights) <- colnames(performanceTable)
 
 # MRSort
 
-assignments<-MRSort(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, 3, criteriaVetos = criteriaVetos)
+assignments<-MRSort(performanceTable, categoriesLowerProfiles, categoriesRanks, criteriaWeights, criteriaMinMax, 3, criteriaVetos = criteriaVetos)
 
 stopifnot(all(assignments == c("Good","Medium","Bad","Bad","Bad")))
 
 # un peu de filtrage
 
-assignments<-MRSort(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, 2, categoriesIDs = c("Medium","Bad"), criteriaIDs = c("Price","Time"), alternativesIDs = c("RER", "BUS"))
+assignments<-MRSort(performanceTable, categoriesLowerProfiles, categoriesRanks, criteriaWeights, criteriaMinMax, 2, categoriesIDs = c("Medium","Bad"), criteriaIDs = c("Price","Time"), alternativesIDs = c("RER", "BUS"))
 
 stopifnot(all(assignments == c("Medium","Bad")))
 
 # un test pour combiner tous les filtrages avec le veto
 
-assignments<-MRSort(performanceTable, categoriesLowerProfiles, criteriaWeights, criteriaMinMax, 2, criteriaVetos = criteriaVetos, categoriesIDs = c("Medium","Bad"), criteriaIDs = c("Price","Time"), alternativesIDs = c("RER", "BUS"))
+assignments<-MRSort(performanceTable, categoriesLowerProfiles, categoriesRanks, criteriaWeights, criteriaMinMax, 2, criteriaVetos = criteriaVetos, categoriesIDs = c("Medium","Bad"), criteriaIDs = c("Price","Time"), alternativesIDs = c("RER", "BUS"))
 
 stopifnot(all(assignments == c("Medium","Bad")))

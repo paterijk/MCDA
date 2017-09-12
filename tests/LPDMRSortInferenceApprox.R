@@ -31,6 +31,6 @@ x<-LPDMRSortInferenceApprox(performanceTable, criteriaMinMax, categoriesRanks, a
                             majorityRules = c("dV","Dv","dv"),
                             timeLimit = 180, populationSize = 30, alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7"))
 
-assignments2 <- LPDMRSort(performanceTable, x$profilesPerformances, x$criteriaWeights, criteriaMinMax, x$majorityThreshold, criteriaVetos=x$vetoPerformances, criteriaDictators=x$dictatorPerformances, majorityRule = x$majorityRule, alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7"))
+assignments2 <- LPDMRSort(performanceTable, x$profilesPerformances, categoriesRanks, x$criteriaWeights, criteriaMinMax, x$majorityThreshold, criteriaVetos=x$vetoPerformances, criteriaDictators=x$dictatorPerformances, majorityRule = x$majorityRule, alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7"))
 
 stopifnot(all(assignments[c("a1","a2","a3","a4","a5","a6","a7")] == assignments2))

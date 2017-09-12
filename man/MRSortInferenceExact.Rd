@@ -99,6 +99,7 @@ x<-MRSortInferenceExact(performanceTable, assignments, categoriesRanks,
                          alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7"))
 
 ElectreAssignments<-MRSort(performanceTable, x$profilesPerformances, 
+                           categoriesRanks,
                            x$weights, criteriaMinMax, x$lambda, 
                            criteriaVetos=x$vetoPerformances,
                            alternativesIDs = c("a1","a2","a3","a4","a5","a6","a7"))
