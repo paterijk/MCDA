@@ -141,6 +141,7 @@ for(i in 1:1)# change to 7 in order to perform all tests
                              minmaxLPD = TRUE)
   
   ElectreAssignments<-LPDMRSort(performanceTable, x$profilesPerformances, 
+                                categoriesRanks,
                                 x$weights, criteriaMinMax, x$lambda, 
                                 criteriaVetos=x$vetoPerformances, 
                                 criteriaDictators=x$dictatorPerformances, 

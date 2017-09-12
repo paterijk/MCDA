@@ -8,11 +8,11 @@ without indifference or preference thresholds attached to criteria. LPDMRSort co
 binary discordance and a binary concordance conditions including several interactions between them.}
 
 \usage{
-LPDMRSort(performanceTable, categoriesLowerProfiles, criteriaWeights, 
-          criteriaMinMax, majorityThreshold, criteriaVetos = NULL, 
-          criteriaDictators = NULL, majorityRule = "M",
-          alternativesIDs = NULL, criteriaIDs = NULL, 
-          categoriesIDs = NULL)
+LPDMRSort(performanceTable, categoriesLowerProfiles, categoriesRanks,
+          criteriaWeights, criteriaMinMax, majorityThreshold,
+          criteriaVetos = NULL, criteriaDictators = NULL,
+          majorityRule = "M", alternativesIDs = NULL,
+          criteriaIDs = NULL, categoriesIDs = NULL)
 }
 
 \arguments{
@@ -23,6 +23,10 @@ LPDMRSort(performanceTable, categoriesLowerProfiles, criteriaWeights,
   categories. The columns are named according to the criteria, and the rows are named 
   according to the categories. The index of the row in the matrix corresponds to the rank 
   of the category.}
+  \item{categoriesRanks}{A vector containing the ranks of the categories (1 for the best,
+  with higher values for increasingly less preferred categories). The vector needs to be 
+  named with the categories names, whereas the ranks need to be a range of values from 1
+  to the number of categories.}
   \item{criteriaWeights}{Vector containing the weights of the criteria. The elements are named according to the IDs of the criteria.}
   \item{criteriaMinMax}{Vector containing the preference direction on each of the criteria.
   "min" (resp. "max") indicates that the criterion has to be minimized (maximized). 
@@ -142,6 +146,7 @@ majorityRules <- c("V","D","v","d","dV","Dv","dv")
 for(i in 1:7)
 {
   ElectreAssignments<-LPDMRSort(performanceTable, profilesPerformances, 
+                                categoriesRanks,
                                 weights, criteriaMinMax, lambda, 
                                 criteriaVetos=vetoPerformances,
                                 criteriaDictators=dictatorPerformances,

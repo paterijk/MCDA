@@ -10,6 +10,12 @@ MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks,
   if (!(is.vector(categoriesRanks)))
     stop("categoriesRanks should be a vector")
   
+  if(is.null(names(categoriesRanks)))
+    stop("categoriesRanks should be named")
+  
+  if(!all(sort(categoriesRanks) == 1:length(categoriesRanks)))
+    stop("categoriesRanks should contain a permutation of the category indices (from 1 to the number of categories)")
+  
   if (!(is.vector(criteriaMinMax)))
     stop("criteriaMinMax should be a vector")
   

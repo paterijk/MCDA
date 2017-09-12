@@ -44,7 +44,7 @@ for(i in 1:1)# change to 7 in order to perform all tests
         x<-LPDMRSortInferenceExact(performanceTable, assignments[i,], categoriesRanks, 
                              criteriaMinMax, majorityRule = majorityRules[i], readableWeights = readableWeights, readableProfiles = readableProfiles, minmaxLPD = minmaxLPD)
   
-        ElectreAssignments<-LPDMRSort(performanceTable, x$profilesPerformances, 
+        ElectreAssignments<-LPDMRSort(performanceTable, x$profilesPerformances, categoriesRanks,
                                 x$weights, criteriaMinMax, x$lambda, criteriaVetos=x$vetoPerformances, criteriaDictators=x$dictatorPerformances, majorityRule = majorityRules[i])
   
         print(x)

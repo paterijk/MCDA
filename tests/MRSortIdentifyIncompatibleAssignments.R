@@ -40,7 +40,7 @@ x<-MRSortInferenceExact(performanceTable, assignments, categoriesRanks,
 
 print(x)
 
-ElectreAssignments<-MRSort(performanceTable, x$profilesPerformances, 
+ElectreAssignments<-MRSort(performanceTable, x$profilesPerformances, categoriesRanks,
                            x$weights, criteriaMinMax, x$lambda, criteriaVetos=x$vetoPerformances, alternativesIDs = filteredAlternativesIDs)
 
 print(all(ElectreAssignments == assignments[filteredAlternativesIDs]))
