@@ -308,14 +308,15 @@ MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks,
       }
     }
     
-    profilesPerformances <- matrix(nrow=numCat,ncol=numCrit)
+    profilesPerformances <- matrix(rep(NA,numCat*numCrit),nrow=numCat,ncol=numCrit)
     
-    for (i in 1:numCat){
+    # the last profile (bottom one) doesn't do anything so we keep it NA
+    for (i in 1:(numCat-1)){
       for (j in 1:numCrit)
         profilesPerformances[i,j] <- solution[varnames==ptknames[i,j]]
     }
     
-    rownames(profilesPerformances) <- names(categoriesRanks)
+    rownames(profilesPerformances) <- names(sort(categoriesRanks))
     colnames(profilesPerformances) <- colnames(performanceTable)
     
     vetoPerformances <- NULL
@@ -331,15 +332,30 @@ MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks,
         }
       }
       
-      vetoPerformances <- matrix(nrow=numCat,ncol=numCrit)
+      vetoPerformances <- matrix(rep(NA,numCat*numCrit),nrow=numCat,ncol=numCrit)
       
-      for (i in 1:numCat){
+      # bottom profile doesn't do anything, keep it as NA
+      for (i in 1:(numCat-1)){
         for (j in 1:numCrit)
           vetoPerformances[i,j] <- solution[varnames==ptvnames[i,j]]
       }
       
-      rownames(vetoPerformances) <- names(categoriesRanks)
+      rownames(vetoPerformances) <- names(sort(categoriesRanks))
       colnames(vetoPerformances) <- colnames(performanceTable)
+      
+      # determine which vetoes are actually used and remove those that are simply an artefact of the linear program
+      
+      used_vetoes <- MRSortIdentifyUsedVetoProfiles(performanceTable, assignments, sort(categoriesRanks), criteriaMinMax, lambda, weights, profilesPerformances, vetoPerformances, alternativesIDs, criteriaIDs)
+      
+      for (k in (numCat-1):1)
+      {
+        cat <- names(categoriesRanks)[categoriesRanks == k]
+        for (j in 1:numCrit)
+        {
+          if (!used_vetoes[cat,j])
+            vetoPerformances[cat,j] <- NA
+        }
+      }
     }
     
     return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances, solverStatus = solverStatus, humanReadableStatus = humanReadableStatus))  
