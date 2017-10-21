@@ -35,6 +35,27 @@ MRSort <- function(performanceTable, categoriesLowerProfiles, categoriesRanks, c
   if (!(is.null(criteriaVetos) || is.matrix(criteriaVetos)))
     stop("criteriaVetos should be a matrix")
   
+  # check if we have a lower profile for the worst category
+  
+  worstCat <- names(categoriesRanks)[categoriesRanks == length(categoriesRanks)]
+  
+  if(!(worstCat %in% rownames(categoriesLowerProfiles)))
+  {
+    categoriesLowerProfiles <- rbind(categoriesLowerProfiles, rep(NA,length(criteriaMinMax)))
+    
+    rownames(categoriesLowerProfiles)[length(categoriesRanks)] <- worstCat
+  }
+  
+  if (!is.null(criteriaVetos))
+  {
+    if(!(worstCat %in% rownames(criteriaVetos)))
+    {
+      criteriaVetos <- rbind(criteriaVetos, rep(NA,length(criteriaMinMax)))
+      
+      rownames(criteriaVetos)[length(categoriesRanks)] <- worstCat
+    }
+  }
+  
   ## filter the data according to the given alternatives and criteria
   
   if (!is.null(alternativesIDs)){
