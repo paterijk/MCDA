@@ -523,5 +523,18 @@ MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks
   
   rownames(bestIndividual$vetoPerformances) <- rownames(bestIndividual$profilesPerformances)
   
+  # determine which vetoes are actually used and remove those that are simply an artefact of the metaheuristic
+  
+  used_vetoes <- MRSortIdentifyUsedVetoProfiles(performanceTable, assignments, sort(categoriesRanks), criteriaMinMax, bestIndividual$majorityThreshold, bestIndividual$criteriaWeights, bestIndividual$profilesPerformances, bestIndividual$vetoPerformances, alternativesIDs, criteriaIDs)
+  
+  for (k in (numCat-1):1)
+  {
+    for (j in 1:numCrit)
+    {
+      if (!used_vetoes[k,j])
+        bestIndividual$vetoPerformances[k,j] <- NA
+    }
+  }
+  
   return(bestIndividual)
 }

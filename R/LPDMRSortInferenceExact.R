@@ -74,7 +74,7 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
     if(readableProfiles)
       modelfilename <- paste(modelfilename, "Profiles", sep = "")
   }
-  if(minmaxLPD)
+  if(minmaxLPD & majorityRule != "")
     modelfilename <- paste(modelfilename, "LPD", sep = "")
   
   modelfilename <- paste(modelfilename, ".gmpl", sep = "")
@@ -299,9 +299,10 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
       }
     }
     
-    profilesPerformances <- matrix(nrow=numCat,ncol=numCrit)
+    profilesPerformances <- matrix(rep(NA,numCat*numCrit),nrow=numCat,ncol=numCrit)
     
-    for (i in 1:numCat){
+    # the last profile (bottom one) doesn't do anything so we keep it NA
+    for (i in 1:(numCat-1)){
       for (j in 1:numCrit)
         profilesPerformances[i,j] <- solution[varnames==ptknames[i,j]]
     }
@@ -322,9 +323,10 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
         }
       }
       
-      vetoPerformances <- matrix(nrow=numCat,ncol=numCrit)
+      vetoPerformances <- matrix(rep(NA,numCat*numCrit),nrow=numCat,ncol=numCrit)
       
-      for (i in 1:numCat){
+      # bottom profile doesn't do anything, keep it as NA
+      for (i in 1:(numCat-1)){
         for (j in 1:numCrit)
           vetoPerformances[i,j] <- solution[varnames==ptvnames[i,j]]
       }
@@ -346,15 +348,50 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
         }
       }
       
-      dictatorPerformances <- matrix(nrow=numCat,ncol=numCrit)
+      dictatorPerformances <- matrix(rep(NA,numCat*numCrit),nrow=numCat,ncol=numCrit)
       
-      for (i in 1:numCat){
+      # bottom profile doesn't do anything, keep it as NA
+      for (i in 1:(numCat-1)){
         for (j in 1:numCrit)
           dictatorPerformances[i,j] <- solution[varnames==ptdnames[i,j]]
       }
       
       rownames(dictatorPerformances) <- names(categoriesRanks)
       colnames(dictatorPerformances) <- colnames(performanceTable)
+    }
+    
+    if(majorityRule %in% c("V","v","d","dV","Dv","dv"))
+    {
+      # determine which vetoes are actually used and remove those that are simply an artefact of the linear program
+      
+      used <- LPDMRSortIdentifyUsedVetoProfiles(performanceTable, assignments, sort(categoriesRanks), criteriaMinMax, lambda, weights, profilesPerformances, vetoPerformances, dictatorPerformances, majorityRule, alternativesIDs, criteriaIDs)
+      
+      for (k in (numCat-1):1)
+      {
+        cat <- names(categoriesRanks)[categoriesRanks == k]
+        for (j in 1:numCrit)
+        {
+          if (!used[cat,j])
+            vetoPerformances[cat,j] <- NA
+        }
+      }
+    }
+    
+    if(majorityRule %in% c("D","v","d","dV","Dv","dv"))
+    {
+      # determine which dictators are actually used and remove those that are simply an artefact of the linear program
+      
+      used <- LPDMRSortIdentifyUsedDictatorProfiles(performanceTable, assignments, sort(categoriesRanks), criteriaMinMax, lambda, weights, profilesPerformances, dictatorPerformances, vetoPerformances, majorityRule, alternativesIDs, criteriaIDs)
+      
+      for (k in (numCat-1):1)
+      {
+        cat <- names(categoriesRanks)[categoriesRanks == k]
+        for (j in 1:numCrit)
+        {
+          if (!used[cat,j])
+            dictatorPerformances[cat,j] <- NA
+        }
+      }
     }
     
     return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances, dictatorPerformances = dictatorPerformances, solverStatus = solverStatus, humanReadableStatus = humanReadableStatus))
