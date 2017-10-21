@@ -49,6 +49,37 @@ LPDMRSort <- function(performanceTable, categoriesLowerProfiles, categoriesRanks
   if (majorityRule %in% c("D","d","dV","Dv","dv") && is.null(criteriaDictators))
     stop("majorityRule requires non-NULL criteriaDictators")
   
+  # check if we have a lower profile for the worst category
+  
+  worstCat <- names(categoriesRanks)[categoriesRanks == length(categoriesRanks)]
+  
+  if(!(worstCat %in% rownames(categoriesLowerProfiles)))
+  {
+    categoriesLowerProfiles <- rbind(categoriesLowerProfiles, rep(NA,length(criteriaMinMax)))
+    
+    rownames(categoriesLowerProfiles)[length(categoriesRanks)] <- worstCat
+  }
+  
+  if (!is.null(criteriaVetos))
+  {
+    if(!(worstCat %in% rownames(criteriaVetos)))
+    {
+      criteriaVetos <- rbind(criteriaVetos, rep(NA,length(criteriaMinMax)))
+      
+      rownames(criteriaVetos)[length(categoriesRanks)] <- worstCat
+    }
+  }
+  
+  if (!is.null(criteriaDictators))
+  {
+    if(!(worstCat %in% rownames(criteriaDictators)))
+    {
+      criteriaDictators <- rbind(criteriaDictators, rep(NA,length(criteriaMinMax)))
+      
+      rownames(criteriaDictators)[length(categoriesRanks)] <- worstCat
+    }
+  }
+  
   ## filter the data according to the given alternatives and criteria
   
   if (!is.null(alternativesIDs)){
