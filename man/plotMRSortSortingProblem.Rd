@@ -6,18 +6,22 @@
 \description{The profiles shown are the separation profiles between the classes. They are stored as the lower profiles of the categories.}
 
 \usage{
-plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles, 
-                          assignments, criteriaMinMax, 
-                          criteriaUBs, criteriaLBs,
-                          categoriesDictators = NULL, categoriesVetoes = NULL,
-                          majorityRule = NULL, criteriaWeights = NULL, 
-                          majorityThreshold = NULL, alternativesIDs = NULL,
-                          criteriaIDs = NULL)
+plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles,
+                         categoriesRanks, assignments, criteriaMinMax, 
+                         criteriaUBs, criteriaLBs,
+                         categoriesDictators = NULL, categoriesVetoes = NULL,
+                         majorityRule = NULL, criteriaWeights = NULL, 
+                         majorityThreshold = NULL, alternativesIDs = NULL,
+                         criteriaIDs = NULL)
 }
 
 \arguments{
   \item{performanceTable}{Matrix or data frame containing the performance table. Each row corresponds to an alternative, and each column to a criterion. Rows (resp. columns) must be named according to the IDs of the alternatives (resp. criteria).}
   \item{categoriesLowerProfiles}{Matrix containing, in each row, the lower profiles of the categories (the separation profiles in fact). The columns are named according to the criteria, and the rows are named according to the categories. The index of the row in the matrix corresponds to the rank of the category.}
+  \item{categoriesRanks}{A vector containing the ranks of the categories (1 for the best,
+  with higher values for increasingly less preferred categories). The vector needs to be 
+  named with the categories names, whereas the ranks need to be a range of values from 1
+  to the number of categories.}
     \item{assignments}{Vector containing the assignments (IDs of the categories) of the alternatives to the categories. The elements are named according to the alternatives.}
   \item{criteriaMinMax}{Vector containing the preference direction on each of the criteria. "min" (resp. "max") indicates that the criterion has to be minimized (maximized). The elements are named according to the IDs of the criteria.}
   \item{criteriaLBs}{Vector containing the lower bounds of the criteria to be considered for the plotting. The elements are named according to the IDs of the criteria.}
@@ -91,7 +95,7 @@ assignments <- assignments<-MRSort(performanceTable,
 names(assignments) <- rownames(performanceTable)
 
 plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles, 
-                         assignments, criteriaMinMax, 
+                         categoriesRanks, assignments, criteriaMinMax, 
                          criteriaUBs, criteriaLBs)
 }
 

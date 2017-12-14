@@ -56,4 +56,4 @@ assignments <- assignments<-MRSort(performanceTable, categoriesLowerProfiles,
 
 names(assignments) <- rownames(performanceTable)
 
-plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles, assignments, criteriaMinMax, criteriaUBs, criteriaLBs)
+plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles, categoriesRanks, assignments, criteriaMinMax, criteriaUBs, criteriaLBs)

@@ -1,4 +1,4 @@
-plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, assignments, criteriaMinMax, criteriaUBs, criteriaLBs, categoriesDictators = NULL, categoriesVetoes = NULL, majorityRule = NULL, criteriaWeights = NULL, majorityThreshold = NULL, alternativesIDs = NULL, criteriaIDs = NULL){
+plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, categoriesRanks, assignments, criteriaMinMax, criteriaUBs, criteriaLBs, categoriesDictators = NULL, categoriesVetoes = NULL, majorityRule = NULL, criteriaWeights = NULL, majorityThreshold = NULL, alternativesIDs = NULL, criteriaIDs = NULL){
   
   ## check the input data
   
@@ -19,6 +19,15 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
   
   if (!(is.vector(criteriaUBs)))
     stop("criteriaUBs should be a vector")
+
+  if (!(is.vector(categoriesRanks)))
+    stop("categoriesRanks should be a vector")
+  
+  if(is.null(names(categoriesRanks)))
+    stop("categoriesRanks should be named")
+  
+  if(!all(sort(categoriesRanks) == 1:length(categoriesRanks)))
+    stop("categoriesRanks should contain a permutation of the category indices (from 1 to the number of categories)")
   
   if (!(is.null(categoriesDictators) || is.matrix(categoriesDictators)))
     stop("categoriesDictators should be a matrix")
@@ -42,11 +51,17 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
     stop("criteriaIDs should be a vector")
   
   ## filter the data according to the given alternatives and criteria
-  
   if (!is.null(alternativesIDs)){
-    performanceTable <- performanceTable[alternativesIDs,]
-    assignments <- assignments[alternativesIDs]
-    
+    if(any(alternativesIDs %in% rownames(performanceTable)))
+    {
+      performanceTable <- performanceTable[alternativesIDs,]
+      assignments <- assignments[alternativesIDs]
+    }
+    else
+    {
+      performanceTable <- NULL
+      assignments <- NULL
+    }
   } 
   
   if (!is.null(criteriaIDs)){
@@ -67,13 +82,14 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
   
   # if there are less than 2 criteria or 2 alternatives, there is no MCDA problem
   
-  if (is.null(dim(performanceTable))) 
-    stop("less than 2 criteria or 2 alternatives")
+  #if (is.null(dim(performanceTable))) 
+  #  stop("less than 2 criteria or 2 alternatives")
   
   # get model assignments
   
   model.assignments <- assignments
-  if (!is.null(criteriaWeights) && !is.null(majorityThreshold))
+
+  if (!is.null(criteriaWeights) && !is.null(majorityThreshold) && !is.null(performanceTable))
   {
     if (is.null(categoriesDictators) && is.null(categoriesVetoes))
       model.assignments <- MRSort(performanceTable, categoriesLowerProfiles, 
@@ -89,8 +105,9 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
         else
           stop("majorityRule should be: 'V' , 'D', 'v', 'd', 'dV', 'Dv', 'dv'")
       }
-      model.assignments <- LPDMRSort(performanceTable, categoriesLowerProfiles, 
-                                     criteriaWeights, criteriaMinMax, majorityThreshold, 
+      model.assignments <- LPDMRSort(performanceTable, categoriesLowerProfiles,
+                                     categoriesRanks, criteriaWeights, criteriaMinMax,
+                                     majorityThreshold,
                                      criteriaVetos=categoriesVetoes, 
                                      criteriaDictators=categoriesDictators, 
                                      majorityRule = majorityRule)
@@ -99,33 +116,41 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
   
   # -------------------------------------------------------
   
-  numCrit <- dim(performanceTable)[2]
+  numCrit <- dim(categoriesLowerProfiles)[2]
   
   numAlt <- dim(performanceTable)[1]
+  
+  if(is.null(numAlt))
+    numAlt <- 0
   
   numCat <- dim(categoriesLowerProfiles)[1]
   
   # -------------------------------------------------------
-  
-  normalizedPerformanceTable <- matrix(nrow=numAlt,ncol=numCrit)
-  
-  for (j in 1:numAlt){
-    for (i in 1:numCrit){
-      if(criteriaMinMax[i] == "min")
-        normalizedPerformanceTable[j,i] <- 1-(performanceTable[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
-      else
-        normalizedPerformanceTable[j,i] <- (performanceTable[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+  if(!is.null(performanceTable))
+  {
+    normalizedPerformanceTable <- matrix(nrow=numAlt,ncol=numCrit)
+    
+    for (j in 1:numAlt){
+      for (i in 1:numCrit){
+        if(criteriaMinMax[i] == "min")
+          normalizedPerformanceTable[j,i] <- 1-(performanceTable[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+        else
+          normalizedPerformanceTable[j,i] <- (performanceTable[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+      }
     }
   }
-  
-  normalizedProfiles <- matrix(nrow=numCat,ncol=numCrit)
-  
-  for (j in 1:numCat){
-    for (i in 1:numCrit){
-      if(criteriaMinMax[i] == "min")
-        normalizedProfiles[j,i] <- 1-(categoriesLowerProfiles[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
-      else
-        normalizedProfiles[j,i] <- (categoriesLowerProfiles[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+
+  if (!is.null(categoriesLowerProfiles))
+  {
+    normalizedProfiles <- matrix(nrow=numCat,ncol=numCrit)
+    
+    for (j in 1:numCat){
+      for (i in 1:numCrit){
+        if(criteriaMinMax[i] == "min")
+          normalizedProfiles[j,i] <- 1-(categoriesLowerProfiles[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+        else
+          normalizedProfiles[j,i] <- (categoriesLowerProfiles[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+      }
     }
   }
   
@@ -136,9 +161,15 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
     for (j in 1:numCat){
       for (i in 1:numCrit){
         if(criteriaMinMax[i] == "min")
-          normalizedDictators[j,i] <- 1-(categoriesDictators[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+          if(!is.null(categoriesDictators[j,i]) & !is.na(categoriesDictators[j,i]))
+            normalizedDictators[j,i] <- 1-(categoriesDictators[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+          else
+            normalizedDictators[j,i] <- -0.5
         else
-          normalizedDictators[j,i] <- (categoriesDictators[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+          if(!is.null(categoriesDictators[j,i]) & !is.na(categoriesDictators[j,i]))
+            normalizedDictators[j,i] <- (categoriesDictators[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+          else
+            normalizedDictators[j,i] <- 1.5
         if (normalizedDictators[j,i] > 1)
           normalizedDictators[j,i] <- 1.5
         else if (normalizedDictators[j,i] < 0)
@@ -146,17 +177,25 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
       }
     }
   }
-  
+
   if (!is.null(categoriesVetoes))
   {
     normalizedVetoes <- matrix(nrow=numCat,ncol=numCrit)
     
-    for (j in 1:numCat){
-      for (i in 1:numCrit){
+    for (j in 1:numCat)
+    {
+      for (i in 1:numCrit)
+      {
         if(criteriaMinMax[i] == "min")
-          normalizedVetoes[j,i] <- 1-(categoriesVetoes[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+          if(!is.null(categoriesVetoes[j,i]) & !is.na(categoriesVetoes[j,i]))
+            normalizedVetoes[j,i] <- 1-(categoriesVetoes[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+          else
+            normalizedVetoes[j,i] <- 1.5
         else
-          normalizedVetoes[j,i] <- (categoriesVetoes[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+          if(!is.null(categoriesVetoes[j,i]) & !is.na(categoriesVetoes[j,i]))
+            normalizedVetoes[j,i] <- (categoriesVetoes[j,i]-criteriaLBs[i])/(criteriaUBs[i]-criteriaLBs[i])
+          else
+            normalizedVetoes[j,i] <- -0.5
         if (normalizedVetoes[j,i] > 1)
           normalizedVetoes[j,i] <- 1.5
         else if (normalizedVetoes[j,i] < 0)
@@ -164,9 +203,10 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
       }
     }
   }
-  
   # color palette when number of categories outside ColorBrewer range
-  col.cat <- rainbow(numAlt)
+  col.cat <- rainbow(20)
+  col.alt.lines <- rainbow(20)
+  col.alt.markers <- rainbow(20)
   
   if (numCat >= 3 && numCat <= 11)
     col.cat <- brewer.pal(numCat,"Dark2")
@@ -176,13 +216,15 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
   palette(col.cat)
   
   # color palette for alternatives lines - the color of the category to which the model assigned them
-  col.alt.lines <- col.cat[model.assignments]
-  
+  if(!is.null(model.assignments))
+    col.alt.lines <- col.cat[model.assignments]
+
   # color palette for alternatives markers - the color of the category to which they should have been assigned
-  col.alt.markers <- col.cat[assignments]
+  if(!is.null(assignments))
+    col.alt.markers <- col.cat[assignments]
   
   # name profiles as delimiting categories
-  profiles.names <- paste(rownames(categoriesLowerProfiles)[1:numCat-1],rownames(categoriesLowerProfiles)[2:numCat],sep = "-")
+  profiles.names <- paste(sapply(1:(numCat-1), function(x) names(categoriesRanks)[categoriesRanks == x]),sapply(2:numCat, function(x) names(categoriesRanks)[categoriesRanks == x]),sep = "-")
   
   ylim=c(-0.1, 1.1)
   
@@ -220,7 +262,8 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
       axis(1,at=c(1:numCrit),labels=criteriaWeights)
     
     # profiles values
-    text(c(1:numCrit), normalizedProfiles[i,], labels = categoriesLowerProfiles[i,], pos=1)
+    if (!is.null(categoriesLowerProfiles))
+      text(c(1:numCrit), normalizedProfiles[i,], labels = categoriesLowerProfiles[i,], pos=1)
     
     if (!is.null(categoriesDictators))
       text(c(1:numCrit), normalizedDictators[i,], labels = categoriesDictators[i,], pos=1)
@@ -229,12 +272,14 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
       text(c(1:numCrit), normalizedVetoes[i,], labels = categoriesVetoes[i,], pos=1)
     
     # alternatives
-    
-    for (j in (1:numAlt))
-      points(1:numCrit,normalizedPerformanceTable[j,],type="l",pch=26, col=col.alt.lines[j], lwd=2)
-    
-    for (j in (1:numAlt))
-      points(1:numCrit,normalizedPerformanceTable[j,],type="p",pch=((j-1)%%25) + 1, col=col.alt.markers[j], lwd=2)
+    if (numAlt > 0)
+    {
+      for (j in (1:numAlt))
+        points(1:numCrit,normalizedPerformanceTable[j,],type="l",pch=26, col=col.alt.lines[j], lwd=2)
+      
+      for (j in (1:numAlt))
+        points(1:numCrit,normalizedPerformanceTable[j,],type="p",pch=((j-1)%%25) + 1, col=col.alt.markers[j], lwd=2)
+    }
     
   }
   
