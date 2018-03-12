@@ -25,7 +25,7 @@ MRSortIdentifyUsedVetoProfiles <- function(performanceTable, assignments, catego
   if (length(majorityThreshold) > 1)
     stop("majorityThreshold should be a single number")
   
-  if (majorityThreshold > 1 || majorityThreshold < 0.5)
+  if (!(majorityThreshold %<=% 1 && majorityThreshold %>=% 0.5))
     stop("majorityThreshold should be a value between 0.5 and 1")
   
   if (!(is.vector(criteriaWeights)))
@@ -46,13 +46,13 @@ MRSortIdentifyUsedVetoProfiles <- function(performanceTable, assignments, catego
   ## filter the data according to the given alternatives and criteria
   
   if (!is.null(alternativesIDs)){
-    performanceTable <- performanceTable[alternativesIDs,]
-    assignments <- assignments[alternativesIDs]
+    performanceTable <- performanceTable[alternativesIDs,,drop = FALSE]
+    assignments <- assignments[alternativesIDs,drop = FALSE]
   } 
   
   if (!is.null(criteriaIDs)){
-    performanceTable <- performanceTable[,criteriaIDs]
-    criteriaMinMax <- criteriaMinMax[criteriaIDs]
+    performanceTable <- performanceTable[,criteriaIDs,drop = FALSE]
+    criteriaMinMax <- criteriaMinMax[criteriaIDs,drop = FALSE]
   }
   
   # -------------------------------------------------------
