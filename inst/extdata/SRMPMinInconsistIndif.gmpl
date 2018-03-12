@@ -53,13 +53,15 @@ s.t. nondictatorWeights{j in 1..m}: 0.5 >= w[j];
 /* non-zero weights */
 s.t. nonzeroWeights{j in 1..m}: w[j] >= gamma;
 /* constrain reference point values */
-s.t. bottomP{j in 1..m}: dir[j] * P[1,j] >= max[j] * (1 - dir[j]) / 2 + min[j] * (dir[j] + 1) / 2;
-s.t. topP{j in 1..m}: max[j] * (dir[j] + 1) / 2 + min[j] * (1 - dir[j]) / 2 >= dir[j] * P[p,j];
+s.t. bottomP1{j in 1..m}: P[1,j] >= min[j];
+s.t. bottomP2{j in 1..m}: max[j] >= P[1,j];
+s.t. topP1{j in 1..m}: max[j] >= P[p,j];
+s.t. topP2{j in 1..m}: P[p,j] >= min[j];
 /* dominance between reference points */
 s.t. dominanceP{k in 1..p-1, j in 1..m}: dir[j] * P[(k+1),j] >= dir[j] * P[k,j];
 /* constraints on the local concordance */
-s.t. lC1{i in 1..n, j in 1..m, k in 1..p}: dir[j] * (A[i,j] - P[k,j]) >= dir[j] * (max[j]-min[j]+1) * (lC[i,j,k] - 1);
-s.t. lC2{i in 1..n, j in 1..m, k in 1..p}: dir[j] * (max[j]-min[j]+1) * lC[i,j,k] >= dir[j] * (A[i,j] - P[k,j]) + gamma;
+s.t. lC1{i in 1..n, j in 1..m, k in 1..p}: dir[j] * (A[i,j] - P[k,j]) >= (max[j]-min[j]+1) * (lC[i,j,k] - 1);
+s.t. lC2{i in 1..n, j in 1..m, k in 1..p}: (max[j]-min[j]+1) * lC[i,j,k] >= dir[j] * (A[i,j] - P[k,j]) + gamma;
 /* constraints on the weighted local concordance */
 s.t. wlC1{i in 1..n, j in 1..m, k in 1..p}: w[j] >= wlC[i,j,k];
 s.t. wlC2{i in 1..n, j in 1..m, k in 1..p}: wlC[i,j,k] >= 0;
