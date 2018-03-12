@@ -55,7 +55,7 @@ LPDMRSortIdentifyIncompatibleAssignments(performanceTable,
 
 \value{
   The function returns NULL if there is a problem, 
-  or a list containing a list of incompatible sets of alternatives as vectors and the status of the execution (1 if OK, 0 if something went wrong).
+  or a list containing a list of incompatible sets of alternatives as vectors and the status of the execution.
 }
 
 \references{

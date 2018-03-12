@@ -229,11 +229,13 @@ MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks,
     else
       stop(out)
     
-    solverStatus <- cplexAPI::getStatCPLEX(env,prob)
+    solverStatus <- paste("Failed (",cplexAPI::status_codeCPLEX(env, cplexAPI::getStatCPLEX(env,prob)),")")
     
     error <- TRUE
     
-    if ((cplexAPI::getStatCPLEX(env,prob) == 101) | (cplexAPI::getStatCPLEX(env,prob) == 102)){
+    if (cplexAPI::getStatCPLEX(env,prob) %in% c(1,5,15,17,19,20,101,102,115,121,123,125,129,130)){
+      solverStatus <- "Solution found"
+      
       solution <- cplexAPI::solutionCPLEX(env,prob)$x
       
       varnames <- cplexAPI::getColNameCPLEX(env,prob, 0,length(solution)-1)
@@ -248,11 +250,12 @@ MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks,
     
     solveMIPGLPK(lp)
     
-    solverStatus <- mipStatusGLPK(lp)
+    solverStatus <- paste("Failed (",return_codeGLPK(mipStatusGLPK(lp)),")")
     
     error <- TRUE
     
     if(mipStatusGLPK(lp)==5){
+      solverStatus <- "Solution found"
       
       mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
       
@@ -269,18 +272,6 @@ MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks,
       error <- FALSE
     }
   }
-  
-  humanReadableStatus <- "Unknown"
-  if(solverStatus %in% c(5,101,102))
-    humanReadableStatus <- "Solution is optimal"
-  else if(solverStatus %in% c(3,4,103,102))
-    humanReadableStatus <- "Solution is infeasible"
-  else if(solverStatus %in% c(111,112))
-    humanReadableStatus <- "Memory limit"
-  else if(solverStatus %in% c(107,108))
-    humanReadableStatus <- "Time limit"
-  else if(solverStatus %in% c(6,118))
-    humanReadableStatus <- "No unbounded solution"
   
   if (!error){
     lambda <- solution[varnames=="lambda"]
@@ -358,9 +349,9 @@ MRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks,
       }
     }
     
-    return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances, solverStatus = solverStatus, humanReadableStatus = humanReadableStatus))  
+    return(list(lambda = lambda, weights = weights, profilesPerformances = profilesPerformances, vetoPerformances = vetoPerformances, solverStatus = solverStatus))  
   } else
   {
-    return(list(solverStatus = solverStatus, humanReadableStatus = humanReadableStatus))
+    return(list(solverStatus = solverStatus))
   }
 }

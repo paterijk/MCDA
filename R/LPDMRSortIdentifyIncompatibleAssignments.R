@@ -215,11 +215,9 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
     else
       stop(out)
     
-    solverStatus <- cplexAPI::getStatCPLEX(env,prob)
-    
     error <- TRUE
     
-    if ((cplexAPI::getStatCPLEX(env,prob) == 101) | (cplexAPI::getStatCPLEX(env,prob) == 102)){
+    if (cplexAPI::getStatCPLEX(env,prob) %in% c(1,5,15,17,19,20,101,102,115,121,123,125,129,130)){
       solution <- cplexAPI::solutionCPLEX(env,prob)$x
       
       varnames <- cplexAPI::getColNameCPLEX(env,prob, 0,length(solution)-1)
@@ -233,8 +231,6 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
   } else if (solver == "glpk"){
     
     solveMIPGLPK(lp)
-    
-    solverStatus <- mipStatusGLPK(lp)
     
     if(mipStatusGLPK(lp)==5){
       
@@ -390,11 +386,11 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
           else
             stop(out)
           
-          solverStatus <- cplexAPI::getStatCPLEX(env,prob)
           
           error <- TRUE
           
-          if ((cplexAPI::getStatCPLEX(env,prob) == 101) | (cplexAPI::getStatCPLEX(env,prob) == 102)){
+          if (cplexAPI::getStatCPLEX(env,prob) %in% c(1,5,15,17,19,20,101,102,115,121,123,125,129,130)){
+            
             solution <- cplexAPI::solutionCPLEX(env,prob)$x
             
             varnames <- cplexAPI::getColNameCPLEX(env,prob, 0,length(solution)-1)
@@ -408,8 +404,6 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
         } else if (solver == "glpk"){
           
           solveMIPGLPK(lp)
-          
-          solverStatus <- mipStatusGLPK(lp)
           
           error <- TRUE
           
@@ -464,9 +458,9 @@ LPDMRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignmen
       incompatibleSetSize <- incompatibleSetSize + 1
     }
     
-    return(list(incompatibleSets = incompatibleSets, status = 1))
+    return(list(incompatibleSets = incompatibleSets, solverStatus = 'Success'))
     
   }
   else
-    return(list(status = 0))
+    return(list(solverStatus = 'Failed'))
 }
