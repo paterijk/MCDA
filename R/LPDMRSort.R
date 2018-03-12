@@ -83,42 +83,38 @@ LPDMRSort <- function(performanceTable, categoriesLowerProfiles, categoriesRanks
   ## filter the data according to the given alternatives and criteria
   
   if (!is.null(alternativesIDs)){
-    performanceTable <- performanceTable[alternativesIDs,]
+    performanceTable <- performanceTable[alternativesIDs,,drop=FALSE]
   } 
   
   if (!is.null(criteriaIDs)){
-    performanceTable <- performanceTable[,criteriaIDs]
-    criteriaWeights <- criteriaWeights[criteriaIDs]
-    criteriaMinMax <- criteriaMinMax[criteriaIDs]
-    categoriesLowerProfiles <- categoriesLowerProfiles[,criteriaIDs]
+    performanceTable <- performanceTable[,criteriaIDs,drop=FALSE]
+    criteriaWeights <- criteriaWeights[criteriaIDs,drop=FALSE]
+    criteriaMinMax <- criteriaMinMax[criteriaIDs,drop=FALSE]
+    categoriesLowerProfiles <- categoriesLowerProfiles[,criteriaIDs,drop=FALSE]
   }
   
   if ((!is.null(criteriaIDs)) && (!is.null(criteriaVetos))){
-    criteriaVetos <- criteriaVetos[,criteriaIDs]  
+    criteriaVetos <- criteriaVetos[,criteriaIDs,drop=FALSE] 
   }
   
   if ((!is.null(criteriaIDs)) && (!is.null(criteriaDictators))){
-    criteriaDictators <- criteriaDictators[,criteriaIDs]  
+    criteriaDictators <- criteriaDictators[,criteriaIDs,drop=FALSE]
   }
   
   if ((!is.null(categoriesIDs)) && (!is.null(criteriaVetos))){
-    criteriaVetos <- criteriaVetos[categoriesIDs,]
+    criteriaVetos <- criteriaVetos[categoriesIDs,,drop=FALSE]
   }
     
   if (!is.null(categoriesIDs)){
-    categoriesLowerProfiles <- categoriesLowerProfiles[categoriesIDs,]
+    categoriesLowerProfiles <- categoriesLowerProfiles[categoriesIDs,,drop=FALSE]
   }
   
   if ((!is.null(categoriesIDs)) && (!is.null(criteriaDictators))){
-    criteriaDictators <- criteriaDictators[categoriesIDs,]
+    criteriaDictators <- criteriaDictators[categoriesIDs,,drop=FALSE]
   }  
   
   # data is filtered, check for some data consistency
   
-  # if there are less than 2 criteria or 2 alternatives, there is no MCDA problem
-  
-  if (is.null(dim(performanceTable))) 
-    stop("less than 2 criteria or 2 alternatives")
   
   if (!is.null(categoriesIDs)){
     # filter out categories
