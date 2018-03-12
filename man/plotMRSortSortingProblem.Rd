@@ -12,7 +12,7 @@ plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles,
                          categoriesDictators = NULL, categoriesVetoes = NULL,
                          majorityRule = NULL, criteriaWeights = NULL, 
                          majorityThreshold = NULL, alternativesIDs = NULL,
-                         criteriaIDs = NULL)
+                         criteriaIDs = NULL, legendRatio = 0.2)
 }
 
 \arguments{
@@ -33,6 +33,7 @@ plotMRSortSortingProblem(performanceTable, categoriesLowerProfiles,
   \item{majorityThreshold}{A value corresponding to the majority threshold. Along with the criteria weights, this value is used to determine when a coalition of criteria is sufficient in order to assert that an alternative is at least as good as a category profile.}
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
+  \item{legendRatio}{The ratio between the legend and plot heights. By defaut 0.2.}
 }
   
 \examples{

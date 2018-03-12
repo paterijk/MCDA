@@ -1,4 +1,4 @@
-plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, categoriesRanks, assignments, criteriaMinMax, criteriaUBs, criteriaLBs, categoriesDictators = NULL, categoriesVetoes = NULL, majorityRule = NULL, criteriaWeights = NULL, majorityThreshold = NULL, alternativesIDs = NULL, criteriaIDs = NULL){
+plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, categoriesRanks, assignments, criteriaMinMax, criteriaUBs, criteriaLBs, categoriesDictators = NULL, categoriesVetoes = NULL, majorityRule = NULL, criteriaWeights = NULL, majorityThreshold = NULL, alternativesIDs = NULL, criteriaIDs = NULL, legendRatio = 0.2){
   
   ## check the input data
   
@@ -228,7 +228,7 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
   
   ylim=c(-0.1, 1.1)
   
-  layout(matrix(c(1:(numCat-1),rep(numCat,numCat-1)),2,numCat-1, byrow = TRUE), widths = rep(1,numCat-1), heights = c(7,1))
+  layout(matrix(c(1:(numCat-1),rep(numCat,numCat-1)),2,numCat-1, byrow = TRUE), widths = rep(1,numCat-1), heights = c(1,legendRatio))
   
   par(mar=c(2, 2, 6, 2))
   
@@ -295,16 +295,21 @@ plotMRSortSortingProblem <- function(performanceTable, categoriesLowerProfiles, 
   {
     if(!is.null(performanceTable))
     {
-      legend("center", c(paste("majorityThreshold =",majorityThreshold,'  '),rownames(performanceTable)), cex=1.0, col=c('black',col.alt.lines), 
-         lwd=2, bty="n",pch=c(NA,rep(NA,numAlt)), lty = c(0,rep(2,numAlt)), ncol = 4)
-      legend("center", c(paste("majorityThreshold =",majorityThreshold,'  '),rownames(performanceTable)), cex=1.0, col=c('black',col.alt.markers), 
-             lwd=2, bty="n",pch=c(NA,rep(c(0,2,5,3,4),floor(numAlt/5) + 1)[1:numAlt]), lty = c(0,rep(0,numAlt)), ncol = 4)
+      legend("left", c(paste("majorityThreshold =",majorityThreshold,'  '),rownames(performanceTable),names(col.cat)), cex=1.0, col=c('black',col.alt.lines,col.cat), 
+         lwd=2, bty="n",pch=c(NA,rep(NA,numAlt),rep(NA,numCat)), lty = c(0,rep(2,numAlt),rep(1,numCat)), ncol = 4)
+      legend("left", c(paste("majorityThreshold =",majorityThreshold,'  '),rownames(performanceTable),names(col.cat)), cex=1.0, col=c('black',col.alt.markers,col.cat), 
+             lwd=2, bty="n",pch=c(NA,rep(c(0,2,5,3,4),floor(numAlt/5) + 1)[1:numAlt],rep(NA,numCat)), lty = c(0,rep(0,numAlt+numCat)), ncol = 4)
     }
     else
-      legend("center", c(paste("majorityThreshold =",majorityThreshold,'  ')), cex=1.2, col=c('black'), 
-             lwd=2, bty="n",pch=c('.'), lty = c(0), horiz = TRUE)
+      legend("left", c(paste("majorityThreshold =",majorityThreshold,'  '),names(col.cat)), cex=1.0, col=c('black',col.cat), 
+             lwd=2, bty="n",pch=rep(NA,numCat+1), lty = c(0,rep(1,numCat)), ncol = 4)
   }
   else
-    legend("center", c(rownames(performanceTable),rownames(categoriesLowerProfiles)), cex=0.8, col=c(col.alt.lines,col.cat), 
-           lwd=2, bty="n",pch=c(mrk.cat[assignments],rep('.',numCat)), lty = c(rep(1,numAlt),rep(1,numCat)), horiz = TRUE)
+  {
+    if(!is.null(performanceTable))
+    {
+      legend("left", c(rownames(performanceTable),names(col.cat)), cex=1.0, col=c(col.alt.lines,col.cat), 
+         lwd=2, bty="n",pch=c(rep(c(0,2,5,3,4),floor(numAlt/5) + 1)[1:numAlt],rep(NA,numCat)), lty = c(0,rep(2,numAlt+numCat)), ncol = 4)
+    }
+  }
 }
