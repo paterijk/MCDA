@@ -62,8 +62,10 @@ maximize obj: sum{i in 1..F}delta[i];
 /* normalized weights */
 s.t. normalisedWeights: sum{i in 1..F} w[i] = 1;
 /* constrain profile values */
-s.t. bottomP{i in 1..F}: PTk[K+1,i] = (Fmax[i] + gamma) * (1 - Fdir[i]) / 2 + (Fmin[i] - gamma) * (Fdir[i] + 1) / 2;
-s.t. topP{i in 1..F}: PTk[1,i] = (Fmax[i] + gamma) * (Fdir[i] + 1) / 2 + (Fmin[i] - gamma) * (1 - Fdir[i]) / 2;
+s.t. bottomP1{i in 1..F}: PTk[1,i] >= Fmin[i];
+s.t. bottomP2{i in 1..F}: Fmax[i] >= PTk[1,i];
+s.t. topP1{i in 1..F}: Fmax[i] >= PTk[K+1,i];
+s.t. topP2{i in 1..F}: PTk[K+1,i] >= Fmin[i];
 s.t. bottomD{i in 1..F}: PTd[K+1,i] = PTk[K+1,i];
 s.t. topD{i in 1..F}: PTd[1,i] = PTk[1,i] + Fdir[i] * gamma;
 /* constraints on the local concordance */

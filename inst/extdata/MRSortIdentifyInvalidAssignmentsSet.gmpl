@@ -56,8 +56,10 @@ minimize obj: 0;
 /* normalized weights */
 s.t. normalisedWeights: sum{i in 1..F} w[i] = 1;
 /* constrain profile values */
-s.t. bottomP{i in 1..F}: PTk[K+1,i] = (Fmax[i] + gamma) * (1 - Fdir[i]) / 2 + (Fmin[i] - gamma) * (Fdir[i] + 1) / 2;
-s.t. topP{i in 1..F}: PTk[1,i] = (Fmax[i] + gamma) * (Fdir[i] + 1) / 2 + (Fmin[i] - gamma) * (1 - Fdir[i]) / 2;
+s.t. bottomP1{i in 1..F}: PTk[1,i] >= Fmin[i];
+s.t. bottomP2{i in 1..F}: Fmax[i] >= PTk[1,i];
+s.t. topP1{i in 1..F}: Fmax[i] >= PTk[K+1,i];
+s.t. topP2{i in 1..F}: PTk[K+1,i] >= Fmin[i];
 /* constraints on the local concordance */
 s.t. lCupp1{x in 1..X, i in 1.. F}: Fdir[i] * (PTx[x,i] - PTk[A[x],i]) + gamma <= lCupp[x,i] * (Fmax[i] - Fmin[i] + 1);
 s.t. lCupp2{x in 1..X, i in 1.. F}: (lCupp[x,i] - 1) * (Fmax[i] - Fmin[i] + 1) <= Fdir[i] * (PTx[x,i] - PTk[A[x],i]);
