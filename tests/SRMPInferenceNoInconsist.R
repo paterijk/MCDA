@@ -23,7 +23,7 @@ expectedValues <- c(10,7,13,3,5,1,10,7,13,4,6,2,14,12,8,15,11,9,4,6,2,6,2,4)
 
 names(expectedValues) <- rownames(performanceTable)
 
-altIDs <- c("a4","a5","a6","a7","a8","a9","a13","a14","a15","a16","a17","a18","a19","a21","a22","a23","a24")
+altIDs <- c("a1","a3","a7","a9","a13","a14","a15","a16","a17","a18")
 
 expectedValues <- expectedValues[altIDs]
 
