@@ -41,6 +41,7 @@ Ranking Method based on Multiple Reference Profiles, forthcoming 2018.
 }
 
 \examples{
+\dontrun{
 # the performance table
 
 performanceTable <- rbind(c(10,10,9),c(10,9,10),c(9,10,10),c(9,9,10),c(9,10,9),c(10,9,9),
@@ -60,7 +61,7 @@ names(criteriaMinMax) <- colnames(performanceTable)
 
 # expected result for the tests below
 
-expectedpreorder <- list("a16","a13",c("a3","a9"),"a14","a17",c("a1","a7"),"a18","a15")
+expectedpreorder <- list("a16","a13",c("a3","a9"),"a14",c("a1","a7"),"a15")
 
 # test - preferences and indifferences
 
@@ -76,8 +77,8 @@ set.seed(1)
 result<-SRMPInferenceApproxFixedProfilesNumber(performanceTable, criteriaMinMax, 3,
                                                preferencePairs, indifferencePairs,
                                                alternativesIDs = c("a1","a3","a7","a9",
-                                               "a13","a14","a15","a16","a17","a18"))
+                                               "a13","a14","a15","a16"))
 
-}
+}}
 \keyword{methods}
 %\keyword{ ~~ other possible keyword(s)}
