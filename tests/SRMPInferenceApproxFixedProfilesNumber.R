@@ -2,16 +2,25 @@
 
 library(MCDA)
 
+# fix seed
+
+set.seed(1234)
+
+# SRMP model
+
+referenceProfiles <- replicate(3, c(0.2,0.5,0.8))
+
+lexicographicOrder <- c(2,1,3)
+
+weights <- c(0.2,0.44,0.36)
+
 # the performance table
 
-performanceTable <- rbind(c(10,10,9),c(10,9,10),c(9,10,10),c(9,9,10),c(9,10,9),c(10,9,9),
-                          c(10,10,7),c(10,7,10),c(7,10,10),c(9,9,17),c(9,17,9),c(17,9,9),
-                          c(7,10,17),c(10,17,7),c(17,7,10),c(7,17,10),c(17,10,7),c(10,7,17),
-                          c(7,9,17),c(9,17,7),c(17,7,9),c(7,17,9),c(17,9,7),c(9,7,17))
+performanceTable <- replicate(3, runif(5)) 
 
 criteriaMinMax <- c("max","max","max")
 
-rownames(performanceTable) <- c("a1","a2","a3","a4","a5","a6","a7","a8","a9","a10","a11","a12","a13","a14","a15","a16","a17","a18","a19","a20","a21","a22","a23","a24")
+rownames(performanceTable) <- c("a1","a2","a3","a4","a5")
 
 colnames(performanceTable) <- c("c1","c2","c3")
 
@@ -19,27 +28,36 @@ names(criteriaMinMax) <- colnames(performanceTable)
 
 # expected result for the tests below
 
-expectedValues <- c(10,7,13,3,5,1,10,7,13,4,6,2,14,12,8,15,11,9,4,6,2,6,2,4)
+expectedValues <- SRMP(performanceTable, referenceProfiles, lexicographicOrder, weights, criteriaMinMax)
 
 names(expectedValues) <- rownames(performanceTable)
 
-altIDs <- c("a1","a3","a7","a9","a13","a14","a15","a16","a17","a18")
-
-expectedValues <- expectedValues[altIDs]
-
-expectedValues <- expectedValues - min(expectedValues) + 1
-
 # test - preferences and indifferences
 
-preferencePairs <- matrix(c("a16","a13","a3","a14","a17","a1","a18","a15","a2","a11","a5","a10","a4","a12",
-                            "a13","a3","a14","a17","a1","a18","a15","a2","a11","a5","a10","a4","a12","a6"),14,2)
-indifferencePairs <- matrix(c("a3","a1","a2","a11","a11","a20","a10","a10","a19","a12","a12","a21",
-                              "a9","a7","a8","a20","a22","a22","a19","a24","a24","a21","a23","a23"),12,2)
+preferencePairs <- c()
+indifferencePairs <- c()
 
-set.seed(1)
+for(i in 1:4)
+{
+  for(j in (i+1):5)
+  {
+    if(expectedValues[[i]] > expectedValues[[j]])
+    {
+      preferencePairs <- rbind(preferencePairs, c(rownames(performanceTable)[i],rownames(performanceTable)[j]))
+    }
+    else if(expectedValues[[i]] < expectedValues[[j]])
+    {
+      preferencePairs <- rbind(preferencePairs, c(rownames(performanceTable)[j],rownames(performanceTable)[i]))
+    }
+    else
+    {
+      indifferencePairs <- rbind(indifferencePairs, c(rownames(performanceTable)[i],rownames(performanceTable)[j]))
+    }
+  }
+}
 
-result<-SRMPInferenceApproxFixedProfilesNumber(performanceTable, criteriaMinMax, 3, preferencePairs, indifferencePairs, alternativesIDs = altIDs)
+result<-SRMPInferenceApproxFixedProfilesNumber(performanceTable, criteriaMinMax, 3, preferencePairs, indifferencePairs)
 
-alternativesValues<-SRMP(performanceTable, result$referenceProfiles, result$lexicographicOrder, result$criteriaWeights, criteriaMinMax, alternativesIDs = altIDs)
+alternativesValues<-SRMP(performanceTable, result$referenceProfiles, result$lexicographicOrder, result$criteriaWeights, criteriaMinMax)
 
 stopifnot(all(alternativesValues == expectedValues))
