@@ -216,18 +216,18 @@ SRMPInferenceApprox <- function(performanceTable, criteriaMinMax, maxProfilesNum
             colnames(profiles1) <- colnames(performanceTable)
             colnames(profiles2) <- colnames(performanceTable)
             
-            for(k in 1:k)
+            for(l in 1:k)
               for(j in 1:numCrit)
               {
                 if(j <= pivot)
                 {
-                  profiles1[k,criteria[j]] <- parent1$referenceProfiles[k,criteria[j]]
-                  profiles2[k,criteria[j]] <- parent2$referenceProfiles[k,criteria[j]]
+                  profiles1[l,criteria[j]] <- parent1$referenceProfiles[l,criteria[j]]
+                  profiles2[l,criteria[j]] <- parent2$referenceProfiles[l,criteria[j]]
                 }
                 else
                 {
-                  profiles1[k,criteria[j]] <- parent2$referenceProfiles[k,criteria[j]]
-                  profiles2[k,criteria[j]] <- parent1$referenceProfiles[k,criteria[j]]
+                  profiles1[l,criteria[j]] <- parent2$referenceProfiles[l,criteria[j]]
+                  profiles2[l,criteria[j]] <- parent1$referenceProfiles[l,criteria[j]]
                 }
               }
             
@@ -299,17 +299,9 @@ SRMPInferenceApprox <- function(performanceTable, criteriaMinMax, maxProfilesNum
       {
         # mutate profiles number - decide whether we add or remove a profile
         
-        add <- c(FALSE,TRUE)
-        
-        if(children[[i]]$referenceProfilesNumber == maxProfilesNumber)
-          add <- c(FALSE)
-        
-        if(children[[i]]$referenceProfilesNumber == 1)
-          add <- c(TRUE)
-        
         # pick whether we add or remove a profile
         
-        if(sample(add, 1))
+        if(sample(c(FALSE,TRUE), 1) && !(children[[i]]$referenceProfilesNumber == maxProfilesNumber))
         {
           # adding a new profile
           
@@ -383,7 +375,7 @@ SRMPInferenceApprox <- function(performanceTable, criteriaMinMax, maxProfilesNum
           else
             children[[i]]$lexicographicOrder <- c(children[[i]]$lexicographicOrder[1:(i1-1)],k,children[[i]]$lexicographicOrder[i1:(children[[i]]$referenceProfilesNumber-1)])
         }
-        else
+        else if(!(children[[i]]$referenceProfilesNumber == 1))
         {
           # removing a profile
           
