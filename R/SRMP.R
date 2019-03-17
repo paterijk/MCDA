@@ -78,16 +78,16 @@ SRMP <- function(performanceTable, referenceProfiles, lexicographicOrder, criter
       {
         if (criteriaMinMax[i] == "min")
         {
-          if (alternativePerformances1[i] %<=% profilePerformances[k,i])
+          if (alternativePerformances1[[i]] %<=% profilePerformances[k,i])
             weightedSum1 = weightedSum1 + criteriaWeights[i]
-          if (alternativePerformances2[i] %<=% profilePerformances[k,i])
+          if (alternativePerformances2[[i]] %<=% profilePerformances[k,i])
             weightedSum2 = weightedSum2 + criteriaWeights[i]
         }
         else
         {
-          if (alternativePerformances1[i] %>=% profilePerformances[k,i])
+          if (alternativePerformances1[[i]] %>=% profilePerformances[k,i])
             weightedSum1 = weightedSum1 + criteriaWeights[i]
-          if (alternativePerformances2[i] %>=% profilePerformances[k,i])
+          if (alternativePerformances2[[i]] %>=% profilePerformances[k,i])
             weightedSum2 = weightedSum2 + criteriaWeights[i]
         }
       }
