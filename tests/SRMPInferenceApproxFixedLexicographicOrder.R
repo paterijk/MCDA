@@ -16,11 +16,11 @@ weights <- c(0.2,0.44,0.36)
 
 # the performance table
 
-performanceTable <- replicate(3, runif(5)) 
+performanceTable <- replicate(3, runif(3)) 
 
 criteriaMinMax <- c("max","max","max")
 
-rownames(performanceTable) <- c("a1","a2","a3","a4","a5")
+rownames(performanceTable) <- c("a1","a2","a3")
 
 colnames(performanceTable) <- c("c1","c2","c3")
 
