@@ -37,9 +37,9 @@ names(expectedValues) <- rownames(performanceTable)
 preferencePairs <- c()
 indifferencePairs <- c()
 
-for(i in 1:4)
+for(i in 1:2)
 {
-  for(j in (i+1):5)
+  for(j in (i+1):3)
   {
     if(expectedValues[[i]] > expectedValues[[j]])
     {
