@@ -48,7 +48,7 @@ Ranking Method based on Multiple Reference Profiles, forthcoming 2018.
 }
 
 \examples{
-\dontrun{
+\donttest{
 # the performance table
 
 performanceTable <- rbind(c(10,10,9),c(10,9,10),c(9,10,10),c(9,9,10),c(9,10,9),c(10,9,9),

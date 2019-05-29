@@ -45,7 +45,7 @@ no reference yet for the algorithmic approach; one should become available in 20
 }
 
 \examples{
-\dontrun{
+\donttest{
 performanceTable <- rbind(c(10,10,9), c(10,9,10), c(9,10,10), c(9,9,10), c(9,10,9), c(10,9,9),
                           c(10,10,7), c(10,7,10), c(7,10,10), c(9,9,17), c(9,17,9), c(17,9,9),
                           c(7,10,17), c(10,17,7), c(17,7,10), c(7,17,10), c(17,10,7), c(10,7,17),
