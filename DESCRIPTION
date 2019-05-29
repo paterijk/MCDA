@@ -1,10 +1,10 @@
 Package: MCDA
-Version: 0.0.18
-Date: 2017-12-20
-Title: Functions to Support the Multicriteria Decision Aiding Process
+Version: 0.0.20
+Date: 2019-05-29
+Title: Support for the Multicriteria Decision Aiding Process
 Author: Patrick Meyer, Sébastien Bigaret, Richard Hodgett, Alexandru-Liviu Olteanu
-Maintainer: Patrick Meyer <patrick.meyer@telecom-bretagne.eu>
-Description: Functions which can be useful to support the analyst in the Multicriteria Decision Aiding (MCDA) process involving multiple, conflicting criteria. 
+Maintainer: Patrick Meyer <patrick.meyer@imt-atlantique.fr>
+Description: Helps the analyst in a Multicriteria Decision Aiding (MCDA) process with algorithms, preference elicitation and data visualisation functions. S. Bigaret, R.E. Hodgett, P. Meyer, R. Mironova, A.L. Olteanu (2017) Supporting the multi-criteria decision aiding process : R and the MCDA package, Euro Journal On Decision Processes, Volume 5, Issue 1 - 4, pp. 169 - 194 <doi:10.1007/s40070-017-0064-1>
 Imports: Rglpk, glpkAPI, methods, RColorBrewer, combinat
 Suggests: Rgraphviz, cplexAPI
 License: EUPL (== 1.1)
