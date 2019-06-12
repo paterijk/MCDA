@@ -603,7 +603,7 @@ LPDMRSortInferenceApprox <- function(performanceTable, criteriaMinMax, categorie
     {
       ct <- ct + 1
       
-      print(sprintf("Best fitness so far: %6.2f%%", bestIndividual$fitness * 100))
+      # print(sprintf("Best fitness so far: %6.2f%%", bestIndividual$fitness * 100))
     }
     
     # check if we are done
@@ -647,7 +647,7 @@ LPDMRSortInferenceApprox <- function(performanceTable, criteriaMinMax, categorie
     population <- Reproduce(population)
   }
   
-  print(sprintf("Final model fitness: %6.2f%%", bestIndividual$fitness * 100))
+  # print(sprintf("Final model fitness: %6.2f%%", bestIndividual$fitness * 100))
   
   # add dummy profiles
   

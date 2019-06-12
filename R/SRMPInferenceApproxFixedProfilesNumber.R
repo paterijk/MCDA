@@ -393,7 +393,7 @@ SRMPInferenceApproxFixedProfilesNumber <- function(performanceTable, criteriaMin
     {
       ct <- ct + 1
       
-      print(sprintf("Best fitness so far: %6.2f%%", bestIndividual$fitness * 100))
+      # print(sprintf("Best fitness so far: %6.2f%%", bestIndividual$fitness * 100))
     }
     
     # check if we are done
@@ -434,7 +434,7 @@ SRMPInferenceApproxFixedProfilesNumber <- function(performanceTable, criteriaMin
     population <- Reproduce(population)
   }
   
-  print(sprintf("Final model fitness: %6.2f%%", bestIndividual$fitness * 100))
+  # print(sprintf("Final model fitness: %6.2f%%", bestIndividual$fitness * 100))
   
   return(bestIndividual)
 }

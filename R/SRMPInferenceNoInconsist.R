@@ -54,9 +54,9 @@ SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfil
     }
   }
   
-  print(preferencePairs)
+  # print(preferencePairs)
   
-  print(indifferencePairs)
+  # print(indifferencePairs)
   
   if (!is.null(criteriaIDs)){
     performanceTable <- performanceTable[,criteriaIDs]

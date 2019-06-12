@@ -467,7 +467,7 @@ MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks
     {
       ct <- ct + 1
       
-      print(sprintf("Best fitness so far: %6.2f%%", bestIndividual$fitness * 100))
+      # print(sprintf("Best fitness so far: %6.2f%%", bestIndividual$fitness * 100))
     }
     
     # check if we are done
@@ -511,7 +511,7 @@ MRSortInferenceApprox <- function(performanceTable, assignments, categoriesRanks
     population <- Reproduce(population)
   }
   
-  print(sprintf("Final model fitness: %6.2f%%", bestIndividual$fitness * 100))
+  # print(sprintf("Final model fitness: %6.2f%%", bestIndividual$fitness * 100))
   
   # add dummy profiles
   
