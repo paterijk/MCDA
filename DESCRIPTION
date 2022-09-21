@@ -1,6 +1,6 @@
 Package: MCDA
-Version: 0.0.21
-Date: 2021-04-05
+Version: 0.0.22
+Date: 2022-09-20
 Title: Support for the Multicriteria Decision Aiding Process
 Author: Patrick Meyer, Sébastien Bigaret, Richard Hodgett, Alexandru-Liviu Olteanu
 Maintainer: Patrick Meyer <patrick.meyer@imt-atlantique.fr>
@@ -9,7 +9,7 @@ Description: Support for the analyst in a Multicriteria Decision Aiding (MCDA) p
     Tatyana Mironova, Alexandru Olteanu (2017) Supporting the multi-criteria decision aiding process : 
     R and the MCDA package, Euro Journal On Decision Processes, Volume 5, Issue 1 - 4, 
     pages 169 - 194 <doi:10.1007/s40070-017-0064-1>.
-Imports: Rglpk, glpkAPI, methods, RColorBrewer, combinat
+Imports: Rglpk, glpkAPI, methods, RColorBrewer, combinat, triangle, plyr, ggplot2
 Suggests: Rgraphviz, cplexAPI
 License: EUPL (== 1.1)
 Encoding: UTF-8

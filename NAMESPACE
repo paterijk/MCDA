@@ -6,6 +6,10 @@ importFrom("graphics", "arrows", "axis", "layout", "legend", "lines","par", "plo
 importFrom("stats", "runif")
 importFrom("methods", "new")
 importFrom("stats", "cor")
+importFrom("utils", "stack")
+import(triangle)
+import(plyr)
+import(ggplot2)
 import(glpkAPI)
 import(RColorBrewer)
 import(combinat)
@@ -43,6 +47,7 @@ export(
   "SRMPInferenceNoInconsist",
   "SRMPInferenceNoInconsistFixedLexicographicOrder",
   "SRMPInferenceNoInconsistFixedProfilesNumber",
+  "SURE",
   "TOPSIS",
   "UTA",
   "UTASTAR",
@@ -57,6 +62,7 @@ export(
   "plotMRSortSortingProblem",
   "plotPiecewiseLinearValueFunctions",
   "plotRadarPerformanceTable",
-  "plotAlternativesValuesPreorder"
+  "plotAlternativesValuesPreorder",
+  "plotSURE"
 )
 
