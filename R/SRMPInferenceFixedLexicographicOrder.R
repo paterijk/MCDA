@@ -1,4 +1,4 @@
-SRMPInferenceFixedLexicographicOrder <- function(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", timeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
+SRMPInferenceFixedLexicographicOrder <- function(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = NULL){
   
   ## check the input data
   if (!(is.matrix(performanceTable) || is.data.frame(performanceTable))) 
@@ -23,7 +23,7 @@ SRMPInferenceFixedLexicographicOrder <- function(performanceTable, criteriaMinMa
     if(timeLimit <= 1)
       stop("timeLimit should be strictly positive (and ideally above one second)")
   }
-
+  
   if (!(is.null(alternativesIDs) || is.vector(alternativesIDs)))
     stop("alternativesIDs should be a vector")
   
@@ -73,11 +73,11 @@ SRMPInferenceFixedLexicographicOrder <- function(performanceTable, criteriaMinMa
   tempPath <- tempdir()
   
   # get model file depending on function options
-
+  
   modelfilename <- "SRMPMinInconsist.gmpl"
   if(length(indifferencePairs) > 0)
     modelfilename <- "SRMPMinInconsistIndif.gmpl"
-
+  
   modelFile <- system.file("extdata", modelfilename, package="MCDA")
   
   dataFile <- tempfile()
@@ -234,86 +234,36 @@ SRMPInferenceFixedLexicographicOrder <- function(performanceTable, criteriaMinMa
   else 
     stop(return_codeGLPK(out))
   
-  if (solver == "cplex")
-  {
+  
+  
+  if(!is.null(timeLimit))
+    setMIPParmGLPK(TM_LIM, timeLimit * 1000)
+  
+  solveMIPGLPK(lp)
+  
+  solverStatus <- mipStatusGLPK(lp)
+  
+  error <- TRUE
+  
+  if(mipStatusGLPK(lp)==5){
     
-    if (!requireNamespace("cplexAPI", quietly = TRUE)) stop("cplexAPI package could not be loaded")
+    mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
     
-    cplexOutFile <- tempfile()
+    solution <- mipColsValGLPK(lp)
     
-    writeLPGLPK(lp, cplexOutFile)
+    objective <- mipObjValGLPK(lp)
     
-    # Open a CPLEX environment
-    env <- cplexAPI::openEnvCPLEX()
+    varnames <- c()
     
-    # Create a problem object
-    prob <- cplexAPI::initProbCPLEX(env)
+    for (i in 1:length(solution))
+      varnames <- c(varnames,getColNameGLPK(lp,i))
     
-    if (!is.null(timeLimit))
-      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_TILIM,timeLimit*1000)
+    paro <- "["
+    parc <- "]"
     
-    if (!is.null(cplexIntegralityTolerance))
-      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_EPINT,cplexIntegralityTolerance)
-    
-    if (!is.null(cplexThreads))
-      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_THREADS,cplexThreads)
-    
-    # Read MIP problem from cplexOutFile
-    out <- cplexAPI::readCopyProbCPLEX(env, prob, cplexOutFile, ftype = "LP")
-    
-    # solve the problem
-    if (out == 0)
-      cplexAPI::mipoptCPLEX(env,prob)
-    else
-      stop(out)
-    
-    solverStatus <- cplexAPI::getStatCPLEX(env,prob)
-    
-    error <- TRUE
-    
-    if ((cplexAPI::getStatCPLEX(env,prob) == 101) | (cplexAPI::getStatCPLEX(env,prob) == 102)){
-      solution <- cplexAPI::solutionCPLEX(env,prob)$x
-      
-      objective <- cplexAPI::getObjValCPLEX(env,prob)
-      
-      varnames <- cplexAPI::getColNameCPLEX(env,prob, 0,length(solution)-1)
-      
-      paro <- "("
-      parc <- ")"
-      
-      error <- FALSE
-    }
-    
-  } else if (solver == "glpk"){
-    
-    if(!is.null(timeLimit))
-      setMIPParmGLPK(TM_LIM, timeLimit * 1000)
-    
-    solveMIPGLPK(lp)
-    
-    solverStatus <- mipStatusGLPK(lp)
-    
-    error <- TRUE
-    
-    if(mipStatusGLPK(lp)==5){
-      
-      mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
-      
-      solution <- mipColsValGLPK(lp)
-      
-      objective <- mipObjValGLPK(lp)
-      
-      varnames <- c()
-      
-      for (i in 1:length(solution))
-        varnames <- c(varnames,getColNameGLPK(lp,i))
-      
-      paro <- "["
-      parc <- "]"
-      
-      error <- FALSE
-    }
+    error <- FALSE
   }
+  
   
   if (!error){
     

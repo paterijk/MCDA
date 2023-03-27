@@ -1,4 +1,4 @@
-SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", timeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
+SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = NULL){
   
   ## check the input data
   if (!(is.matrix(performanceTable) || is.data.frame(performanceTable))) 
@@ -23,7 +23,7 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
     if(timeLimit <= 1)
       stop("timeLimit should be strictly positive (and ideally above one second)")
   }
-
+  
   if (!(is.null(alternativesIDs) || is.vector(alternativesIDs)))
     stop("alternativesIDs should be a vector")
   
@@ -73,11 +73,11 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
   tempPath <- tempdir()
   
   # get model file depending on function options
-
+  
   modelfilename <- "SRMPNoInconsist.gmpl"
   if(length(indifferencePairs) > 0)
     modelfilename <- "SRMPNoInconsistIndif.gmpl"
-
+  
   modelFile <- system.file("extdata", modelfilename, package="MCDA")
   
   dataFile <- tempfile()
@@ -234,82 +234,34 @@ SRMPInferenceNoInconsistFixedLexicographicOrder <- function(performanceTable, cr
   else 
     stop(return_codeGLPK(out))
   
-  if (solver == "cplex")
-  {
+  
+  
+  if(!is.null(timeLimit))
+    setMIPParmGLPK(TM_LIM, timeLimit * 1000)
+  
+  solveMIPGLPK(lp)
+  
+  solverStatus <- mipStatusGLPK(lp)
+  
+  error <- TRUE
+  
+  if(mipStatusGLPK(lp)==5){
     
-    if (!requireNamespace("cplexAPI", quietly = TRUE)) stop("cplexAPI package could not be loaded")
+    mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
     
-    cplexOutFile <- tempfile()
+    solution <- mipColsValGLPK(lp)
     
-    writeLPGLPK(lp, cplexOutFile)
+    varnames <- c()
     
-    # Open a CPLEX environment
-    env <- cplexAPI::openEnvCPLEX()
+    for (i in 1:length(solution))
+      varnames <- c(varnames,getColNameGLPK(lp,i))
     
-    # Create a problem object
-    prob <- cplexAPI::initProbCPLEX(env)
+    paro <- "["
+    parc <- "]"
     
-    if (!is.null(timeLimit))
-      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_TILIM,timeLimit*1000)
-    
-    if (!is.null(cplexIntegralityTolerance))
-      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_EPINT,cplexIntegralityTolerance)
-    
-    if (!is.null(cplexThreads))
-      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_THREADS,cplexThreads)
-    
-    # Read MIP problem from cplexOutFile
-    out <- cplexAPI::readCopyProbCPLEX(env, prob, cplexOutFile, ftype = "LP")
-    
-    # solve the problem
-    if (out == 0)
-      cplexAPI::mipoptCPLEX(env,prob)
-    else
-      stop(out)
-    
-    solverStatus <- cplexAPI::getStatCPLEX(env,prob)
-    
-    error <- TRUE
-    
-    if ((cplexAPI::getStatCPLEX(env,prob) == 101) | (cplexAPI::getStatCPLEX(env,prob) == 102)){
-      solution <- cplexAPI::solutionCPLEX(env,prob)$x
-      
-      varnames <- cplexAPI::getColNameCPLEX(env,prob, 0,length(solution)-1)
-      
-      paro <- "("
-      parc <- ")"
-      
-      error <- FALSE
-    }
-    
-  } else if (solver == "glpk"){
-    
-    if(!is.null(timeLimit))
-      setMIPParmGLPK(TM_LIM, timeLimit * 1000)
-    
-    solveMIPGLPK(lp)
-    
-    solverStatus <- mipStatusGLPK(lp)
-    
-    error <- TRUE
-    
-    if(mipStatusGLPK(lp)==5){
-      
-      mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
-      
-      solution <- mipColsValGLPK(lp)
-      
-      varnames <- c()
-      
-      for (i in 1:length(solution))
-        varnames <- c(varnames,getColNameGLPK(lp,i))
-      
-      paro <- "["
-      parc <- "]"
-      
-      error <- FALSE
-    }
+    error <- FALSE
   }
+  
   
   if (!error){  
     

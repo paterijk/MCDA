@@ -1,4 +1,4 @@
-SRMPInferenceNoInconsistFixedProfilesNumber <- function(performanceTable, criteriaMinMax, profilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", timeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
+SRMPInferenceNoInconsistFixedProfilesNumber <- function(performanceTable, criteriaMinMax, profilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = NULL){
   
   ## check the input data
   if (!(is.matrix(performanceTable) || is.data.frame(performanceTable))) 
@@ -19,13 +19,13 @@ SRMPInferenceNoInconsistFixedProfilesNumber <- function(performanceTable, criter
   profilesNumber <- as.integer(profilesNumber)
   
   if (!(is.null(timeLimit)))
-      {
-        if(!is.numeric(timeLimit))
-          stop("timeLimit should be numeric")
-        if(timeLimit <= 0)
-          stop("timeLimit should be strictly pozitive")
+  {
+    if(!is.numeric(timeLimit))
+      stop("timeLimit should be numeric")
+    if(timeLimit <= 0)
+      stop("timeLimit should be strictly pozitive")
   }
-
+  
   if (!(is.null(alternativesIDs) || is.vector(alternativesIDs)))
     stop("alternativesIDs should be a vector")
   
@@ -87,7 +87,7 @@ SRMPInferenceNoInconsistFixedProfilesNumber <- function(performanceTable, criter
         return(result)
     }
     
-    result <- SRMPInferenceNoInconsistFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, solver, timeLeft, cplexIntegralityTolerance, cplexThreads)
+    result <- SRMPInferenceNoInconsistFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, timeLeft)
     
     if(result$solverStatus == 5)
       return(list(criteriaWeights = result$criteriaWeights, referenceProfiles = result$referenceProfiles, lexicographicOrder = lexicographicOrder, solverStatus = result$solverStatus, humanReadableStatus = result$humanReadableStatus))

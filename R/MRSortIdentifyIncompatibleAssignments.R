@@ -1,4 +1,4 @@
-MRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto = FALSE, incompatibleSetsLimit = 100, largerIncompatibleSetsMargin = 0, alternativesIDs = NULL, criteriaIDs = NULL, solver = "glpk", cplexIntegralityTolerance = NULL, cplexThreads = NULL){
+MRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, veto = FALSE, incompatibleSetsLimit = 100, largerIncompatibleSetsMargin = 0, alternativesIDs = NULL, criteriaIDs = NULL){
   
   ## check the input data
   if (!((is.matrix(performanceTable) || (is.data.frame(performanceTable))))) 
@@ -179,74 +179,27 @@ MRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments,
     mplBuildProbGLPK(tran,lp)
   else 
     stop(return_codeGLPK(out))
-  if (solver == "cplex")
-  {
+  
+  
+  solveMIPGLPK(lp)
+  
+  error <- TRUE
+  
+  if(mipStatusGLPK(lp)==5){
     
-    if (!requireNamespace("cplexAPI", quietly = TRUE)) stop("cplexAPI package could not be loaded")
+    mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
     
-    cplexOutFile <- tempfile()
+    solution <- mipColsValGLPK(lp)
     
-    writeLPGLPK(lp, cplexOutFile)
+    varnames <- c()
     
-    # Open a CPLEX environment
-    env <- cplexAPI::openEnvCPLEX()
+    for (i in 1:length(solution))
+      varnames <- c(varnames,getColNameGLPK(lp,i))
     
-    # Create a problem object
-    prob <- cplexAPI::initProbCPLEX(env)
+    paro <- "["
+    parc <- "]"
     
-    # if (!is.null(cplexTimeLimit))
-    #   cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_TILIM,cplexTimeLimit)
-    
-    if (!is.null(cplexIntegralityTolerance))
-      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_EPINT,cplexIntegralityTolerance)
-    
-    if (!is.null(cplexThreads))
-      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_THREADS,cplexThreads)
-    
-    # Read MIP problem from cplexOutFile
-    out <- cplexAPI::readCopyProbCPLEX(env, prob, cplexOutFile, ftype = "LP")
-    
-    # solve the problem
-    if (out == 0)
-      cplexAPI::mipoptCPLEX(env,prob)
-    else
-      stop(out)
-    
-    error <- TRUE
-    
-    if (cplexAPI::getStatCPLEX(env,prob) %in% c(1,5,15,17,19,20,101,102,115,121,123,125,129,130)){
-      solution <- cplexAPI::solutionCPLEX(env,prob)$x
-      
-      varnames <- cplexAPI::getColNameCPLEX(env,prob, 0,length(solution)-1)
-      
-      paro <- "("
-      parc <- ")"
-      
-      error <- FALSE
-    }
-    
-  } else if (solver == "glpk"){
-    
-    solveMIPGLPK(lp)
-    
-    error <- TRUE
-    
-    if(mipStatusGLPK(lp)==5){
-      
-      mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
-      
-      solution <- mipColsValGLPK(lp)
-      
-      varnames <- c()
-      
-      for (i in 1:length(solution))
-        varnames <- c(varnames,getColNameGLPK(lp,i))
-      
-      paro <- "["
-      parc <- "]"
-      
-      error <- FALSE
-    }
+    error <- FALSE
   }
   
   if (!error){
@@ -289,7 +242,7 @@ MRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments,
       datacontent2a <- paste(datacontent2a, solution[varnames==paste("OnOff",paro,i,parc,sep="")], sep = " ")
     
     datacontent2b <- paste("param PrevOnOffLimit := \n1\t ", minIncompatibleSetsSize, sep ="")
-
+    
     # iterate through acceptes sizes for incompatible assignment sets
     
     incompatibleSetSize <- minIncompatibleSetsSize
@@ -352,76 +305,29 @@ MRSortIdentifyIncompatibleAssignments <- function(performanceTable, assignments,
         else 
           stop(return_codeGLPK(out))
         
-        if (solver == "cplex")
-        {
+        
+        
+        solveMIPGLPK(lp)
+        
+        error <- TRUE
+        
+        if(mipStatusGLPK(lp)==5){
           
-          if (!requireNamespace("cplexAPI", quietly = TRUE)) stop("cplexAPI package could not be loaded")
+          mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
           
-          cplexOutFile <- tempfile()
+          solution <- mipColsValGLPK(lp)
           
-          writeLPGLPK(lp, cplexOutFile)
+          varnames <- c()
           
-          # Open a CPLEX environment
-          env <- cplexAPI::openEnvCPLEX()
+          for (i in 1:length(solution))
+            varnames <- c(varnames,getColNameGLPK(lp,i))
           
-          # Create a problem object
-          prob <- cplexAPI::initProbCPLEX(env)
+          paro <- "["
+          parc <- "]"
           
-          # if (!is.null(cplexTimeLimit))
-          #   cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_TILIM,cplexTimeLimit)
-          
-          if (!is.null(cplexIntegralityTolerance))
-            cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_EPINT,cplexIntegralityTolerance)
-          
-          if (!is.null(cplexThreads))
-            cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_THREADS,cplexThreads)
-          
-          # Read MIP problem from cplexOutFile
-          out <- cplexAPI::readCopyProbCPLEX(env, prob, cplexOutFile, ftype = "LP")
-          
-          # solve the problem
-          if (out == 0)
-            cplexAPI::mipoptCPLEX(env,prob)
-          else
-            stop(out)
-          
-          error <- TRUE
-          
-          if (cplexAPI::getStatCPLEX(env,prob) %in% c(1,5,15,17,19,20,101,102,115,121,123,125,129,130)){
-            
-            solution <- cplexAPI::solutionCPLEX(env,prob)$x
-            
-            varnames <- cplexAPI::getColNameCPLEX(env,prob, 0,length(solution)-1)
-            
-            paro <- "("
-            parc <- ")"
-            
-            error <- FALSE
-          }
-          
-        } else if (solver == "glpk"){
-          
-          solveMIPGLPK(lp)
-          
-          error <- TRUE
-          
-          if(mipStatusGLPK(lp)==5){
-            
-            mplPostsolveGLPK(tran, lp, sol = GLP_MIP)
-            
-            solution <- mipColsValGLPK(lp)
-            
-            varnames <- c()
-            
-            for (i in 1:length(solution))
-              varnames <- c(varnames,getColNameGLPK(lp,i))
-            
-            paro <- "["
-            parc <- "]"
-            
-            error <- FALSE
-          }
+          error <- FALSE
         }
+        
         
         
         if (!error){

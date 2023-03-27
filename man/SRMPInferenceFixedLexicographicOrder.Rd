@@ -9,9 +9,7 @@
 SRMPInferenceFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicographicOrder,
                                      preferencePairs, indifferencePairs = NULL,
                                      alternativesIDs = NULL, criteriaIDs = NULL,
-                                     solver="glpk", timeLimit = NULL,
-                                     cplexIntegralityTolerance = NULL,
-                                     cplexThreads = NULL)
+                                     timeLimit = NULL)
 }
 
 \arguments{
@@ -26,10 +24,7 @@ SRMPInferenceFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicogra
     \item{indifferencePairs}{A two column matrix containing on each row a pair of alternative names the two alternatives are considered to indifferent with respect to each other.}
   \item{alternativesIDs}{Vector containing IDs of alternatives, according to which the datashould be filtered.}
   \item{criteriaIDs}{Vector containing IDs of criteria, according to which the data should be filtered.}
-  \item{solver}{String specifying if the glpk solver (glpk) should be used, or the cplex (cplex) solver. By default glpk. The cplex solver requires to install the cplex binary and the cplex C API, as well as the cplexAPI R package.}
   \item{timeLimit}{Allows to fix a time limit of the execution, in seconds. By default NULL (which corresponds to no time limit).}
-  \item{cplexIntegralityTolerance}{If the cplex solver is used, allows to fix a tolerance for integrality. By default NULL (which corresponds to the default value of cplex).}
-  \item{cplexThreads}{If the cplex solver is used, allows to set the number of threads for the calculation. By default NULL (which corresponds to the default value of cplex - 1).}
 }
 
 \value{
@@ -37,7 +32,7 @@ SRMPInferenceFixedLexicographicOrder(performanceTable, criteriaMinMax, lexicogra
   \item{criteriaWeights}{The inferred criteria weights.}
   \item{referenceProfiles}{The inferred reference profiles.}
   \item{fitness}{The percentage (0 to 1) of fulfilled pair-wise relations.}
-  \item{solverStatus}{The solver status as given by glpk or cplex.}
+  \item{solverStatus}{The solver status as given by glpk.}
   \item{humanReadableStatus}{A description of the solver status.}
 }
 

@@ -20,6 +20,7 @@ export(
   "AHP",
   "MARE",
   "ELECTREIIIDistillation",
+  "ELECTRE3",
   "LPDMRSort",
   "LPDMRSortIdentifyUsedDictatorProfiles",
   "LPDMRSortIdentifyUsedVetoProfiles",

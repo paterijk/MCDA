@@ -1,4 +1,4 @@
-SRMPInference <- function(performanceTable, criteriaMinMax, maxProfilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", timeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
+SRMPInference <- function(performanceTable, criteriaMinMax, maxProfilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = NULL){
   
   ## check the input data
   if (!(is.matrix(performanceTable) || is.data.frame(performanceTable))) 
@@ -85,7 +85,7 @@ SRMPInference <- function(performanceTable, criteriaMinMax, maxProfilesNumber, p
         return(result)
     }
     
-    result <- SRMPInferenceFixedProfilesNumber(performanceTable, criteriaMinMax, i, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, solver, timeLeft, cplexIntegralityTolerance, cplexThreads)
+    result <- SRMPInferenceFixedProfilesNumber(performanceTable, criteriaMinMax, i, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, timeLeft)
     
     if(result$fitness > bestResult$fitness)
       bestResult <- list(criteriaWeights = result$criteriaWeights, referenceProfilesNumber = i, referenceProfiles = result$referenceProfiles, lexicographicOrder = result$lexicographicOrder, fitness = result$fitness, solverStatus = result$solverStatus, humanReadableStatus = result$humanReadableStatus)

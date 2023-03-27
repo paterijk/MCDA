@@ -1,4 +1,4 @@
-LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, majorityRule = "M", readableWeights = FALSE, readableProfiles = FALSE, minmaxLPD = FALSE, alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", cplexTimeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
+LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRanks, criteriaMinMax, majorityRule = "M", readableWeights = FALSE, readableProfiles = FALSE, minmaxLPD = FALSE, alternativesIDs = NULL, criteriaIDs = NULL){
   
   ## check the input data
   if (!((is.matrix(performanceTable) || (is.data.frame(performanceTable))))) 
@@ -186,57 +186,7 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
   else 
     stop(return_codeGLPK(out))
   
-  if (solver == "cplex")
-  {
-    
-    if (!requireNamespace("cplexAPI", quietly = TRUE)) stop("cplexAPI package could not be loaded")
-    
-    cplexOutFile <- tempfile()
-    
-    writeLPGLPK(lp, cplexOutFile)
-    
-    # Open a CPLEX environment
-    env <- cplexAPI::openEnvCPLEX()
-    
-    # Create a problem object
-    prob <- cplexAPI::initProbCPLEX(env)
-    
-    if (!is.null(cplexTimeLimit))
-      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_TILIM,cplexTimeLimit)
-    
-    if (!is.null(cplexIntegralityTolerance))
-      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_EPINT,cplexIntegralityTolerance)
-    
-    if (!is.null(cplexThreads))
-      cplexAPI::setDblParmCPLEX(env,cplexAPI::CPX_PARAM_THREADS,cplexThreads)
-    
-    # Read MIP problem from cplexOutFile
-    out <- cplexAPI::readCopyProbCPLEX(env, prob, cplexOutFile, ftype = "LP")
-    
-    # solve the problem
-    if (out == 0)
-      cplexAPI::mipoptCPLEX(env,prob)
-    else
-      stop(out)
-    
-    solverStatus <- paste('Failed (',cplexAPI::status_codeCPLEX(env, cplexAPI::getStatCPLEX(env,prob)),')')
-    
-    error <- TRUE
-    
-    if (cplexAPI::getStatCPLEX(env,prob) %in% c(1,5,15,17,19,20,101,102,115,121,123,125,129,130)){
-      solverStatus <- 'Solution found'
-      
-      solution <- cplexAPI::solutionCPLEX(env,prob)$x
-      
-      varnames <- cplexAPI::getColNameCPLEX(env,prob, 0,length(solution)-1)
-      
-      paro <- "("
-      parc <- ")"
-      
-      error <- FALSE
-    }
-    
-  } else if (solver == "glpk"){
+
     
     solveMIPGLPK(lp)
     
@@ -261,7 +211,7 @@ LPDMRSortInferenceExact <- function(performanceTable, assignments, categoriesRan
       
       error <- FALSE
     }
-  }
+  
   
   if (!error){
     

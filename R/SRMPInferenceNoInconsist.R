@@ -1,4 +1,4 @@
-SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, solver="glpk", timeLimit = NULL, cplexIntegralityTolerance = NULL, cplexThreads = NULL){
+SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfilesNumber, preferencePairs, indifferencePairs = NULL, alternativesIDs = NULL, criteriaIDs = NULL, timeLimit = NULL){
   
   ## check the input data
   if (!(is.matrix(performanceTable) || is.data.frame(performanceTable))) 
@@ -89,7 +89,7 @@ SRMPInferenceNoInconsist <- function(performanceTable, criteriaMinMax, maxProfil
         return(result)
     }
     
-    result <- SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMinMax, i, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, solver, timeLeft, cplexIntegralityTolerance, cplexThreads)
+    result <- SRMPInferenceNoInconsistFixedProfilesNumber(performanceTable, criteriaMinMax, i, preferencePairs, indifferencePairs, alternativesIDs, criteriaIDs, timeLeft)
     
     if(result$solverStatus == 5)
       return(list(criteriaWeights = result$criteriaWeights, referenceProfilesNumber = i, referenceProfiles = result$referenceProfiles, lexicographicOrder = result$lexicographicOrder, solverStatus = result$solverStatus, humanReadableStatus = result$humanReadableStatus))
